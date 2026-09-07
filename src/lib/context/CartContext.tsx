@@ -30,7 +30,7 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "hair-luxe-cart";
+const STORAGE_KEY = "zooto-luxe-cart";
 
 function loadCart(): CartItem[] {
   if (typeof window === "undefined") return [];
@@ -60,8 +60,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setItems(loadCart());
     if (typeof window !== "undefined") {
-      const method = localStorage.getItem("hair-luxe-method") as DeliveryMethod | null;
-      const zone = localStorage.getItem("hair-luxe-zone");
+      const method = localStorage.getItem("zooto-luxe-method") as DeliveryMethod | null;
+      const zone = localStorage.getItem("zooto-luxe-zone");
       if (method) setDeliveryMethod(method);
       if (zone) setDeliveryZone(zone);
     }
@@ -75,12 +75,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loaded) return;
-    localStorage.setItem("hair-luxe-method", deliveryMethod);
+    localStorage.setItem("zooto-luxe-method", deliveryMethod);
   }, [deliveryMethod, loaded]);
 
   useEffect(() => {
     if (!loaded) return;
-    localStorage.setItem("hair-luxe-zone", deliveryZone);
+    localStorage.setItem("zooto-luxe-zone", deliveryZone);
   }, [deliveryZone, loaded]);
 
   const addItem = (item: CartItem) => {

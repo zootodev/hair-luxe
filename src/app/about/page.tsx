@@ -68,7 +68,7 @@ export default function AboutPage() {
             <div className="rounded-2xl overflow-hidden border border-gold/20">
               <Image
                 src="https://images.unsplash.com/photo-1560067174-c5a3a8f37060?q=80&w=1200&auto=format&fit=crop"
-                alt="Hair Luxe Studio"
+                alt="Zooto Luxe Studio"
                 width={1200}
                 height={900}
                 className="object-cover w-full h-[420px]"

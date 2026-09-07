@@ -63,7 +63,7 @@ export default function TrackOrderPage() {
               type="text"
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
-              placeholder="HL-2026-0001"
+              placeholder="ZL-2026-0001"
               className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
             />
           </label>
@@ -181,7 +181,7 @@ export default function TrackOrderPage() {
         {!found && (
           <p className="text-center text-xs text-muted mt-6">
             Your Order ID is shown on the checkout confirmation screen (e.g.{" "}
-            <span className="text-gold">HL-2026-0001</span>). Please check your email
+            <span className="text-gold">ZL-2026-0001</span>). Please check your email
             for a copy.
           </p>
         )}

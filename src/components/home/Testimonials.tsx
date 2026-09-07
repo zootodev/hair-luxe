@@ -2,7 +2,7 @@ const testimonials = [
   {
     name: "Adebisi O.",
     location: "Toronto",
-    text: "My custom wig from Hair Luxe is absolutely stunning! The install was seamless and I get compliments everywhere I go. Truly luxury from start to finish.",
+    text: "My custom wig from Zooto Luxe is absolutely stunning! The install was seamless and I get compliments everywhere I go. Truly luxury from start to finish.",
     service: "Wig Making",
   },
   {

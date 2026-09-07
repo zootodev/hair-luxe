@@ -1,7 +1,7 @@
 import { getProductById, products } from "@/lib/data/products";
 import type { CartItem } from "@/lib/types";
 
-const SOLD_KEY = "hair-luxe-sold";
+const SOLD_KEY = "zooto-luxe-sold";
 
 export interface StockRecord {
   productId: string;

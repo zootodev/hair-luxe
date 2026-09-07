@@ -1,13 +1,13 @@
 import type { Order, Booking } from "@/lib/types";
 
-const ORDERS_KEY = "hair-luxe-orders";
-const BOOKINGS_KEY = "hair-luxe-bookings";
+const ORDERS_KEY = "zooto-luxe-orders";
+const BOOKINGS_KEY = "zooto-luxe-bookings";
 
 export function generateOrderId(): string {
   const now = new Date();
   const year = now.getFullYear();
   const count = getOrders().length + 1;
-  return `HL-${year}-${String(count).padStart(4, "0")}`;
+  return `ZL-${year}-${String(count).padStart(4, "0")}`;
 }
 
 export function generateBookingId(): string {

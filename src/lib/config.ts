@@ -1,5 +1,5 @@
 export const BUSINESS = {
-  name: "Hair Luxe",
+  name: "Zooto Luxe",
   tagline: "Where Luxury Meets Hair",
   description:
     "Premium hair services and products. Wigs, hair revamping, makeup, lashes, microblading and more - crafted with elegance.",
@@ -10,7 +10,7 @@ export const BUSINESS = {
   address: "123 Beauty Avenue, Toronto, Ontario, Canada",
   city: "Ontario",
   hours: "Mon - Sat: 9:00 AM - 7:00 PM",
-  instagram: "@hairluxe.ca",
+  instagram: "@zootoluxe.ca",
   deliveryFee: 15,
   freeDeliveryOver: 250,
 };
