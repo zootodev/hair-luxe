@@ -18,7 +18,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold">
-                HL
+                ZL
               </span>
               <span className="font-serif text-xl tracking-wide text-gradient-gold font-semibold">
                 {BUSINESS.name}

@@ -1,4 +1,4 @@
-# Hair Luxe - Premium Hair Business Ecommerce Website
+# Zooto Luxe - Premium Hair Business Ecommerce Website
 
 A modern, luxury-themed ecommerce website for a hair business with Interac e-Transfer payment and EmailJS order notifications.
 
@@ -117,7 +117,7 @@ All business settings live in **`src/lib/config.ts`**:
 
 ```ts
 export const BUSINESS = {
-  name: "Hair Luxe",
+  name: "Zooto Luxe",
   email: "ifeoluwaniolufunmilayo@gmail.com",      // your business email
   phone: "(416) 555-0199",                          // your phone
   interacEmail: "ifeoluwaniolufunmilayo@gmail.com", // Interac e-Transfer recipient

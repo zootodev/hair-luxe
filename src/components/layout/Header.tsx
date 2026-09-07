@@ -43,7 +43,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link href="/" className="flex items-center gap-2 group">
             <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif text-xl font-bold shadow-lg shadow-gold/20">
-              HL
+              ZL
             </span>
             <span className="font-serif text-2xl md:text-3xl tracking-wide text-gradient-gold font-semibold">
               {BUSINESS.name.split(" ")[0]}

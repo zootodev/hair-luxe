@@ -51,7 +51,7 @@ export default function WhyChooseUs() {
           </p>
           <h2 className="font-serif text-3xl sm:text-5xl font-bold mb-4">
             Why Choose {""}
-            <span className="text-gradient-gold">Hair Luxe</span>
+            <span className="text-gradient-gold">Zooto Luxe</span>
           </h2>
         </div>
 
