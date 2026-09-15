@@ -92,9 +92,21 @@ export default function AdminPage() {
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-bold">Order Management</h1>
           </div>
-          <p className="text-xs text-muted">
-            Data stored locally in this browser. Data is cleared with browser history.
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-muted">
+              Data stored locally in this browser. Data is cleared with browser history.
+            </p>
+            <button
+              onClick={() => {
+                fetch("/api/admin/logout", { method: "POST" }).then(() => {
+                  window.location.href = "/";
+                });
+              }}
+              className="px-4 py-2 rounded-full text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors cursor-pointer"
+            >
+              Log out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
