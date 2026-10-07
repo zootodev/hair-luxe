@@ -15,15 +15,26 @@ const FOCUSABLE =
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
+  const onCloseRef = useRef(onClose);
+  const wasOpen = useRef(false);
 
   useEffect(() => {
-    if (!isOpen) return;
+    onCloseRef.current = onClose;
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      wasOpen.current = false;
+      return;
+    }
+    const justOpened = !wasOpen.current;
+    wasOpen.current = true;
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== "Tab" || !panelRef.current) return;
@@ -42,21 +53,25 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       }
     };
 
+    let focusTimer: ReturnType<typeof setTimeout> | undefined;
+    if (justOpened) {
+      focusTimer = setTimeout(() => {
+        panelRef.current?.querySelector<HTMLElement>(
+          'button[aria-label="Close"], input, select, textarea, a[href]'
+        )?.focus();
+      }, 0);
+    }
+
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
-    const focusTimer = window.setTimeout(() => {
-      panelRef.current?.querySelector<HTMLElement>(
-        'button[aria-label="Close"], input, select, textarea, a[href]'
-      )?.focus();
-    }, 0);
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
-      window.clearTimeout(focusTimer);
+      if (focusTimer !== undefined) clearTimeout(focusTimer);
       previouslyFocused?.focus?.();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
