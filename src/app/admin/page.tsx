@@ -211,12 +211,13 @@ export default function AdminPage() {
             <p className="text-yellow-300 leading-relaxed">
               <strong>Persistent storage is not configured yet.</strong> Orders placed now
               are kept only in server memory and may be lost on redeploys. To persist
-              orders/bookings across browsers permanently, add the environment variables{" "}
-              <code className="text-yellow-200">KV_REST_API_URL</code> and{" "}
+              orders/bookings across browsers permanently, add one of:{" "}
+              <code className="text-yellow-200">DATABASE_URL</code> (Supabase Postgres),{" "}
+              <code className="text-yellow-200">KV_REST_API_URL</code> +{" "}
               <code className="text-yellow-200">KV_REST_API_TOKEN</code> (Vercel KV /
-              Upstash) - or{" "}
-              <code className="text-yellow-200">UPSTASH_REDIS_REST_URL</code> and{" "}
-              <code className="text-yellow-200">UPSTASH_REDIS_REST_TOKEN</code> - through{" "}
+              Upstash), or{" "}
+              <code className="text-yellow-200">UPSTASH_REDIS_REST_URL</code> +{" "}
+              <code className="text-yellow-200">UPSTASH_REDIS_REST_TOKEN</code> through
               <span className="text-yellow-200">vercel env add</span>.
             </p>
           </div>

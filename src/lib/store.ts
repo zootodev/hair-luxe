@@ -1,4 +1,5 @@
 import type { Order, Booking } from "@/lib/types";
+import { Pool } from "pg";
 
 const ORDERS_KEY = "hl:orders:v1";
 const BOOKINGS_KEY = "hl:bookings:v1";
@@ -24,11 +25,21 @@ function getRestConfig(): { url: string; token: string } | null {
   return url && token ? { url, token } : null;
 }
 
+function getPgUrl(): string | null {
+  const url = (process.env.DATABASE_URL ?? "").trim();
+  return url || null;
+}
+
+function isPostgres(): boolean {
+  return getPgUrl() !== null;
+}
+
 export function storeConfigured(): boolean {
-  return getRestConfig() !== null;
+  return getRestConfig() !== null || getPgUrl() !== null;
 }
 
 export function storeKind(): string {
+  if (process.env.DATABASE_URL) return "Supabase Postgres";
   if (process.env.KV_REST_API_URL) return "Vercel KV";
   if (process.env.UPSTASH_REDIS_REST_URL) return "Upstash Redis";
   return "memory (not persistent)";
@@ -82,32 +93,185 @@ async function persistSold(sold: Record<string, number>): Promise<void> {
   mem.sold = sold;
 }
 
+// ---------- Postgres (Supabase) adapter ----------
+
+let pool: Pool | null = null;
+let pgInitPromise: Promise<void> | null = null;
+
+function pg(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: getPgUrl() ?? undefined,
+      max: 1,
+      ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 8_000,
+      idleTimeoutMillis: 30_000,
+    });
+    pool.on("error", (err) => console.error("[store] pg pool error", err));
+  }
+  return pool;
+}
+
+function pgInit(): Promise<void> {
+  if (!pgInitPromise) {
+    pgInitPromise = pg()
+      .query(`
+        CREATE TABLE IF NOT EXISTS app_meta (
+          key text PRIMARY KEY,
+          value text NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS orders (
+          id text PRIMARY KEY,
+          data jsonb NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS bookings (
+          id text PRIMARY KEY,
+          data jsonb NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT now()
+        );
+        ALTER TABLE app_meta ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+      `)
+      .then(() => undefined)
+      .catch((err) => {
+        pgInitPromise = null;
+        throw err;
+      });
+  }
+  return pgInitPromise;
+}
+
+async function pgGetOrders(): Promise<Order[]> {
+  await pgInit();
+  const result = await pg().query<{ data: Order }>(
+    "SELECT data FROM orders ORDER BY created_at DESC"
+  );
+  return result.rows.map((r) => r.data);
+}
+
+async function pgUpsertOrder(order: Order): Promise<void> {
+  await pgInit();
+  await pg().query(
+    "INSERT INTO orders (id, data) VALUES ($1, $2::jsonb) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data",
+    [order.id, JSON.stringify(order)]
+  );
+}
+
+async function pgGetOrderById(id: string): Promise<Order | undefined> {
+  await pgInit();
+  const result = await pg().query<{ data: Order }>(
+    "SELECT data FROM orders WHERE LOWER(id) = LOWER($1)",
+    [id]
+  );
+  return result.rows[0]?.data;
+}
+
+async function pgDeleteOrder(id: string): Promise<boolean> {
+  await pgInit();
+  const result = await pg().query("DELETE FROM orders WHERE LOWER(id) = LOWER($1)", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+async function pgGetBookings(): Promise<Booking[]> {
+  await pgInit();
+  const result = await pg().query<{ data: Booking }>(
+    "SELECT data FROM bookings ORDER BY created_at DESC"
+  );
+  return result.rows.map((r) => r.data);
+}
+
+async function pgUpsertBooking(booking: Booking): Promise<void> {
+  await pgInit();
+  await pg().query(
+    "INSERT INTO bookings (id, data) VALUES ($1, $2::jsonb) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data",
+    [booking.id, JSON.stringify(booking)]
+  );
+}
+
+async function pgDeleteBooking(id: string): Promise<boolean> {
+  await pgInit();
+  const result = await pg().query("DELETE FROM bookings WHERE LOWER(id) = LOWER($1)", [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+async function pgGetSold(): Promise<Record<string, number>> {
+  await pgInit();
+  const result = await pg().query<{ value: string }>(
+    "SELECT value FROM app_meta WHERE key = 'sold'"
+  );
+  return result.rows[0] ? (JSON.parse(result.rows[0].value) as Record<string, number>) : {};
+}
+
+async function pgSetSold(sold: Record<string, number>): Promise<void> {
+  await pgInit();
+  await pg().query(
+    "INSERT INTO app_meta (key, value) VALUES ('sold', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+    [JSON.stringify(sold)]
+  );
+}
+
+async function pgNextId(key: string): Promise<number> {
+  await pgInit();
+  const result = await pg().query<{ value: number }>(
+    "INSERT INTO app_meta (key, value) VALUES ($1, '1') ON CONFLICT (key) DO UPDATE SET value = (app_meta.value::int + 1)::text RETURNING value::int AS value",
+    [key]
+  );
+  return result.rows[0].value;
+}
+
+// ---------- Public API ----------
+
 export async function getOrders(): Promise<Order[]> {
-  if (storeConfigured()) {
-    try {
+  try {
+    if (isPostgres()) return await pgGetOrders();
+    if (storeConfigured()) {
       const raw = await getString(ORDERS_KEY);
       if (raw != null) return JSON.parse(raw) as Order[];
-    } catch (error) {
-      console.error("[store] failed to read orders", error);
     }
+  } catch (error) {
+    console.error("[store] failed to read orders", error);
   }
   return mem.orders;
 }
 
 export async function getOrderById(id: string): Promise<Order | undefined> {
+  if (isPostgres()) {
+    try {
+      return await pgGetOrderById(id);
+    } catch (error) {
+      console.error("[store] failed to read order", error);
+      return undefined;
+    }
+  }
   const orders = await getOrders();
   return orders.find((o) => o.id.toLowerCase() === id.toLowerCase());
 }
 
 export async function addOrder(order: Order): Promise<void> {
-  const orders = await getOrders();
-  await persistOrders([order, ...orders]);
+  if (isPostgres()) {
+    await pgUpsertOrder(order);
+  } else {
+    const orders = await getOrders();
+    await persistOrders([order, ...orders]);
+  }
+  mem.orders = [order, ...mem.orders];
 }
 
 export async function updateOrderStatus(
   id: string,
   status: Order["status"]
 ): Promise<boolean> {
+  if (isPostgres()) {
+    const order = await getOrderById(id);
+    if (!order) return false;
+    await pgUpsertOrder({ ...order, status });
+    mem.orders = mem.orders.map((o) =>
+      o.id.toLowerCase() === id.toLowerCase() ? { ...o, status } : o
+    );
+    return true;
+  }
   const orders = await getOrders();
   const next = orders.map((o) =>
     o.id.toLowerCase() === id.toLowerCase() ? { ...o, status } : o
@@ -118,6 +282,13 @@ export async function updateOrderStatus(
 }
 
 export async function deleteOrder(id: string): Promise<boolean> {
+  if (isPostgres()) {
+    const removed = await pgDeleteOrder(id);
+    if (removed) {
+      mem.orders = mem.orders.filter((o) => o.id.toLowerCase() !== id.toLowerCase());
+    }
+    return removed;
+  }
   const orders = await getOrders();
   const next = orders.filter((o) => o.id.toLowerCase() !== id.toLowerCase());
   if (next.length === orders.length) return false;
@@ -130,23 +301,36 @@ export async function isOrderIdTaken(id: string): Promise<boolean> {
 }
 
 export async function getBookings(): Promise<Booking[]> {
-  if (storeConfigured()) {
-    try {
+  try {
+    if (isPostgres()) return await pgGetBookings();
+    if (storeConfigured()) {
       const raw = await getString(BOOKINGS_KEY);
       if (raw != null) return JSON.parse(raw) as Booking[];
-    } catch (error) {
-      console.error("[store] failed to read bookings", error);
     }
+  } catch (error) {
+    console.error("[store] failed to read bookings", error);
   }
   return mem.bookings;
 }
 
 export async function addBooking(booking: Booking): Promise<void> {
-  const bookings = await getBookings();
-  await persistBookings([booking, ...bookings]);
+  if (isPostgres()) {
+    await pgUpsertBooking(booking);
+  } else {
+    const bookings = await getBookings();
+    await persistBookings([booking, ...bookings]);
+  }
+  mem.bookings = [booking, ...mem.bookings];
 }
 
 export async function deleteBooking(id: string): Promise<boolean> {
+  if (isPostgres()) {
+    const removed = await pgDeleteBooking(id);
+    if (removed) {
+      mem.bookings = mem.bookings.filter((b) => b.id.toLowerCase() !== id.toLowerCase());
+    }
+    return removed;
+  }
   const bookings = await getBookings();
   const next = bookings.filter((b) => b.id.toLowerCase() !== id.toLowerCase());
   if (next.length === bookings.length) return false;
@@ -155,13 +339,14 @@ export async function deleteBooking(id: string): Promise<boolean> {
 }
 
 export async function getSold(): Promise<Record<string, number>> {
-  if (storeConfigured()) {
-    try {
+  try {
+    if (isPostgres()) return await pgGetSold();
+    if (storeConfigured()) {
       const raw = await getString(SOLD_KEY);
       if (raw != null) return JSON.parse(raw) as Record<string, number>;
-    } catch (error) {
-      console.error("[store] failed to read sold", error);
     }
+  } catch (error) {
+    console.error("[store] failed to read sold", error);
   }
   return mem.sold;
 }
@@ -173,7 +358,12 @@ export async function bumpSold(
   for (const item of items) {
     sold[item.productId] = (sold[item.productId] ?? 0) + item.quantity;
   }
-  await persistSold(sold);
+  if (isPostgres()) {
+    await pgSetSold(sold);
+  } else {
+    await persistSold(sold);
+  }
+  mem.sold = sold;
 }
 
 export async function nextOrderId(requestedId?: string): Promise<string> {
@@ -182,7 +372,9 @@ export async function nextOrderId(requestedId?: string): Promise<string> {
     if (!(await isOrderIdTaken(requestedId))) return requestedId;
   }
   let n: number;
-  if (storeConfigured()) {
+  if (isPostgres()) {
+    n = await pgNextId(ORDER_SEQ_KEY);
+  } else if (storeConfigured()) {
     n = Number(await redis("incr", [ORDER_SEQ_KEY]));
   } else {
     mem.orderSeq = Math.max(mem.orderSeq, mem.orders.length) + 1;
@@ -194,7 +386,9 @@ export async function nextOrderId(requestedId?: string): Promise<string> {
 export async function nextBookingId(): Promise<string> {
   const year = new Date().getFullYear();
   let n: number;
-  if (storeConfigured()) {
+  if (isPostgres()) {
+    n = await pgNextId(BOOKING_SEQ_KEY);
+  } else if (storeConfigured()) {
     n = Number(await redis("incr", [BOOKING_SEQ_KEY]));
   } else {
     mem.bookingSeq = Math.max(mem.bookingSeq, mem.bookings.length) + 1;
