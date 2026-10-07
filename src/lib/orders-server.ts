@@ -35,6 +35,7 @@ export interface CreateOrderResult {
 
 const ORDER_ID_PATTERN = /^HL-\d{4}-\d{4}$/;
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const PAYMENT_PROOF_PATTERN = /^data:image\/(png|jpe?g|webp);base64,/;
 
 export async function createOrderServer(
   input: CreateOrderInput
@@ -75,7 +76,7 @@ export async function createOrderServer(
 
   if (
     input.paymentProof &&
-    (!input.paymentProof.startsWith("data:image/") ||
+    (!PAYMENT_PROOF_PATTERN.test(input.paymentProof) ||
       input.paymentProof.length > 2_500_000)
   ) {
     return { ok: false, error: "Payment proof could not be accepted. Please try another image." };

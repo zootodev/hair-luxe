@@ -19,7 +19,8 @@ const STATUS_STYLES: Record<Order["status"], string> = {
 type Tab = "orders" | "bookings" | "deliveries";
 
 function csvValue(value: string | number): string {
-  const s = String(value ?? "");
+  let s = String(value ?? "");
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
@@ -569,6 +570,7 @@ export default function AdminPage() {
                                 href={order.paymentProof}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                download={order.paymentProofName || "payment-proof"}
                                 className="block rounded-lg overflow-hidden group"
                               >
                                 {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded data URL */}

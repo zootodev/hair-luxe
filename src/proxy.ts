@@ -5,19 +5,26 @@ import { SESSION_COOKIE, getExpectedToken, tokenMatches } from "@/lib/admin-auth
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/admin/login") {
+  if (pathname === "/admin/login" || pathname === "/api/admin/login") {
     return NextResponse.next();
   }
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 
   if (!token) {
+    if (pathname.startsWith("/api/admin")) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
     return redirectToLogin(request);
   }
 
   const expected = await getExpectedToken();
   if (tokenMatches(token, expected)) {
     return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/api/admin")) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   return redirectToLogin(request);
@@ -32,5 +39,5 @@ function redirectToLogin(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
