@@ -103,11 +103,6 @@ export default function Footer() {
                   Terms &amp; Conditions
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="text-sm text-muted hover:text-gold transition-colors">
-                  Orders
-                </Link>
-              </li>
             </ul>
           </div>
 
