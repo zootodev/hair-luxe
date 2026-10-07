@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductBySlug, getProductsByCategory, products } from "@/lib/data/products";
+import { products } from "@/lib/data/products";
+import { getVisibleProductById, getVisibleProducts } from "@/lib/catalog";
 import ProductCard from "@/components/products/ProductCard";
 import ProductDetailClient from "@/components/products/ProductDetail";
 import { BUSINESS } from "@/lib/config";
@@ -10,13 +11,15 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug ?? p.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getVisibleProductById(slug);
   if (!product) return {};
   return {
     title: `${product.name} | ${BUSINESS.name}`,
@@ -33,14 +36,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getVisibleProductById(slug);
 
   if (!product) {
     notFound();
   }
 
-  const related = getProductsByCategory(product.category)
-    .filter((p) => p.id !== product.id)
+  const all = await getVisibleProducts();
+  const related = all
+    .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
   return (

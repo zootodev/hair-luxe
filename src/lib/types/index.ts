@@ -21,6 +21,7 @@ export interface Service {
   image: string;
   includes: string[];
   featured?: boolean;
+  visible?: boolean;
 }
 
 export interface Product {
@@ -37,7 +38,32 @@ export interface Product {
   rating: number;
   reviewCount: number;
   featured?: boolean;
+  visible?: boolean;
+  sold?: number;
   details: string[];
+}
+
+export interface DeliveryZoneSettings {
+  name: string;
+  zones: string[];
+  fee: number;
+  days: string;
+}
+
+export interface SiteSettings {
+  businessName: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  phoneFormatted: string;
+  address: string;
+  city: string;
+  hours: string;
+  interacEmail: string;
+  deliveryFee: number;
+  freeDeliveryOver: number;
+  deliveryZones: DeliveryZoneSettings[];
+  announcement: { enabled: boolean; text: string };
 }
 
 export interface CartItem {

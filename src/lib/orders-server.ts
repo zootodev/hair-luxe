@@ -1,11 +1,10 @@
-import { getProductById } from "@/lib/data/products";
-import { DELIVERY_ZONES } from "@/lib/config";
+import { computeLiveDeliveryFee, getLiveProductById, getLiveSettings } from "@/lib/catalog";
+import type { LiveProduct } from "@/lib/catalog";
 import {
   addOrder,
   bumpSold,
   nextOrderId,
 } from "@/lib/store";
-import { computeDeliveryFee } from "@/lib/delivery";
 import { sendOrderEmail } from "@/lib/email-server";
 import type { CartItem, DeliveryMethod, Order } from "@/lib/types";
 
@@ -43,7 +42,8 @@ export async function createOrderServer(
   const items = Array.isArray(input.items) ? input.items : [];
   const deliveryMethod: DeliveryMethod =
     input.deliveryMethod === "pickup" ? "pickup" : "delivery";
-  const deliveryZone = input.deliveryZone ?? DELIVERY_ZONES[1].name;
+  const settings = await getLiveSettings();
+  const deliveryZone = input.deliveryZone ?? settings.deliveryZones[0]?.name ?? "";
   const customer = input.customer ?? {};
 
   if (items.length === 0) {
@@ -83,15 +83,19 @@ export async function createOrderServer(
 
   const validatedItems: CartItem[] = [];
   for (const item of items) {
-    const product = getProductById(item.productId);
+    const product: LiveProduct | undefined = await getLiveProductById(item.productId);
     if (!product) {
       return { ok: false, error: `Product ${item.productId} is no longer available.` };
     }
+    if (product.visible === false) {
+      return { ok: false, error: `${product.name} is no longer available.` };
+    }
     const qty = Math.max(1, Math.floor(Number(item.quantity) || 1));
-    if (qty > product.stockCount) {
+    const availableStock = Math.max(0, product.stockCount - product.sold);
+    if (qty > availableStock) {
       return {
         ok: false,
-        error: `${product.name} only has ${product.stockCount} in stock.`,
+        error: `${product.name} only has ${availableStock} in stock.`,
       };
     }
     validatedItems.push({
@@ -108,7 +112,7 @@ export async function createOrderServer(
     validatedItems.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)
   );
   const deliveryFee = Number(
-    computeDeliveryFee(deliveryMethod, deliveryZone, subtotal).toFixed(2)
+    computeLiveDeliveryFee(settings, deliveryMethod, deliveryZone, subtotal).toFixed(2)
   );
   const total = Number((subtotal + deliveryFee).toFixed(2));
 

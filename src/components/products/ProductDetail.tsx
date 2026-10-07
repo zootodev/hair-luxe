@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/data/products";
 import { useCart } from "@/lib/context/CartContext";
-import { getAvailableStock } from "@/lib/stock";
 import type { Product } from "@/lib/types";
 
 export default function ProductDetailClient({ product }: { product: Product }) {
@@ -12,7 +11,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [added, setAdded] = useState(false);
-  const available = getAvailableStock(product.id);
+  const available = Math.max(0, product.stockCount - (product.sold ?? 0));
   const outOfStock = available <= 0;
 
   const handleAdd = () => {

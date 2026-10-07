@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { services } from "@/lib/data/services";
+import { getVisibleServiceById, getVisibleServices } from "@/lib/catalog";
 import { BUSINESS, SITE_URL } from "@/lib/config";
 import ServiceDetailClient from "@/components/services/ServiceDetailClient";
 
@@ -10,13 +11,15 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((s) => s.id === slug);
+  const service = await getVisibleServiceById(slug);
   if (!service) {
     return { title: `Service Not Found | ${BUSINESS.name}` };
   }
@@ -38,13 +41,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
-  const service = services.find((s) => s.id === slug);
+  const service = await getVisibleServiceById(slug);
 
   if (!service) {
     notFound();
   }
 
-  const related = services.filter((s) => s.id !== service.id).slice(0, 3);
+  const allServices = await getVisibleServices();
+  const related = allServices.filter((s) => s.id !== service.id).slice(0, 3);
 
   return (
     <div className="pt-24 md:pt-28 pb-16">

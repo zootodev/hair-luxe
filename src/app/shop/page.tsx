@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ShopGrid from "@/components/products/ShopGrid";
+import { getVisibleProducts } from "@/lib/catalog";
 import { BUSINESS } from "@/lib/config";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: `Shop Products | ${BUSINESS.name}`,
@@ -18,6 +21,7 @@ interface Props {
 
 export default async function ShopPage({ searchParams }: Props) {
   const { q } = await searchParams;
+  const products = await getVisibleProducts();
 
   return (
     <div className="pt-24 md:pt-28 pb-16">
@@ -33,7 +37,7 @@ export default async function ShopPage({ searchParams }: Props) {
         </div>
 
         <Suspense fallback={null}>
-          <ShopGrid initialSearch={q ?? ""} />
+          <ShopGrid products={products} initialSearch={q ?? ""} />
         </Suspense>
       </div>
     </div>

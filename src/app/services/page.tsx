@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { services } from "@/lib/data/services";
@@ -9,6 +9,20 @@ import BookingModal from "@/components/services/BookingModal";
 
 export default function ServicesPage() {
   const [bookingService, setBookingService] = useState<Service | null>(null);
+  const [catalogServices, setCatalogServices] = useState<Service[]>(services);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/catalog", { cache: "no-store" })
+      .then((res) => (res.ok ? (res.json() as Promise<{ services?: Service[] }>) : null))
+      .then((data) => {
+        if (data?.services && !cancelled) setCatalogServices(data.services);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="pt-24 md:pt-28 pb-16">
@@ -25,7 +39,7 @@ export default function ServicesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => (
+          {catalogServices.map((service) => (
             <div
               key={service.id}
               className="group flex flex-col rounded-2xl bg-surface border border-surface-light hover:border-gold/40 overflow-hidden transition-all duration-300 shadow-lg shadow-black/20 hover:-translate-y-1"

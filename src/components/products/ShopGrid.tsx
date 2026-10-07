@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { products } from "@/lib/data/products";
 import ProductCard from "@/components/products/ProductCard";
-import type { ProductCategory } from "@/lib/types";
+import type { Product, ProductCategory } from "@/lib/types";
 
 const CATEGORIES: ("All" | ProductCategory)[] = [
   "All",
@@ -24,10 +23,11 @@ const SORT_OPTIONS = [
 type SortValue = (typeof SORT_OPTIONS)[number]["value"];
 
 interface ShopGridProps {
+  products: Product[];
   initialSearch?: string;
 }
 
-export default function ShopGrid({ initialSearch = "" }: ShopGridProps) {
+export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [category, setCategory] = useState<"All" | ProductCategory>("All");
@@ -77,7 +77,7 @@ export default function ShopGrid({ initialSearch = "" }: ShopGridProps) {
         result = [...result].sort((a, b) => Number(b.featured ?? false) - Number(a.featured ?? false));
     }
     return result;
-  }, [category, sort, search]);
+  }, [category, sort, search, products]);
 
   return (
     <>

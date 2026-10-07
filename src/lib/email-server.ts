@@ -116,3 +116,20 @@ export function sendContactEmail(msg: {
     business_name: BUSINESS.name,
   });
 }
+
+export function sendCustomerMessage(msg: {
+  to: string;
+  subject: string;
+  message: string;
+  orderId?: string;
+  customerName?: string;
+}): Promise<SendResult> {
+  return send({
+    customer_name: msg.customerName || "Customer",
+    customer_email: msg.to,
+    subject: msg.subject,
+    message: msg.message,
+    order_id: msg.orderId || "",
+    business_name: BUSINESS.name,
+  });
+}

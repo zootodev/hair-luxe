@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { services } from "@/lib/data/services";
 import Button from "@/components/ui/Button";
+import type { Service } from "@/lib/types";
 
-export default function FeaturedServices() {
+export default function FeaturedServices({ services }: { services: Service[] }) {
   const featured = services.filter((s) => s.featured).slice(0, 3);
 
   return (

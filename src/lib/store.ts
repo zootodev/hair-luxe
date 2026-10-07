@@ -13,6 +13,9 @@ const mem = {
   sold: {} as Record<string, number>,
   orderSeq: 0,
   bookingSeq: 0,
+  catalogProducts: {} as Record<string, Record<string, unknown>>,
+  catalogServices: {} as Record<string, Record<string, unknown>>,
+  settings: {} as Record<string, unknown>,
 };
 
 function getRestConfig(): { url: string; token: string } | null {
@@ -133,6 +136,18 @@ function pgInit(): Promise<void> {
         ALTER TABLE app_meta ENABLE ROW LEVEL SECURITY;
         ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
         ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+        CREATE TABLE IF NOT EXISTS catalog_products (
+          key text PRIMARY KEY,
+          data jsonb NOT NULL,
+          updated_at timestamptz NOT NULL DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS catalog_services (
+          key text PRIMARY KEY,
+          data jsonb NOT NULL,
+          updated_at timestamptz NOT NULL DEFAULT now()
+        );
+        ALTER TABLE catalog_products ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE catalog_services ENABLE ROW LEVEL SECURITY;
       `)
       .then(() => undefined)
       .catch((err) => {
@@ -219,6 +234,84 @@ async function pgNextId(key: string): Promise<number> {
     [key]
   );
   return result.rows[0].value;
+}
+
+async function pgGetMeta(key: string): Promise<Record<string, unknown> | null> {
+  await pgInit();
+  const result = await pg().query<{ value: string }>(
+    "SELECT value FROM app_meta WHERE key = $1",
+    [key]
+  );
+  if (!result.rows[0]) return null;
+  try {
+    return JSON.parse(result.rows[0].value) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+async function pgSetMeta(key: string, obj: Record<string, unknown>): Promise<void> {
+  await pgInit();
+  await pg().query(
+    "INSERT INTO app_meta (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+    [key, JSON.stringify(obj)]
+  );
+}
+
+async function pgGetCatalogProducts(): Promise<Record<string, Record<string, unknown>>> {
+  await pgInit();
+  const result = await pg().query<{ key: string; data: Record<string, unknown> }>(
+    "SELECT key, data FROM catalog_products"
+  );
+  return Object.fromEntries(result.rows.map((r) => [r.key, r.data]));
+}
+
+async function pgUpsertCatalogProduct(
+  key: string,
+  data: Record<string, unknown>
+): Promise<void> {
+  await pgInit();
+  await pg().query(
+    "INSERT INTO catalog_products (key, data) VALUES ($1, $2::jsonb) ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()",
+    [key, JSON.stringify(data)]
+  );
+}
+
+async function pgDeleteCatalogProduct(key: string): Promise<void> {
+  await pgInit();
+  await pg().query("DELETE FROM catalog_products WHERE key = $1", [key]);
+}
+
+async function pgGetCatalogServices(): Promise<Record<string, Record<string, unknown>>> {
+  await pgInit();
+  const result = await pg().query<{ key: string; data: Record<string, unknown> }>(
+    "SELECT key, data FROM catalog_services"
+  );
+  return Object.fromEntries(result.rows.map((r) => [r.key, r.data]));
+}
+
+async function pgUpsertCatalogService(
+  key: string,
+  data: Record<string, unknown>
+): Promise<void> {
+  await pgInit();
+  await pg().query(
+    "INSERT INTO catalog_services (key, data) VALUES ($1, $2::jsonb) ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()",
+    [key, JSON.stringify(data)]
+  );
+}
+
+async function pgDeleteCatalogService(key: string): Promise<void> {
+  await pgInit();
+  await pg().query("DELETE FROM catalog_services WHERE key = $1", [key]);
+}
+
+async function pgGetSettingsObject(): Promise<Record<string, unknown> | null> {
+  return pgGetMeta("settings");
+}
+
+async function pgSaveSettingsObject(obj: Record<string, unknown>): Promise<void> {
+  await pgSetMeta("settings", obj);
 }
 
 // ---------- Public API ----------
@@ -349,6 +442,84 @@ export async function getSold(): Promise<Record<string, number>> {
     console.error("[store] failed to read sold", error);
   }
   return mem.sold;
+}
+
+// ---------- Catalog overrides + settings ----------
+
+export async function getCatalogProducts(): Promise<Record<string, Record<string, unknown>>> {
+  try {
+    if (isPostgres()) return await pgGetCatalogProducts();
+  } catch (error) {
+    console.error("[store] failed to read catalog products", error);
+  }
+  return mem.catalogProducts;
+}
+
+export async function saveCatalogProduct(
+  key: string,
+  data: Record<string, unknown>
+): Promise<void> {
+  if (isPostgres()) {
+    await pgUpsertCatalogProduct(key, data);
+  }
+  mem.catalogProducts[key] = data;
+}
+
+export async function deleteCatalogProduct(key: string): Promise<void> {
+  if (isPostgres()) {
+    await pgDeleteCatalogProduct(key);
+  }
+  delete mem.catalogProducts[key];
+}
+
+export async function getCatalogServices(): Promise<Record<string, Record<string, unknown>>> {
+  try {
+    if (isPostgres()) return await pgGetCatalogServices();
+  } catch (error) {
+    console.error("[store] failed to read catalog services", error);
+  }
+  return mem.catalogServices;
+}
+
+export async function saveCatalogService(
+  key: string,
+  data: Record<string, unknown>
+): Promise<void> {
+  if (isPostgres()) {
+    await pgUpsertCatalogService(key, data);
+  }
+  mem.catalogServices[key] = data;
+}
+
+export async function deleteCatalogService(key: string): Promise<void> {
+  if (isPostgres()) {
+    await pgDeleteCatalogService(key);
+  }
+  delete mem.catalogServices[key];
+}
+
+export async function getStoredSettings(): Promise<Record<string, unknown>> {
+  try {
+    if (isPostgres()) {
+      const stored = await pgGetSettingsObject();
+      if (stored) return stored;
+    } else if (storeConfigured()) {
+      const raw = await getString("hl:settings:v1");
+      if (raw != null) return JSON.parse(raw) as Record<string, unknown>;
+    }
+  } catch (error) {
+    console.error("[store] failed to read settings", error);
+  }
+  return mem.settings;
+}
+
+export async function saveStoredSettings(obj: Record<string, unknown>): Promise<void> {
+  if (isPostgres()) {
+    await pgSaveSettingsObject(obj);
+  } else if (storeConfigured()) {
+    await setString("hl:settings:v1", JSON.stringify(obj));
+  }
+  mem.settings = obj;
 }
 
 export async function bumpSold(

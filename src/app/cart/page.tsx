@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/context/CartContext";
 import { formatPrice } from "@/lib/data/products";
-import { DELIVERY_ZONES } from "@/lib/config";
 import Button from "@/components/ui/Button";
 
 export default function CartPage() {
@@ -20,6 +19,7 @@ export default function CartPage() {
     setDeliveryMethod,
     deliveryZone,
     setDeliveryZone,
+    deliveryZones,
   } = useCart();
 
   if (items.length === 0) {
@@ -173,7 +173,7 @@ export default function CartPage() {
                     onChange={(e) => setDeliveryZone(e.target.value)}
                     className="w-full h-10 rounded-lg bg-surface-light border border-surface-light px-3 text-sm focus:border-gold focus:outline-none"
                   >
-                    {DELIVERY_ZONES.map((z) => (
+                    {deliveryZones.map((z) => (
                       <option key={z.name} value={z.name}>
                         {z.name} - ${z.fee.toFixed(2)} ({z.days})
                       </option>

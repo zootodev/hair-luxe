@@ -17,7 +17,7 @@ const NAV_LINKS = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { itemCount } = useCart();
+  const { itemCount, announcement } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileNav, setMobileNav] = useState<{ open: boolean; path: string }>({
     open: false,
@@ -49,6 +49,11 @@ export default function Header() {
           : "bg-gradient-to-b from-black/80 to-transparent"
       }`}
     >
+      {announcement.enabled && announcement.text && (
+        <div className="bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-center text-xs font-semibold py-2 px-4">
+          {announcement.text}
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link href="/" className="flex items-center gap-2 group">

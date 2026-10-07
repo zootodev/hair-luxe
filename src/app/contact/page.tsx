@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { BUSINESS } from "@/lib/config";
+import { useCart } from "@/lib/context/CartContext";
 
 export default function ContactPage() {
+  const { business } = useCart();
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -38,11 +39,11 @@ export default function ContactPage() {
         setSendError(
           res.status === 429
             ? "Too many messages sent. Please wait a moment and try again."
-            : data?.error || `We could not send your message. Please call us at ${BUSINESS.phone}.`
+            : data?.error || `We could not send your message. Please call us at ${business.phone}.`
         );
       }
     } catch {
-      setSendError(`Cannot reach the server. Please call us at ${BUSINESS.phone}.`);
+      setSendError(`Cannot reach the server. Please call us at ${business.phone}.`);
     } finally {
       setSending(false);
     }
@@ -67,7 +68,7 @@ export default function ContactPage() {
             {[
               {
                 title: "Visit Our Studio",
-                value: BUSINESS.address,
+                value: business.address,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -80,7 +81,7 @@ export default function ContactPage() {
               },
               {
                 title: "Call Us",
-                value: BUSINESS.phone,
+                value: business.phone,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
@@ -89,7 +90,7 @@ export default function ContactPage() {
               },
               {
                 title: "Email Us",
-                value: BUSINESS.email,
+                value: business.email,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -99,7 +100,7 @@ export default function ContactPage() {
               },
               {
                 title: "Order Payments",
-                value: `Interac e-Transfer to ${BUSINESS.interacEmail}`,
+                value: `Interac e-Transfer to ${business.interacEmail}`,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -127,7 +128,7 @@ export default function ContactPage() {
 
             <div className="rounded-2xl bg-surface border border-surface-light p-5">
               <p className="font-semibold text-sm mb-2">Opening Hours</p>
-              <p className="text-sm text-muted">{BUSINESS.hours}</p>
+              <p className="text-sm text-muted">{business.hours}</p>
               <p className="text-sm text-muted mt-1">Sunday: Closed</p>
             </div>
           </div>

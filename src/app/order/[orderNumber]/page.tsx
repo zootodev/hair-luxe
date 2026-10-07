@@ -7,12 +7,13 @@ import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { getOrders } from "@/lib/orders";
 import { formatPrice } from "@/lib/data/products";
-import { BUSINESS } from "@/lib/config";
+import { useCart } from "@/lib/context/CartContext";
 import type { Order } from "@/lib/types";
 
 export default function OrderConfirmationPage() {
   const params = useParams<{ orderNumber: string }>();
   const orderNumber = params.orderNumber.toUpperCase().replace("ORDER ", "");
+  const { business } = useCart();
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
 
   /* eslint-disable react-hooks/set-state-in-effect -- client-only order lookup after mount */
@@ -120,7 +121,7 @@ export default function OrderConfirmationPage() {
           <div className="space-y-1.5 text-sm">
             <p className="flex justify-between">
               <span className="text-muted">Send To:</span>
-              <span className="font-medium">{BUSINESS.interacEmail}</span>
+              <span className="font-medium">{business.interacEmail}</span>
             </p>
             <p className="flex justify-between">
               <span className="text-muted">Amount:</span>
@@ -140,7 +141,7 @@ export default function OrderConfirmationPage() {
             </>
           ) : (
             <>
-              Pickup at {BUSINESS.address}. Please call {BUSINESS.phone} when you arrive.
+              Pickup at {business.address}. Please call {business.phone} when you arrive.
             </>
           )}
         </p>

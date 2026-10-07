@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/data/products";
 import { useCart } from "@/lib/context/CartContext";
-import { getAvailableStock } from "@/lib/stock";
 
 interface ProductCardProps {
   product: Product;
@@ -13,7 +12,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
-  const available = getAvailableStock(product.id);
+  const available = Math.max(0, product.stockCount - (product.sold ?? 0));
   const outOfStock = available <= 0;
 
   const handleQuickAdd = () => {

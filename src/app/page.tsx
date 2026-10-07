@@ -4,14 +4,19 @@ import WhyChooseUs from "@/components/home/WhyChooseUs";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import Testimonials from "@/components/home/Testimonials";
 import CtaBanner from "@/components/home/CtaBanner";
+import { getVisibleProducts, getVisibleServices } from "@/lib/catalog";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [products, services] = await Promise.all([getVisibleProducts(), getVisibleServices()]);
+
   return (
     <>
       <Hero />
-      <FeaturedServices />
+      <FeaturedServices services={services} />
       <WhyChooseUs />
-      <FeaturedProducts />
+      <FeaturedProducts products={products} />
       <Testimonials />
       <CtaBanner />
     </>

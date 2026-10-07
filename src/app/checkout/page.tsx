@@ -6,11 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
 import { formatPrice } from "@/lib/data/products";
-import { BUSINESS } from "@/lib/config";
 import { generateOrderId, saveOrder } from "@/lib/orders";
-import { getDeliveryZoneInfo } from "@/lib/delivery";
 import { recordSold } from "@/lib/stock";
-import type { Order } from "@/lib/types";
+import type { DeliveryZoneSettings, Order } from "@/lib/types";
 
 const STATUS_STEPS = [
   { label: "Order Details", step: 1 },
@@ -20,8 +18,12 @@ const STATUS_STEPS = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, clearCart } =
+  const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, clearCart, business, deliveryZones } =
     useCart();
+
+  const zoneInfo =
+    deliveryZones.find((z) => z.name === deliveryZone) ??
+    ({ name: deliveryZone, zones: [], fee: 0, days: "2-3 business days" } satisfies DeliveryZoneSettings);
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
@@ -42,7 +44,6 @@ const [submitting, setSubmitting] = useState(false);
   const [proofError, setProofError] = useState("");
   const proofInputRef = useRef<HTMLInputElement>(null);
   const [previewId, setPreviewId] = useState<string>(() => generateOrderId());
-  const zoneInfo = getDeliveryZoneInfo(deliveryZone);
 
   useEffect(() => {
     if (step !== 2) return;
@@ -280,7 +281,7 @@ const handlePlaceOrder = async () => {
             <div className="space-y-1.5 text-sm">
               <p className="flex justify-between">
                 <span className="text-muted">Send To:</span>
-                <span className="font-medium">{BUSINESS.interacEmail}</span>
+                <span className="font-medium">{business.interacEmail}</span>
               </p>
               <p className="flex justify-between">
                 <span className="text-muted">Amount:</span>
@@ -300,7 +301,7 @@ const handlePlaceOrder = async () => {
               </>
             ) : (
               <>
-                Pickup at {BUSINESS.address}. Please call {BUSINESS.phone} when you arrive.
+                Pickup at {business.address}. Please call {business.phone} when you arrive.
               </>
             )}
           </p>
@@ -566,8 +567,8 @@ const handlePlaceOrder = async () => {
                         desc: "Open your bank's app or website and navigate to Interac e-Transfer.",
                       },
                       {
-                        title: `Step 2: Send to ${BUSINESS.interacEmail}`,
-                        desc: `Enter the email ${BUSINESS.interacEmail} as the recipient. Does the recipient have the security question set up? No problem, select "No security question" if available.`,
+                        title: `Step 2: Send to ${business.interacEmail}`,
+                        desc: `Enter the email ${business.interacEmail} as the recipient. Does the recipient have the security question set up? No problem, select "No security question" if available.`,
                       },
                       {
                         title: `Step 3: Send exactly ${formatPrice(total)}`,
@@ -601,7 +602,7 @@ const handlePlaceOrder = async () => {
                     <div className="space-y-2 text-sm">
                       <p className="flex justify-between">
                         <span className="text-muted">Recipient</span>
-                        <span className="font-medium text-gold">{BUSINESS.interacEmail}</span>
+                        <span className="font-medium text-gold">{business.interacEmail}</span>
                       </p>
                       <p className="flex justify-between">
                         <span className="text-muted">Amount</span>
@@ -679,7 +680,7 @@ const handlePlaceOrder = async () => {
                     <span className="text-sm text-foreground/85 leading-relaxed">
                       I confirm I have sent the Interac e-Transfer of{" "}
                       <strong className="text-gold">{formatPrice(total)}</strong> to{" "}
-                      <strong>{BUSINESS.interacEmail}</strong> with message{" "}
+                      <strong>{business.interacEmail}</strong> with message{" "}
                       <strong>Order {previewId}</strong>.
                     </span>
                   </label>

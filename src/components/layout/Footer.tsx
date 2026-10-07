@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { BUSINESS, SOCIAL_LINKS } from "@/lib/config";
+import { SOCIAL_LINKS } from "@/lib/config";
+import { useCart } from "@/lib/context/CartContext";
 
 const SERVICE_LINKS = [
   "Hair Revamping",
@@ -11,6 +14,7 @@ const SERVICE_LINKS = [
 ];
 
 export default function Footer() {
+  const { business } = useCart();
   return (
     <footer className="mt-16 border-t border-gold/20 bg-surface text-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -21,11 +25,11 @@ export default function Footer() {
                 HL
               </span>
               <span className="font-serif text-xl tracking-wide text-gradient-gold font-semibold">
-                {BUSINESS.name}
+                {business.name}
               </span>
             </div>
             <p className="text-sm text-muted leading-relaxed">
-              {BUSINESS.tagline}. Premium services and products crafted with elegance for
+              {business.tagline}. Premium services and products crafted with elegance for
               beauty that speaks for itself.
             </p>
           </div>
@@ -120,7 +124,7 @@ export default function Footer() {
                     />
                   </svg>
                 </span>
-                <span>{BUSINESS.address}</span>
+                <span>{business.address}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold mt-0.5">
@@ -128,7 +132,7 @@ export default function Footer() {
                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                   </svg>
                 </span>
-                <span>{BUSINESS.phone}</span>
+                <span>{business.phone}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold mt-0.5">
@@ -137,7 +141,7 @@ export default function Footer() {
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                   </svg>
                 </span>
-                <span>{BUSINESS.email}</span>
+                <span>{business.email}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold mt-0.5">
@@ -157,7 +161,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 border-t border-gold/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted">
-            &copy; {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.
+            &copy; {new Date().getFullYear()} {business.name}. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted">
             <a
@@ -189,7 +193,7 @@ export default function Footer() {
             </a>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 rounded-full bg-gold animate-pulse" />
-              {BUSINESS.city}
+              {business.city}
             </span>
           </div>
         </div>

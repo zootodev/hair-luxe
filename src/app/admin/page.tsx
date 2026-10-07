@@ -4,6 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/data/products";
 import type { Order, Booking } from "@/lib/types";
+import AdminSidebar, { type AdminView } from "@/components/admin/AdminSidebar";
+import ProductsManager from "@/components/admin/ProductsManager";
+import ServicesManager from "@/components/admin/ServicesManager";
+import SettingsManager from "@/components/admin/SettingsManager";
 
 const STATUS_STYLES: Record<Order["status"], string> = {
   pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
@@ -34,6 +38,7 @@ function downloadCsv(filename: string, rows: (string | number)[][]) {
 
 export default function AdminPage() {
   const router = useRouter();
+  const [view, setView] = useState<AdminView>("dashboard");
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -43,6 +48,16 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
   const [storeConfigured, setStoreConfigured] = useState(true);
+  const [emailTarget, setEmailTarget] = useState<{
+    kind: "order" | "booking";
+    id: string;
+    customerName: string;
+  } | null>(null);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailSent, setEmailSent] = useState("");
 
   const fetchData = useCallback(async () => {
     try {
@@ -165,6 +180,43 @@ export default function AdminPage() {
     ]);
   };
 
+  const handleLogout = () => {
+    fetch("/api/admin/logout", { method: "POST" }).then(() => {
+      router.push("/");
+    });
+  };
+
+  const sendCustomerEmail = async () => {
+    if (!emailTarget) return;
+    if (!emailSubject.trim() || !emailMessage.trim()) {
+      setEmailError("Subject and message are required.");
+      return;
+    }
+    setEmailSending(true);
+    setEmailError("");
+    setEmailSent("");
+    try {
+      const res = await fetch("/api/admin/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          [emailTarget.kind === "order" ? "orderId" : "bookingId"]: emailTarget.id,
+          subject: emailSubject,
+          message: emailMessage,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setEmailSent(`Email sent to ${emailTarget.customerName}.`);
+      setEmailSubject("");
+      setEmailMessage("");
+      setEmailTarget(null);
+    } catch {
+      setEmailError("Failed to send email. Please try again.");
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
   const allDeliveries = useMemo(() => {
     return orders
       .filter((o) => o.customer.deliveryMethod === "delivery" && o.status !== "cancelled")
@@ -174,9 +226,33 @@ export default function AdminPage() {
       );
   }, [orders]);
 
+  if (view === "products" || view === "services" || view === "settings") {
+    const manager =
+      view === "products" ? (
+        <ProductsManager />
+      ) : view === "services" ? (
+        <ServicesManager />
+      ) : (
+        <SettingsManager />
+      );
+    return (
+      <div className="pt-24 md:pt-28 pb-16 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <AdminSidebar active={view} onChange={setView} onLogout={handleLogout} />
+            <div className="flex-1 min-w-0">{manager}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-24 md:pt-28 pb-16 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <AdminSidebar active={view} onChange={setView} onLogout={handleLogout} />
+          <div className="flex-1 min-w-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
@@ -185,22 +261,12 @@ export default function AdminPage() {
             <h1 className="font-serif text-3xl sm:text-4xl font-bold">Order Management</h1>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-xs text-muted">
+<p className="text-xs text-muted">
               {storeConfigured
                 ? "Orders are stored securely on the server and shared across all admin browsers."
                 : "Orders are stored in server memory only."}
             </p>
-            <button
-              onClick={() => {
-                fetch("/api/admin/logout", { method: "POST" }).then(() => {
-                  router.push("/");
-                });
-              }}
-              className="px-4 py-2 rounded-full text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors cursor-pointer"
-            >
-              Log out
-            </button>
-          </div>
+        </div>
         </div>
 
         {!storeConfigured && (
@@ -542,6 +608,22 @@ export default function AdminPage() {
                           )}
                           <span className="flex-1" />
                           <button
+                            onClick={() => {
+                              setEmailError("");
+                              setEmailSent("");
+                              setEmailSubject(`Regarding your order ${order.id}`);
+                              setEmailMessage("");
+                              setEmailTarget({
+                                kind: "order",
+                                id: order.id,
+                                customerName: `${order.customer.firstName} ${order.customer.lastName}`,
+                              });
+                            }}
+                            className="px-3 py-1.5 rounded-full text-xs font-medium text-gold hover:bg-gold/10 border border-gold/30 transition-colors cursor-pointer"
+                          >
+                            Email customer
+                          </button>
+                          <button
                             onClick={() => handleDeleteOrder(order.id)}
                             className="px-3 py-1.5 rounded-full text-xs font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors cursor-pointer"
                           >
@@ -601,6 +683,21 @@ export default function AdminPage() {
                       <span className="px-2.5 py-1 rounded-full bg-gold/10 text-gold text-xs font-semibold">
                         {booking.email}
                       </span>
+                      <button
+                        onClick={() => {
+                          setEmailError("");
+                          setEmailSent("");
+                          setEmailSubject(`Regarding your ${booking.service} booking`);
+                          setEmailMessage("");
+                          setEmailTarget({ kind: "booking", id: booking.id, customerName: booking.name });
+                        }}
+                        className="text-gold hover:bg-gold/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        aria-label={`Email ${booking.name}`}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                      </button>
                       <button
                         onClick={() => handleDeleteBooking(booking.id)}
                         className="text-red-400 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors cursor-pointer"
@@ -677,6 +774,77 @@ export default function AdminPage() {
         )}
         </>
         )}
+
+        {emailTarget && (
+          <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4">
+            <div className="w-full max-w-lg rounded-2xl bg-surface border border-surface-light p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-serif text-xl font-bold">
+                  Email {emailTarget.customerName}
+                  <span className="block text-xs text-muted font-normal mt-0.5">
+                    {emailTarget.kind === "order" ? `Order ${emailTarget.id}` : `Booking ${emailTarget.id}`}
+                  </span>
+                </h3>
+                <button
+                  onClick={() => setEmailTarget(null)}
+                  className="text-muted hover:text-gold p-1 cursor-pointer"
+                  aria-label="Close"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {emailError && (
+                <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 mb-4 text-sm text-red-400">
+                  {emailError}
+                </div>
+              )}
+              {emailSent && (
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 mb-4 text-sm text-emerald-400">
+                  {emailSent}
+                </div>
+              )}
+              <div className="space-y-3 text-sm">
+                <label className="block">
+                  <span className="block text-xs text-muted mb-1">Subject</span>
+                  <input
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-gold focus:outline-none"
+                  />
+                </label>
+                <label className="block">
+                  <span className="block text-xs text-muted mb-1">Message</span>
+                  <textarea
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    rows={5}
+                    placeholder="Write your reply to this customer..."
+                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-gold focus:outline-none resize-y"
+                  />
+                </label>
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-5">
+                <button
+                  onClick={() => setEmailTarget(null)}
+                  className="px-4 py-2 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={sendCustomerEmail}
+                  disabled={emailSending}
+                  className="px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {emailSending ? "Sending..." : "Send Email"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        </div>
+        </div>
       </div>
     </div>
   );
