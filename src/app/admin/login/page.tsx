@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -9,17 +9,26 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    router.prefetch("/admin");
+  }, [router]);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
 
       const data = await res.json().catch(() => ({}));
 
@@ -30,10 +39,18 @@ export default function AdminLoginPage() {
       }
 
       const next = new URLSearchParams(window.location.search).get("next");
-      router.push(next && next.startsWith("/") ? next : "/admin");
+      const target =
+        next && next.startsWith("/") && !next.startsWith("//") ? next : "/admin";
+      router.push(target);
       router.refresh();
-    } catch {
-      setError("Network error. Please try again.");
+      setTimeout(() => setLoading(false), 1000);
+    } catch (err) {
+      clearTimeout(timeout);
+      setError(
+        err instanceof DOMException && err.name === "AbortError"
+          ? "Sign in timed out. Please check your connection and try again."
+          : "Network error. Please try again."
+      );
       setLoading(false);
     }
   }
