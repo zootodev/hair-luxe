@@ -14,6 +14,24 @@ const STATUS_STYLES: Record<Order["status"], string> = {
 
 type Tab = "orders" | "bookings" | "deliveries";
 
+function csvValue(value: string | number): string {
+  const s = String(value ?? "");
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function downloadCsv(filename: string, rows: (string | number)[][]) {
+  const csv = rows.map((r) => r.map(csvValue).join(",")).join("\r\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("orders");
@@ -119,6 +137,34 @@ export default function AdminPage() {
     await fetchData();
   };
 
+  const exportOrders = () => {
+    const date = new Date().toISOString().slice(0, 10);
+    downloadCsv(`hair-luxe-orders-${date}.csv`, [
+      [
+        "id", "date", "status", "first_name", "last_name", "email", "phone", "city",
+        "address", "delivery_method", "delivery_zone", "items", "subtotal",
+        "delivery_fee", "total", "notes",
+      ],
+      ...orders.map((o) => [
+        o.id, o.date, o.status, o.customer.firstName, o.customer.lastName,
+        o.customer.email, o.customer.phone, o.customer.city,
+        o.customer.address ?? "", o.customer.deliveryMethod, o.customer.deliveryZone ?? "",
+        o.items.map((i) => `${i.name} (x${i.quantity})`).join("; "),
+        o.subtotal, o.deliveryFee, o.total, o.customer.notes ?? "",
+      ]),
+    ]);
+  };
+
+  const exportBookings = () => {
+    const date = new Date().toISOString().slice(0, 10);
+    downloadCsv(`hair-luxe-bookings-${date}.csv`, [
+      ["id", "date_created", "name", "email", "phone", "service", "preferred_date", "preferred_time", "notes"],
+      ...bookings.map((b) => [
+        b.id, b.dateCreated, b.name, b.email, b.phone, b.service, b.date, b.time, b.notes ?? "",
+      ]),
+    ]);
+  };
+
   const allDeliveries = useMemo(() => {
     return orders
       .filter((o) => o.customer.deliveryMethod === "delivery" && o.status !== "cancelled")
@@ -211,29 +257,47 @@ export default function AdminPage() {
           ))}
         </div>
 
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {(
-            [
-              { key: "orders", label: "Orders" },
-              { key: "bookings", label: "Bookings" },
-              { key: "deliveries", label: "Deliveries" },
-            ] as { key: Tab; label: string }[]
-          ).map((t) => (
+        <div className="flex gap-2 mb-6 flex-wrap items-center justify-between">
+          <div className="flex gap-2 flex-wrap">
+            {(
+              [
+                { key: "orders", label: "Orders" },
+                { key: "bookings", label: "Bookings" },
+                { key: "deliveries", label: "Deliveries" },
+              ] as { key: Tab; label: string }[]
+            ).map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                  tab === t.key
+                    ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background"
+                    : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
+                }`}
+              >
+                {t.label}
+                {t.key === "orders" && orders.length > 0 && (
+                  <span className="ml-1.5 opacity-70">({orders.length})</span>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 flex-wrap">
             <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
-                tab === t.key
-                  ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background"
-                  : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
-              }`}
+              onClick={exportOrders}
+              disabled={orders.length === 0}
+              className="px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              {t.label}
-              {t.key === "orders" && orders.length > 0 && (
-                <span className="ml-1.5 opacity-70">({orders.length})</span>
-              )}
+              Export Orders
             </button>
-          ))}
+            <button
+              onClick={exportBookings}
+              disabled={bookings.length === 0}
+              className="px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Export Bookings
+            </button>
+          </div>
         </div>
 
         {tab === "orders" && (

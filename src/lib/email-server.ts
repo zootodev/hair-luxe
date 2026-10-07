@@ -66,6 +66,26 @@ export function sendOrderEmail(order: Order): Promise<SendResult> {
   });
 }
 
+const STATUS_NOTES: Record<Order["status"], string> = {
+  pending: "We received your payment and are confirming your order.",
+  processing: "Your order is being prepared. We will let you know as soon as it ships.",
+  completed: "Your order is complete and ready.",
+  cancelled: "Your order was cancelled. Contact us if this was unexpected.",
+};
+
+export function sendOrderStatusEmail(order: Order): Promise<SendResult> {
+  return send({
+    order_id: order.id,
+    customer_name: `${order.customer.firstName} ${order.customer.lastName}`,
+    customer_email: order.customer.email || order.customer.phone,
+    order_status: order.status.toUpperCase(),
+    status_message: STATUS_NOTES[order.status],
+    total: order.total.toFixed(2),
+    interac_email: BUSINESS.interacEmail,
+    business_name: BUSINESS.name,
+  });
+}
+
 export function sendBookingEmail(booking: Booking): Promise<SendResult> {
   return send({
     order_id: booking.id,

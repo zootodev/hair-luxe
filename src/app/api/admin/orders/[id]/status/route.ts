@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin-session";
-import { updateOrderStatus } from "@/lib/store";
+import { getOrderById, updateOrderStatus } from "@/lib/store";
+import { sendOrderStatusEmail } from "@/lib/email-server";
 import type { Order } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -28,10 +29,17 @@ export async function POST(
     return NextResponse.json({ error: "Invalid status." }, { status: 400 });
   }
 
-  const updated = await updateOrderStatus(id, status as Order["status"]);
-  if (!updated) {
+  const existing = await getOrderById(id);
+  if (!existing) {
     return NextResponse.json({ error: "Order not found." }, { status: 404 });
   }
 
-  return NextResponse.json({ ok: true });
+  await updateOrderStatus(id, status as Order["status"]);
+  const updatedOrder = (await getOrderById(id)) ?? existing;
+  const email = await sendOrderStatusEmail(updatedOrder);
+
+  return NextResponse.json(
+    { ok: true, emailOk: email.ok },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }
