@@ -1,17 +1,11 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    router.prefetch("/admin");
-  }, [router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -41,9 +35,7 @@ export default function AdminLoginPage() {
       const next = new URLSearchParams(window.location.search).get("next");
       const target =
         next && next.startsWith("/") && !next.startsWith("//") ? next : "/admin";
-      router.push(target);
-      router.refresh();
-      setTimeout(() => setLoading(false), 1000);
+      window.location.assign(target);
     } catch (err) {
       clearTimeout(timeout);
       setError(
