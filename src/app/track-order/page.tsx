@@ -17,8 +17,23 @@ export default function TrackOrderPage() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [found, setFound] = useState<Order | null>(null);
+  const [searching, setSearching] = useState(false);
 
-  const lookup = () => {
+  const checkoutLocal = (id: string, ph: string) => {
+    const orders = getOrders();
+    const match = orders.find(
+      (o) =>
+        o.id.toUpperCase() === id &&
+        o.customer.phone.replace(/\D/g, "") === ph
+    );
+    if (match) {
+      setFound(match);
+      return true;
+    }
+    return false;
+  };
+
+  const lookup = async () => {
     const id = orderId.trim().toUpperCase();
     const ph = phone.trim().replace(/\D/g, "");
     if (!id || !ph) {
@@ -26,18 +41,36 @@ export default function TrackOrderPage() {
       setFound(null);
       return;
     }
-    const orders = getOrders();
-    const match = orders.find(
-      (o) =>
-        o.id.toUpperCase() === id &&
-        o.customer.phone.replace(/\D/g, "").includes(ph)
-    );
-    if (match) {
-      setFound(match);
-      setError("");
-    } else {
-      setError("No order found. Please check your Order ID and phone number.");
-      setFound(null);
+    setSearching(true);
+    setError("");
+
+    try {
+      const res = await fetch(`/api/order/${encodeURIComponent(id)}?phone=${encodeURIComponent(ph)}`);
+      if (res.status === 429) {
+        setError("Too many lookups. Please wait a moment and try again.");
+        return;
+      }
+      if (res.ok) {
+        const data = (await res.json()) as { order: Order };
+        setFound(data.order);
+        return;
+      }
+      if (res.status === 503) {
+        if (checkoutLocal(id, ph)) return;
+        setError("Order tracking is being set up. Please try again in a moment.");
+        return;
+      }
+      if (res.status === 400 || res.status === 404) {
+        if (checkoutLocal(id, ph)) return;
+        setError("No order found. Please check your Order ID and phone number.");
+        return;
+      }
+      setError("Unexpected error. Please try again.");
+    } catch {
+      if (checkoutLocal(id, ph)) return;
+      setError("Could not reach the server. Please check your connection and try again.");
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -88,9 +121,10 @@ export default function TrackOrderPage() {
 
           <button
             onClick={lookup}
-            className="w-full h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+            disabled={searching}
+            className="w-full h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
           >
-            Look Up Order
+            {searching ? "Looking Up..." : "Look Up Order"}
           </button>
         </div>
 

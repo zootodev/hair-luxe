@@ -62,7 +62,7 @@ export default function CartPage() {
                 className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl bg-surface border border-surface-light"
               >
                 <Link
-                  href={`/products/${item.productId}`}
+                  href={`/shop/${item.productId}`}
                   className="relative w-full sm:w-24 h-32 sm:h-24 rounded-lg overflow-hidden bg-surface-light shrink-0"
                 >
                   <Image src={item.image} alt={item.name} fill className="object-cover" sizes="96px" />

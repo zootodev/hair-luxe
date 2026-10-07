@@ -1,14 +1,14 @@
 ﻿"use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
 import { formatPrice } from "@/lib/data/products";
 import { BUSINESS } from "@/lib/config";
-import { sendOrderEmail } from "@/lib/email/sendOrderEmail";
 import { generateOrderId, saveOrder } from "@/lib/orders";
+import { getDeliveryZoneInfo } from "@/lib/delivery";
 import { recordSold } from "@/lib/stock";
 import type { Order } from "@/lib/types";
 
@@ -17,15 +17,6 @@ const STATUS_STEPS = [
   { label: "Interac Payment", step: 2 },
   { label: "Confirmation", step: 3 },
 ];
-
-interface ValidateResponse {
-  ok: boolean;
-  items?: Order["items"];
-  subtotal?: number;
-  deliveryFee?: number;
-  total?: number;
-  error?: string;
-}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -44,14 +35,28 @@ export default function CheckoutPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [agreed, setAgreed] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+const [submitting, setSubmitting] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
-const [emailStatus, setEmailStatus] = useState<string>("");
   const [proofFile, setProofFile] = useState<{ dataUrl: string; name: string } | null>(null);
   const [proofLoading, setProofLoading] = useState(false);
   const [proofError, setProofError] = useState("");
   const proofInputRef = useRef<HTMLInputElement>(null);
-  const previewId = generateOrderId();
+  const [previewId, setPreviewId] = useState<string>(() => generateOrderId());
+  const zoneInfo = getDeliveryZoneInfo(deliveryZone);
+
+  useEffect(() => {
+    if (step !== 2) return;
+    let cancelled = false;
+    fetch("/api/orders/next")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { id?: string } | null) => {
+        if (data?.id && !cancelled) setPreviewId(data.id);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [step]);
 
   const handleProofFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -126,79 +131,55 @@ const [emailStatus, setEmailStatus] = useState<string>("");
 const handlePlaceOrder = async () => {
     if (!agreed) return;
     setSubmitting(true);
-    setEmailStatus("");
-
-    let validatedItems = items;
-    let validatedSubtotal = subtotal;
-    let validatedDeliveryFee = deliveryFee;
-    let validatedTotal = total;
 
     try {
-      const res = await fetch("/api/orders/validate", {
+      const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, deliveryMethod, deliveryZone }),
+        body: JSON.stringify({
+          items,
+          deliveryMethod,
+          deliveryZone,
+          customer: {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            phone: form.phone,
+            city: form.city,
+            address: deliveryMethod === "delivery" ? form.address : undefined,
+            notes: form.notes,
+          },
+          paymentProof: proofFile?.dataUrl,
+          paymentProofName: proofFile?.name,
+          requestedId: previewId,
+        }),
       });
+
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as ValidateResponse;
-        setSubmitting(false);
-        setErrors({ phone: "" });
-        alert(data.error ?? "We could not validate your order. Please try again.");
+        alert(data?.error ?? "We could not place your order. Please try again.");
         return;
       }
-      const data = (await res.json()) as ValidateResponse;
-      if (data.items) validatedItems = data.items;
-      if (typeof data.subtotal === "number") validatedSubtotal = data.subtotal;
-      if (typeof data.deliveryFee === "number") validatedDeliveryFee = data.deliveryFee;
-      if (typeof data.total === "number") validatedTotal = data.total;
+
+      const order: Order = data.order;
+      try {
+        saveOrder(order);
+      } catch {
+        console.error("Failed to save order locally; it is saved on the server.");
+      }
+      try {
+        recordSold(items);
+      } catch {
+        console.error("Failed to update the local stock counter.");
+      }
+      clearCart();
+      setPlacedOrder(order);
+      router.push(`/order/${order.id}`);
     } catch {
-      // Validation is best-effort server-side; fall back to client totals on network failure.
-      console.error("Order validation request failed; using client-side totals.");
+      alert("We could not reach the server. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
     }
-
-    const order: Order = {
-      id: generateOrderId(),
-      customer: {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        phone: form.phone,
-        city: form.city,
-        address: deliveryMethod === "delivery" ? form.address : undefined,
-        deliveryMethod,
-        deliveryZone: deliveryMethod === "delivery" ? deliveryZone : undefined,
-        notes: form.notes,
-      },
-      items: validatedItems,
-      subtotal: validatedSubtotal,
-      deliveryFee: validatedDeliveryFee,
-      total: validatedTotal,
-      status: "pending",
-      paymentMethod: "interac",
-      date: new Date().toISOString(),
-      paymentProof: proofFile?.dataUrl,
-      paymentProofName: proofFile?.name,
-    };
-
-    const emailResult = await sendOrderEmail(order);
-    saveOrder(order);
-    recordSold(items);
-    clearCart();
-
-    setEmailStatus(
-      emailResult.ok
-        ? "Order confirmation email sent successfully."
-        : emailResult.status === 412
-          ? "Order placed. Email blocked by EmailJS domain policy (412). The dashboard allowlist is a paid feature - see the console or contact setup support."
-          : emailResult.status === 401
-            ? "Order placed. Email failed: Invalid EmailJS Public Key (401). Check src/lib/config.ts."
-            : emailResult.status
-              ? `Order placed. Email failed (error ${emailResult.status}: ${emailResult.text}). Check the console for details.`
-              : "Order placed, but the email notification could not be sent (no response from EmailJS). Check your internet / any firewall or ad-blocker, then verify the order in the admin dashboard."
-    );
-    setPlacedOrder(order);
-    setSubmitting(false);
-    router.push(`/order/${order.id}`);
   };
 
   if (items.length === 0 && !placedOrder) {
@@ -324,17 +305,13 @@ const handlePlaceOrder = async () => {
             )}
           </p>
 
-          {placedOrder.paymentProofName && (
+{placedOrder.paymentProofName && (
             <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-3 mb-5 text-sm text-emerald-400 flex items-center gap-2 justify-center">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               Payment proof received: {placedOrder.paymentProofName}
             </div>
-          )}
-
-          {emailStatus && (
-            <p className="text-sm text-emerald-400 mb-6">{emailStatus}</p>
           )}
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -549,9 +526,10 @@ const handlePlaceOrder = async () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <p className="text-muted">
-                    Delivery is {formatPrice(deliveryFee)} to {deliveryZone} and takes 2-3
-                    business days. We&apos;ll call you on your phone number before delivery.
+<p className="text-muted">
+                    Delivery is {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)} to{" "}
+                    {deliveryZone} and takes {zoneInfo.days}. We&apos;ll call you on your
+                    phone number before delivery.
                   </p>
                 </div>
 

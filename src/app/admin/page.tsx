@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getOrders, updateOrderStatus, deleteOrder, getBookings, deleteBooking } from "@/lib/orders";
 import { formatPrice } from "@/lib/data/products";
 import type { Order, Booking } from "@/lib/types";
 
@@ -23,18 +22,42 @@ export default function AdminPage() {
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [deliveryFilter, setDeliveryFilter] = useState<string>("all");
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState("");
+  const [storeConfigured, setStoreConfigured] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setApiError("");
+    try {
+      const res = await fetch("/api/admin/orders", { cache: "no-store" });
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (!res.ok) {
+        setApiError("Could not load orders. Please refresh the page.");
+        setLoading(false);
+        return;
+      }
+      const data = (await res.json()) as {
+        orders: Order[];
+        bookings: Booking[];
+        storeConfigured: boolean;
+      };
+      setOrders(data.orders);
+      setBookings(data.bookings);
+      setStoreConfigured(data.storeConfigured);
+    } catch {
+      setApiError("Could not load orders. Please check your connection.");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
 
   useEffect(() => {
-    setOrders(getOrders());
-    setBookings(getBookings());
-
-    const refresh = () => {
-      setOrders(getOrders());
-      setBookings(getBookings());
-    };
-    window.addEventListener("storage", refresh);
-    return () => window.removeEventListener("storage", refresh);
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
@@ -58,21 +81,41 @@ export default function AdminPage() {
     return { totalRevenue, pending, deliveries, total: orders.length };
   }, [orders]);
 
-  const handleStatus = (orderId: string, status: Order["status"]) => {
-    updateOrderStatus(orderId, status);
-    setOrders(getOrders());
+  const handleStatus = async (orderId: string, status: Order["status"]) => {
+    try {
+      await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+    } catch {
+      // fall through; refresh shows whether it succeeded
+    }
+    await fetchData();
   };
 
-  const handleDeleteOrder = (orderId: string) => {
+  const handleDeleteOrder = async (orderId: string) => {
     if (!confirm(`Delete order ${orderId}? This cannot be undone.`)) return;
-    deleteOrder(orderId);
-    setOrders(getOrders());
+    try {
+      await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
+        method: "DELETE",
+      });
+    } catch {
+      // fall through
+    }
+    await fetchData();
   };
 
-  const handleDeleteBooking = (bookingId: string) => {
+  const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm(`Delete booking ${bookingId}?`)) return;
-    deleteBooking(bookingId);
-    setBookings(getBookings());
+    try {
+      await fetch(`/api/admin/bookings/${encodeURIComponent(bookingId)}`, {
+        method: "DELETE",
+      });
+    } catch {
+      // fall through
+    }
+    await fetchData();
   };
 
   const allDeliveries = useMemo(() => {
@@ -96,7 +139,9 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-3">
             <p className="text-xs text-muted">
-              Data stored locally in this browser. Data is cleared with browser history.
+              {storeConfigured
+                ? "Orders are stored securely on the server and shared across all admin browsers."
+                : "Orders are stored in server memory only."}
             </p>
             <button
               onClick={() => {
@@ -111,6 +156,39 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {!storeConfigured && (
+          <div className="rounded-2xl bg-yellow-500/10 border border-yellow-500/30 p-4 mb-8 text-sm flex items-start gap-3">
+            <svg className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <p className="text-yellow-300 leading-relaxed">
+              <strong>Persistent storage is not configured yet.</strong> Orders placed now
+              are kept only in server memory and may be lost on redeploys. To persist
+              orders/bookings across browsers permanently, add the environment variables{" "}
+              <code className="text-yellow-200">KV_REST_API_URL</code> and{" "}
+              <code className="text-yellow-200">KV_REST_API_TOKEN</code> (Vercel KV /
+              Upstash) - or{" "}
+              <code className="text-yellow-200">UPSTASH_REDIS_REST_URL</code> and{" "}
+              <code className="text-yellow-200">UPSTASH_REDIS_REST_TOKEN</code> - through{" "}
+              <span className="text-yellow-200">vercel env add</span>.
+            </p>
+          </div>
+        )}
+
+        {apiError && (
+          <div className="rounded-2xl bg-red-500/10 border border-red-500/30 p-4 mb-8 text-sm text-red-400">
+            {apiError}
+          </div>
+        )}
+
+        {loading && (
+          <div className="text-center py-16">
+            <p className="text-muted">Loading orders...</p>
+          </div>
+        )}
+
+        {!loading && (
+          <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: "Total Orders", value: stats.total, color: "text-gold" },
@@ -530,6 +608,8 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

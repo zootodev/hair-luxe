@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { products } from "@/lib/data/products";
 import ProductCard from "@/components/products/ProductCard";
 import type { ProductCategory } from "@/lib/types";
@@ -27,9 +28,29 @@ interface ShopGridProps {
 }
 
 export default function ShopGrid({ initialSearch = "" }: ShopGridProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [category, setCategory] = useState<"All" | ProductCategory>("All");
   const [sort, setSort] = useState<SortValue>("featured");
   const [search, setSearch] = useState(initialSearch);
+
+  useEffect(() => {
+    const urlQ = searchParams.get("q") ?? "";
+    if (urlQ !== search) {
+      setSearch(urlQ);
+    }
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (search.trim()) params.set("q", search.trim());
+      else params.delete("q");
+      const qs = params.toString();
+      router.replace(`/shop${qs ? `?${qs}` : ""}`, { scroll: false });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     let result = products.filter(

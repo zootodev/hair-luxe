@@ -1,3 +1,5 @@
+import { safeEqual } from "@/lib/timing-safe";
+
 export const SESSION_COOKIE = "hair-luxe-admin-session";
 
 const SALT = "hair-luxe-admin-session-v1";
@@ -12,4 +14,8 @@ export async function hashAdminPassword(password: string): Promise<string> {
 
 export async function getExpectedToken(): Promise<string> {
   return hashAdminPassword(process.env.ADMIN_PASSWORD ?? "");
+}
+
+export function tokenMatches(token: string, expected: string): boolean {
+  return safeEqual(token, expected);
 }

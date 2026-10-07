@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, getExpectedToken } from "@/lib/admin-auth";
+import { SESSION_COOKIE, getExpectedToken, tokenMatches } from "@/lib/admin-auth";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -16,7 +16,7 @@ export async function proxy(request: NextRequest) {
   }
 
   const expected = await getExpectedToken();
-  if (token === expected) {
+  if (tokenMatches(token, expected)) {
     return NextResponse.next();
   }
 

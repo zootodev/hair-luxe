@@ -8,7 +8,8 @@ import {
   type ReactNode,
 } from "react";
 import type { CartItem, DeliveryMethod } from "@/lib/types";
-import { BUSINESS, DELIVERY_ZONES } from "@/lib/config";
+import { DELIVERY_ZONES } from "@/lib/config";
+import { computeDeliveryFee } from "@/lib/delivery";
 import { getAvailableStock } from "@/lib/stock";
 
 interface CartContextValue {
@@ -43,12 +44,6 @@ function loadCart(): CartItem[] {
   } catch {
     return [];
   }
-}
-
-function findDeliveryFee(method: DeliveryMethod, zone: string): number {
-  if (method === "pickup") return 0;
-  const found = DELIVERY_ZONES.find((z) => z.name === zone);
-  return found ? found.fee : BUSINESS.deliveryFee;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -133,8 +128,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const fee = findDeliveryFee(deliveryMethod, deliveryZone);
-  const deliveryFee = deliveryMethod === "delivery" ? fee : 0;
+  const deliveryFee = computeDeliveryFee(deliveryMethod, deliveryZone, subtotal);
   const total = subtotal + deliveryFee;
 
   const value: CartContextValue = {

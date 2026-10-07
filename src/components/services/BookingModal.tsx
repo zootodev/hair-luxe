@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
-import { sendBookingEmail } from "@/lib/email/sendOrderEmail";
 import { generateBookingId, saveBooking } from "@/lib/orders";
 import { BUSINESS } from "@/lib/config";
 import type { Booking, Service } from "@/lib/types";
@@ -34,6 +33,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
     date: "",
     time: "",
     notes: "",
+    website: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<Booking | null>(null);
@@ -41,7 +41,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
 
   const close = () => {
     onClose();
-    setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "" });
+    setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "", website: "" });
     setSuccess(null);
     setError("");
   };
@@ -60,6 +60,49 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
     setSubmitting(true);
     setError("");
 
+    const payload = {
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      service: service.name,
+      date: form.date,
+      time: form.time,
+      notes: form.notes,
+      website: form.website,
+    };
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        booking?: Booking;
+        error?: string;
+        emailOk?: boolean;
+      } | null;
+
+      if (res.ok && data?.booking) {
+        setSubmitting(false);
+        setSuccess(data.booking);
+        setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "", website: "" });
+        if (!data.emailOk) {
+          console.error("Booking saved, but the notification email could not be sent.");
+        }
+        return;
+      }
+      setSubmitting(false);
+      setError(
+        res.status === 429
+          ? data?.error ?? "Too many booking attempts. Please try again shortly."
+          : data?.error ?? "Your booking could not be saved. Please try again."
+      );
+      return;
+    } catch {
+      // Server unreachable - fall through to local-only save.
+    }
+
     const booking: Booking = {
       id: generateBookingId(),
       name: form.name,
@@ -72,15 +115,15 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
       dateCreated: new Date().toISOString(),
     };
 
-    const emailResult = await sendBookingEmail(booking);
-    saveBooking(booking);
-
+    try {
+      saveBooking(booking);
+    } catch {
+      console.error("Failed to save booking locally");
+    }
     setSubmitting(false);
     setSuccess(booking);
-    setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "" });
-    if (!emailResult.ok) {
-      console.error("Booking email failed:", emailResult.status, emailResult.text);
-    }
+    setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "", website: "" });
+    console.warn("Booking saved locally only; server persistence is not available.");
   };
 
   const today = new Date();
@@ -146,6 +189,18 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div aria-hidden="true" className="hidden">
+            <label>
+              Leave this field empty
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.website}
+                onChange={(e) => setForm({ ...form, website: e.target.value })}
+              />
+            </label>
+          </div>
           <div>
             <p className="text-xl font-serif mb-1">{service.name}</p>
             <p className="text-sm text-gold">

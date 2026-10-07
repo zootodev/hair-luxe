@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,17 +9,56 @@ interface ModalProps {
   children: ReactNode;
 }
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useRef(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? `modal-title-${crypto.randomUUID()}`
+      : `modal-title-${Math.random().toString(36).slice(2)}`
+  ).current;
+
   useEffect(() => {
     if (!isOpen) return;
-    const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const focusables = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)
+      ).filter((el) => el.offsetParent !== null);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
-    document.addEventListener("keydown", onEsc);
+
+    document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      panelRef.current?.querySelector<HTMLElement>(
+        'button[aria-label="Close"], input, select, textarea, a[href]'
+      )?.focus();
+    }, 0);
+
     return () => {
-      document.removeEventListener("keydown", onEsc);
+      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
+      window.clearTimeout(focusTimer);
+      previouslyFocused?.focus?.();
     };
   }, [isOpen, onClose]);
 
@@ -30,11 +69,20 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-surface border border-gold/20 shadow-2xl shadow-black/60 gold-border-gradient">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-surface border border-gold/20 shadow-2xl shadow-black/60 gold-border-gradient"
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gold/10">
           {title && (
-            <h3 className="font-serif text-xl text-gold">{title}</h3>
+            <h3 id={titleId} className="font-serif text-xl text-gold">
+              {title}
+            </h3>
           )}
           <button
             onClick={onClose}

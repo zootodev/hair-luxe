@@ -307,6 +307,11 @@ export function getProductsByCategory(category: string): Product[] {
   return products.filter((p) => p.category === category);
 }
 
+const priceFormatter = new Intl.NumberFormat("en-CA", {
+  style: "currency",
+  currency: "CAD",
+});
+
 export function formatPrice(price: number): string {
-  return `$${price.toFixed(2)}`;
+  return priceFormatter.format(price);
 }

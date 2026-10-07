@@ -26,7 +26,6 @@ export const SOCIAL_LINKS = {
 export const PUBLIC_KEY = "GeLrfdQC6goeir_m2";
 export const SERVICE_ID = "service_tlbd789";
 export const TEMPLATE_ID = "template_rg8t7gm";
-export const SLAVE_KEY = "YOUR_EMAILJS_SLAVE_KEY";
 
 export const DELIVERY_ZONES = [
   {
@@ -62,11 +61,5 @@ export const DELIVERY_ZONES = [
     days: "3-5 business days",
   },
 ];
-
-export const DELIVERY_FEE_PLACEHOLDER = {
-  note: "PLACEHOLDER - update DELIVERY_ZONES fees and BUSINESS.deliveryFee with real delivery pricing before going live.",
-  deliveryFee: BUSINESS.deliveryFee,
-  freeDeliveryOver: BUSINESS.freeDeliveryOver,
-};
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zooto-luxe.vercel.app";

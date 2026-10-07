@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { BUSINESS } from "@/lib/config";
-import { sendContactEmail } from "@/lib/email/sendOrderEmail";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [sendError, setSendError] = useState("");
@@ -14,24 +13,38 @@ export default function ContactPage() {
     e.preventDefault();
     setSending(true);
     setSendError("");
-    const result = await sendContactEmail({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      subject: form.subject,
-      message: form.message,
-    });
-    setSending(false);
-    if (result.ok) {
-      setSent(true);
-      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
-      setTimeout(() => setSent(false), 5000);
-    } else {
-      setSendError(
-        result.status
-          ? `Email failed (error ${result.status}). Please call us at ${BUSINESS.phone} instead.`
-          : `Could not reach our server. Please call us at ${BUSINESS.phone}.`
-      );
+    try {
+      const res = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          subject: form.subject,
+          message: form.message,
+          website: form.website,
+        }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+      } | null;
+      if (res.ok && data?.ok !== false) {
+        setSent(true);
+        setForm({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
+        setTimeout(() => setSent(false), 5000);
+      } else {
+        setSendError(
+          res.status === 429
+            ? "Too many messages sent. Please wait a moment and try again."
+            : data?.error || `We could not send your message. Please call us at ${BUSINESS.phone}.`
+        );
+      }
+    } catch {
+      setSendError(`Cannot reach the server. Please call us at ${BUSINESS.phone}.`);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -125,6 +138,18 @@ export default function ContactPage() {
               className="rounded-2xl bg-surface border border-surface-light p-6 sm:p-8"
             >
               <h2 className="font-serif text-xl font-bold mb-6">Send Us a Message</h2>
+              <div aria-hidden="true" className="hidden">
+                <label>
+                  Leave this field empty
+                  <input
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(e) => setForm({ ...form, website: e.target.value })}
+                  />
+                </label>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <label className="block">
                   <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">

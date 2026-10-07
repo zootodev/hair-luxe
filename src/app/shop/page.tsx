@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import ShopGrid from "@/components/products/ShopGrid";
 import { BUSINESS } from "@/lib/config";
 
@@ -31,7 +32,9 @@ export default async function ShopPage({ searchParams }: Props) {
           </p>
         </div>
 
-        <ShopGrid initialSearch={q ?? ""} />
+        <Suspense fallback={null}>
+          <ShopGrid initialSearch={q ?? ""} />
+        </Suspense>
       </div>
     </div>
   );
