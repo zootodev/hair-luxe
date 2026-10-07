@@ -37,7 +37,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["zooto.taile2c6a0.ts.net"],
   images: {
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

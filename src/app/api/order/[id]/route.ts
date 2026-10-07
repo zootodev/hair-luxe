@@ -37,5 +37,8 @@ export async function GET(
     return NextResponse.json({ error: "Order not found." }, { status: 404 });
   }
 
-  return NextResponse.json({ ok: true, order });
+  return NextResponse.json(
+    { ok: true, order },
+    { headers: { "Cache-Control": "no-store, must-revalidate" } }
+  );
 }

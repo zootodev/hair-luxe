@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductBySlug, getProductsByCategory } from "@/lib/data/products";
+import { getProductBySlug, getProductsByCategory, products } from "@/lib/data/products";
 import ProductCard from "@/components/products/ProductCard";
 import ProductDetailClient from "@/components/products/ProductDetail";
 import { BUSINESS } from "@/lib/config";
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+export function generateStaticParams() {
+  return products.map((p) => ({ slug: p.slug ?? p.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

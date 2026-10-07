@@ -27,10 +27,9 @@ export default function AdminPage() {
   const [storeConfigured, setStoreConfigured] = useState(true);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
-    setApiError("");
     try {
       const res = await fetch("/api/admin/orders", { cache: "no-store" });
+      setApiError("");
       if (res.status === 401) {
         router.push("/admin/login");
         return;
@@ -55,9 +54,11 @@ export default function AdminPage() {
     }
   }, [router]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- data fetch (all setState calls are post-await) */
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {

@@ -34,12 +34,14 @@ export default function ShopGrid({ initialSearch = "" }: ShopGridProps) {
   const [sort, setSort] = useState<SortValue>("featured");
   const [search, setSearch] = useState(initialSearch);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- two-way URL binding */
   useEffect(() => {
     const urlQ = searchParams.get("q") ?? "";
     if (urlQ !== search) {
       setSearch(urlQ);
     }
   }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     const timer = setTimeout(() => {

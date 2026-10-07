@@ -15,9 +15,11 @@ export default function OrderConfirmationPage() {
   const orderNumber = params.orderNumber.toUpperCase().replace("ORDER ", "");
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- client-only order lookup after mount */
   useEffect(() => {
     setOrder(getOrders().find((o) => o.id.toUpperCase() === orderNumber) ?? null);
   }, [orderNumber]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (order === undefined) {
     return (

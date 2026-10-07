@@ -14,5 +14,8 @@ export async function GET(request: NextRequest) {
     );
   }
   const id = await nextOrderId();
-  return NextResponse.json({ id });
+  return NextResponse.json(
+    { id },
+    { headers: { "Cache-Control": "no-store, must-revalidate" } }
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,11 +14,7 @@ const FOCUSABLE =
 
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const titleId = useRef(
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? `modal-title-${crypto.randomUUID()}`
-      : `modal-title-${Math.random().toString(36).slice(2)}`
-  ).current;
+  const titleId = useId();
 
   useEffect(() => {
     if (!isOpen) return;

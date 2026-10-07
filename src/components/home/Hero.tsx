@@ -1,15 +1,17 @@
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { BUSINESS } from "@/lib/config";
 
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1722354142475-5b90b0ff9839?q=80&w=2000&auto=format&fit=crop')",
-        }}
+      <Image
+        src="https://images.unsplash.com/photo-1722354142475-5b90b0ff9839?q=80&auto=format&fit=crop"
+        alt="Hair Luxe salon styling"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-background" />
 

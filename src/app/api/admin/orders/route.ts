@@ -9,11 +9,14 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
   const [orders, bookings] = await Promise.all([getOrders(), getBookings()]);
-  return NextResponse.json({
-    ok: true,
-    orders,
-    bookings,
-    storeConfigured: storeConfigured(),
-    storeKind: storeConfigured() ? "persistent" : "memory",
-  });
+  return NextResponse.json(
+    {
+      ok: true,
+      orders,
+      bookings,
+      storeConfigured: storeConfigured(),
+      storeKind: storeConfigured() ? "persistent" : "memory",
+    },
+    { headers: { "Cache-Control": "no-store, must-revalidate" } }
+  );
 }

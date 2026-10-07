@@ -19,7 +19,11 @@ export default function Header() {
   const router = useRouter();
   const { itemCount } = useCart();
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileNav, setMobileNav] = useState<{ open: boolean; path: string }>({
+    open: false,
+    path: "",
+  });
+  const mobileOpen = mobileNav.open && mobileNav.path === pathname;
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -28,10 +32,6 @@ export default function Header() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,7 +124,7 @@ export default function Header() {
             </Link>
 
             <button
-              onClick={() => setMobileOpen((v) => !v)}
+              onClick={() => setMobileNav((v) => ({ open: !v.open, path: pathname }))}
               className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold"
               aria-label="Toggle menu"
             >

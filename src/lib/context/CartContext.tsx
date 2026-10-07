@@ -52,6 +52,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [deliveryZone, setDeliveryZone] = useState<string>(DELIVERY_ZONES[1].name);
   const [loaded, setLoaded] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- one-time local storage hydrate after mount */
   useEffect(() => {
     setItems(loadCart());
     if (typeof window !== "undefined") {
@@ -62,6 +63,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
     setLoaded(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!loaded) return;
