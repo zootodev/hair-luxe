@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
         <div className="rounded-2xl bg-surface border border-surface-light p-8">
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold text-xl">
-              ZL
+              HL
             </div>
             <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
               Private Dashboard

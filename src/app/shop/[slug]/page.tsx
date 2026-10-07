@@ -1,20 +1,35 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductById, getProductsByCategory, products } from "@/lib/data/products";
+import { getProductBySlug, getProductsByCategory } from "@/lib/data/products";
 import ProductCard from "@/components/products/ProductCard";
 import ProductDetailClient from "@/components/products/ProductDetail";
+import { BUSINESS } from "@/lib/config";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return products.map((p) => ({ id: p.id }));
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
+  if (!product) return {};
+  return {
+    title: `${product.name} | ${BUSINESS.name}`,
+    description: product.description,
+    alternates: { canonical: `/shop/${product.slug ?? product.id}` },
+    openGraph: {
+      title: `${product.name} | ${BUSINESS.name}`,
+      description: product.description,
+      type: "website",
+      images: [{ url: product.image }],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: Props) {
-  const { id } = await params;
-  const product = getProductById(id);
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product) {
     notFound();
@@ -32,8 +47,8 @@ export default async function ProductDetailPage({ params }: Props) {
             Home
           </Link>
           <span>/</span>
-          <Link href="/products" className="hover:text-gold transition-colors">
-            Products
+          <Link href="/shop" className="hover:text-gold transition-colors">
+            Shop
           </Link>
           <span>/</span>
           <span className="text-gold">{product.name}</span>

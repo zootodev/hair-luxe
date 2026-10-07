@@ -27,7 +27,7 @@ export default function FeaturedProducts() {
         </div>
 
         <div className="text-center mt-10">
-          <Button href="/products">Shop All Products</Button>
+          <Button href="/shop">Shop All Products</Button>
         </div>
       </div>
     </section>

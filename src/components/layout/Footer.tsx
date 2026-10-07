@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BUSINESS } from "@/lib/config";
+import { BUSINESS, SOCIAL_LINKS } from "@/lib/config";
 
 const SERVICE_LINKS = [
   "Hair Revamping",
@@ -18,14 +18,14 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold">
-                ZL
+                HL
               </span>
               <span className="font-serif text-xl tracking-wide text-gradient-gold font-semibold">
                 {BUSINESS.name}
               </span>
             </div>
             <p className="text-sm text-muted leading-relaxed">
-              Where luxury meets hair. Premium services and products crafted with elegance for
+              {BUSINESS.tagline}. Premium services and products crafted with elegance for
               beauty that speaks for itself.
             </p>
           </div>
@@ -56,7 +56,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/products"
+                  href="/shop"
                   className="text-sm text-muted hover:text-gold transition-colors"
                 >
                   Shop Products
@@ -143,10 +143,39 @@ export default function Footer() {
           <p className="text-xs text-muted">
             &copy; {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.
           </p>
-          <p className="text-xs text-muted flex items-center gap-1.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-gold animate-pulse" />{" "}
-            {BUSINESS.instagram}
-          </p>
+          <div className="flex items-center gap-4 text-xs text-muted">
+            <a
+              href={SOCIAL_LINKS.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gold transition-colors"
+              aria-label="WhatsApp"
+            >
+              WhatsApp
+            </a>
+            <a
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gold transition-colors"
+              aria-label="Instagram"
+            >
+              Instagram
+            </a>
+            <a
+              href={SOCIAL_LINKS.tiktok}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gold transition-colors"
+              aria-label="TikTok"
+            >
+              TikTok
+            </a>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 rounded-full bg-gold animate-pulse" />
+              {BUSINESS.city}
+            </span>
+          </div>
         </div>
       </div>
     </footer>

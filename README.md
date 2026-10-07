@@ -1,20 +1,22 @@
-# Zooto Luxe - Premium Hair Business Ecommerce Website
+# Hair Luxe - Premium Hair Business Ecommerce Website
 
-A modern, luxury-themed ecommerce website for a hair business with Interac e-Transfer payment and EmailJS order notifications.
+A modern, luxury-themed ecommerce website for a hair business with Interac e-Transfer payment and EmailJS order notifications. Rebranded from Zooto Luxe to **Hair Luxe**.
 
 ## Features
 
 - **Services**: Hair revamping, wig making, makeup, lash extensions, microblading, skin tag removal with online booking
-- **Products**: Wigs, hair bundles, lashes, hair care products with catalog filtering and search
+- **Products**: Wigs, hair bundles, lashes, hair care products with catalog filtering (`/shop`) and search
+- **Product Pages**: `/shop/[slug]` with related products, SEO metadata, and canonical URLs
 - **Shopping Cart**: Persistent cart with localStorage, quantity management, delivery/pickup toggling
-- **Checkout**: Customer info collection with Interac e-Transfer payment instructions
+- **Checkout**: Customer info collection, Interac e-Transfer payment instructions, server-side price validation
+- **Order Confirmation**: `/order/[orderNumber]` page shown after placing an order
 - **Order Emails**: Order details (including customer phone number) sent to your email via EmailJS
 - **Admin Dashboard**: View and manage orders, bookings, and delivery queue
 - **Design**: Luxury dark theme with gold accents, fully responsive
 
 ## Tech Stack
 
-- Next.js 16 (App Router, static export)
+- Next.js 16 (App Router, Vercel serverless deployment)
 - React 19
 - TypeScript
 - Tailwind CSS 4
@@ -38,10 +40,18 @@ npm install
 
 Update these files:
 
-**`.env.local`** (create this file):
+**`.env.local`** (create this file - see `.env.example`):
 ```
 NEXT_PUBLIC_EMAILJS_SERVICE_ID=YOUR_SERVICE_ID
 NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=YOUR_TEMPLATE_ID
+NEXT_PUBLIC_INTERAC_EMAIL=payment@yourbusiness.com
+NEXT_PUBLIC_BUSINESS_EMAIL=hello@yourbusiness.com
+NEXT_PUBLIC_WHATSAPP=https://wa.me/14378982207
+NEXT_PUBLIC_WHATSAPP_PHONE=+1 437 898 2207
+NEXT_PUBLIC_TIKTOK=https://www.tiktok.com/@yourhandle
+NEXT_PUBLIC_INSTAGRAM=https://www.instagram.com/yourhandle
+NEXT_PUBLIC_SITE_URL=https://your-site.vercel.app
+ADMIN_PASSWORD=YOUR_ADMIN_PASSWORD
 ```
 
 **`src/lib/config.ts`**:
@@ -109,24 +119,30 @@ Open http://localhost:3000
 npm run build
 ```
 
-The static site is exported to the `out/` folder. Upload this folder to your traditional hosting (GoDaddy, Hostinger, etc.) via FTP.
+This app deploys to **Vercel** (serverless). Connect the GitHub repo to Vercel and push to `main` to auto-deploy. Set all env vars above in the Vercel dashboard too.
 
 ## Business Configuration
 
-All business settings live in **`src/lib/config.ts`**:
+Most business settings live in **`src/lib/config.ts`** and can be overridden with env vars (see `.env.example`):
 
 ```ts
 export const BUSINESS = {
-  name: "Zooto Luxe",
-  email: "ifeoluwaniolufunmilayo@gmail.com",      // your business email
-  phone: "(416) 555-0199",                          // your phone
-  interacEmail: "ifeoluwaniolufunmilayo@gmail.com", // Interac e-Transfer recipient
+  name: "Hair Luxe",
+  interacEmail: process.env.NEXT_PUBLIC_INTERAC_EMAIL ?? "payment@yourbusiness.com",
+  email: process.env.NEXT_PUBLIC_BUSINESS_EMAIL ?? "hello@yourbusiness.com",
+  tagline: "Where Luxury Meets Hair",
+  secondaryTagline: "More Than Hair. It's a Lifestyle.",
   deliveryFee: 15,
-  freeDeliveryOver: 250,
 };
+
+export const DELIVERY_ZONES = [
+  { name: "Toronto", fee: 10 },
+  { name: "GTA", fee: 15 },
+  { name: "Other Ontario", fee: 25 },
+];
 ```
 
-Update products in **`src/lib/data/products.ts`** and services in **`src/lib/data/services.ts`**.
+Update products in **`src/lib/data/products.ts`**, services in **`src/lib/data/services.ts`**, and the EmailJS keys in **`src/lib/config.ts`**.
 
 ## Project Structure
 
@@ -134,29 +150,39 @@ Update products in **`src/lib/data/products.ts`** and services in **`src/lib/dat
 src/
 ├── app/
 │   ├── page.tsx              # Home page
-│   ├── services/             # Services + booking
-│   ├── products/             # Product catalog + detail
+│   ├── shop/                 # Product catalog + product detail (SEO)
+│   ├── services/             # Services + booking + service detail
 │   ├── cart/                 # Shopping cart
 │   ├── checkout/             # Checkout + Interac + email
+│   ├── order/[orderNumber]/  # Order confirmation page
+│   ├── track-order/          # Track order lookup
 │   ├── about/                # About page
 │   ├── contact/              # Contact page
-│   └── admin/                # Order management
+│   ├── admin/                # Order management (password protected)
+│   ├── api/                  # API routes (admin login, order validation)
+│   ├── sitemap.ts            # SEO sitemap
+│   └── robots.ts             # SEO robots
 ├── components/
 │   ├── layout/               # Header, Footer
 │   ├── home/                 # Home sections
-│   ├── products/             # Product card
+│   ├── products/             # Product card, shop grid
+│   ├── services/             # Booking modal
 │   └── ui/                   # Button, Modal
 └── lib/
-    ├── config.ts             # Business settings
+    ├── config.ts             # Business settings + social links
     ├── data/                 # Products & services data
     ├── context/              # Cart state
     ├── email/                # EmailJS integration
     ├── orders.ts             # localStorage order helpers
+    ├── stock.ts              # Sold products tracking
+    ├── rate-limit.ts         # In-memory rate limiting
     └── types/                # TypeScript types
 ```
 
 ## Notes
 
-- The admin dashboard stores orders in the browser's localStorage. On traditional hosting, order data persists per-browser.
+- The admin dashboard stores orders in the browser's localStorage. Data persists per-browser.
 - Delivery is available across Ontario with zone-based fees (Toronto $10, GTA $15, Other Ontario $25).
 - Interac e-Transfer is manually confirmed - the business owner verifies payment in their bank before processing.
+- The `DELIVERY_FEE_PLACEHOLDER` value in `src/lib/config.ts` is a placeholder - replace with the business's real fees before going live.
+- Demo content (products, prices, testimonials) in `src/lib/data/` serves as placeholder sample data - replace with real business content before launch.

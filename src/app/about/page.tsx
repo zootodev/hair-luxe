@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { BUSINESS } from "@/lib/config";
+
+export const metadata: Metadata = {
+  title: `About Us | ${BUSINESS.name}`,
+  description:
+    "The art of luxury beauty. Custom wig making, hair revamping, makeup, lash extensions, microblading and skin tag removal in Ontario, Canada.",
+  alternates: { canonical: "/about" },
+};
 
 const values = [
   {
@@ -67,8 +75,8 @@ export default function AboutPage() {
           <div className="relative">
             <div className="rounded-2xl overflow-hidden border border-gold/20">
               <Image
-                src="https://images.unsplash.com/photo-1560067174-c5a3a8f37060?q=80&w=1200&auto=format&fit=crop"
-                alt="Zooto Luxe Studio"
+                src="https://images.unsplash.com/photo-1722354142475-5b90b0ff9839?q=80&w=1200&auto=format&fit=crop"
+                alt="Hair Luxe Studio"
                 width={1200}
                 height={900}
                 className="object-cover w-full h-[420px]"

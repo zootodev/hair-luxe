@@ -63,7 +63,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-col flex-1 p-4">
-        <Link href={`/products/${product.id}`} className="group-hover:text-gold transition-colors">
+        <Link href={`/shop/${product.slug ?? product.id}`} className="group-hover:text-gold transition-colors">
           <h3 className="font-serif text-base font-semibold leading-snug line-clamp-2">
             {product.name}
           </h3>
@@ -89,7 +89,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {outOfStock ? "Sold Out" : "Add to Cart"}
           </button>
           <Link
-            href={`/products/${product.id}`}
+            href={`/shop/${product.slug ?? product.id}`}
             className="flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
             aria-label="View details"
           >

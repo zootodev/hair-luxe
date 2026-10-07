@@ -1,18 +1,26 @@
 export const BUSINESS = {
-  name: "Zooto Luxe",
+  name: "Hair Luxe",
   tagline: "Where Luxury Meets Hair",
+  secondaryTagline: "More Than Hair. It's a Lifestyle.",
   description:
     "Premium hair services and products. Wigs, hair revamping, makeup, lashes, microblading and more - crafted with elegance.",
-  email: "ifeoluwaniolufunmilayo@gmail.com",
+  email: process.env.NEXT_PUBLIC_BUSINESS_EMAIL || "ifeoluwaniolufunmilayo@gmail.com",
   phone: "(416) 555-0199",
   phoneFormatted: "416-555-0199",
-  interacEmail: "ifeoluwaniolufunmilayo@gmail.com",
-  address: "123 Beauty Avenue, Toronto, Ontario, Canada",
+  interacEmail:
+    process.env.NEXT_PUBLIC_INTERAC_EMAIL || "ifeoluwaniolufunmilayo@gmail.com",
+  address: "Ontario, Canada",
   city: "Ontario",
   hours: "Mon - Sat: 9:00 AM - 7:00 PM",
-  instagram: "@zootoluxe.ca",
   deliveryFee: 15,
   freeDeliveryOver: 250,
+};
+
+export const SOCIAL_LINKS = {
+  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP || "https://wa.me/14378982207",
+  whatsappPhone: process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "+1 437 898 2207",
+  tiktok: process.env.NEXT_PUBLIC_TIKTOK || "https://www.tiktok.com/@hairluxe",
+  instagram: process.env.NEXT_PUBLIC_INSTAGRAM || "https://www.instagram.com/hairluxe.ca",
 };
 
 export const PUBLIC_KEY = "GeLrfdQC6goeir_m2";
@@ -54,3 +62,11 @@ export const DELIVERY_ZONES = [
     days: "3-5 business days",
   },
 ];
+
+export const DELIVERY_FEE_PLACEHOLDER = {
+  note: "PLACEHOLDER - update DELIVERY_ZONES fees and BUSINESS.deliveryFee with real delivery pricing before going live.",
+  deliveryFee: BUSINESS.deliveryFee,
+  freeDeliveryOver: BUSINESS.freeDeliveryOver,
+};
+
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zooto-luxe.vercel.app";

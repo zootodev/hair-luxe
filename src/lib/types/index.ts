@@ -25,6 +25,7 @@ export interface Service {
 
 export interface Product {
   id: string;
+  slug?: string;
   name: string;
   category: ProductCategory;
   description: string;

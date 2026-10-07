@@ -2,24 +2,26 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
 import { BUSINESS } from "@/lib/config";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
+  { href: "/shop", label: "Shop" },
   { href: "/services", label: "Services" },
-  { href: "/products", label: "Shop" },
-  { href: "/track-order", label: "Track Order" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { itemCount } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -30,6 +32,14 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+    setSearchOpen(false);
+    setQuery("");
+  };
 
   return (
     <header
@@ -43,7 +53,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link href="/" className="flex items-center gap-2 group">
             <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif text-xl font-bold shadow-lg shadow-gold/20">
-              ZL
+              HL
             </span>
             <span className="font-serif text-2xl md:text-3xl tracking-wide text-gradient-gold font-semibold">
               {BUSINESS.name.split(" ")[0]}
@@ -71,6 +81,16 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSearchOpen((v) => !v)}
+              className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
+              aria-label="Search"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+              </svg>
+            </button>
+
             <Link
               href="/cart"
               className="relative flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
@@ -97,7 +117,7 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/checkout"
+              href="/services"
               className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-gold/20"
             >
               Book Now
@@ -120,8 +140,45 @@ export default function Header() {
         </div>
       </div>
 
+      {searchOpen && (
+        <form
+          onSubmit={submitSearch}
+          className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3"
+        >
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+              </svg>
+            </span>
+            <input
+              autoFocus
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search wigs, bundles, lashes..."
+              className="w-full h-11 rounded-full bg-surface border border-gold/30 pl-11 pr-4 text-sm focus:border-gold focus:outline-none"
+            />
+          </div>
+        </form>
+      )}
+
       {mobileOpen && (
         <nav className="md:hidden bg-background/98 backdrop-blur-md border-t border-gold/20 px-4 pb-6 pt-2">
+          <form onSubmit={submitSearch} className="relative mb-3">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search products..."
+              className="w-full h-11 rounded-full bg-surface-light border border-surface-light pl-10 pr-4 text-sm focus:border-gold focus:outline-none"
+            />
+          </form>
           <div className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const active = pathname === link.href;
@@ -140,7 +197,13 @@ export default function Header() {
               );
             })}
             <Link
-              href="/checkout"
+              href="/track-order"
+              className="px-4 py-3 rounded-lg text-sm font-medium tracking-wide text-foreground/80 hover:bg-gold/5 hover:text-gold transition-colors"
+            >
+              Track Order
+            </Link>
+            <Link
+              href="/services"
               className="mt-3 inline-flex items-center justify-center h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold"
             >
               Book Now

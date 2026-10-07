@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
 import { formatPrice } from "@/lib/data/products";
 import { BUSINESS } from "@/lib/config";
@@ -17,7 +18,17 @@ const STATUS_STEPS = [
   { label: "Confirmation", step: 3 },
 ];
 
+interface ValidateResponse {
+  ok: boolean;
+  items?: Order["items"];
+  subtotal?: number;
+  deliveryFee?: number;
+  total?: number;
+  error?: string;
+}
+
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, clearCart } =
     useCart();
 
@@ -112,10 +123,38 @@ const [emailStatus, setEmailStatus] = useState<string>("");
     setStep(1);
   };
 
-  const handlePlaceOrder = async () => {
+const handlePlaceOrder = async () => {
     if (!agreed) return;
     setSubmitting(true);
     setEmailStatus("");
+
+    let validatedItems = items;
+    let validatedSubtotal = subtotal;
+    let validatedDeliveryFee = deliveryFee;
+    let validatedTotal = total;
+
+    try {
+      const res = await fetch("/api/orders/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, deliveryMethod, deliveryZone }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as ValidateResponse;
+        setSubmitting(false);
+        setErrors({ phone: "" });
+        alert(data.error ?? "We could not validate your order. Please try again.");
+        return;
+      }
+      const data = (await res.json()) as ValidateResponse;
+      if (data.items) validatedItems = data.items;
+      if (typeof data.subtotal === "number") validatedSubtotal = data.subtotal;
+      if (typeof data.deliveryFee === "number") validatedDeliveryFee = data.deliveryFee;
+      if (typeof data.total === "number") validatedTotal = data.total;
+    } catch {
+      // Validation is best-effort server-side; fall back to client totals on network failure.
+      console.error("Order validation request failed; using client-side totals.");
+    }
 
     const order: Order = {
       id: generateOrderId(),
@@ -130,10 +169,10 @@ const [emailStatus, setEmailStatus] = useState<string>("");
         deliveryZone: deliveryMethod === "delivery" ? deliveryZone : undefined,
         notes: form.notes,
       },
-      items,
-      subtotal,
-      deliveryFee,
-      total,
+      items: validatedItems,
+      subtotal: validatedSubtotal,
+      deliveryFee: validatedDeliveryFee,
+      total: validatedTotal,
       status: "pending",
       paymentMethod: "interac",
       date: new Date().toISOString(),
@@ -159,6 +198,7 @@ const [emailStatus, setEmailStatus] = useState<string>("");
     );
     setPlacedOrder(order);
     setSubmitting(false);
+    router.push(`/order/${order.id}`);
   };
 
   if (items.length === 0 && !placedOrder) {
@@ -176,8 +216,8 @@ const [emailStatus, setEmailStatus] = useState<string>("");
           </div>
           <h1 className="font-serif text-3xl font-bold mb-3">No Items to Checkout</h1>
           <p className="text-muted mb-8">Your cart is empty. Add some luxury products first.</p>
-          <Link
-            href="/products"
+<Link
+            href="/shop"
             className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity"
           >
             Shop Products

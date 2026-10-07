@@ -10,10 +10,10 @@ export const products: Product[] = [
     price: 250,
     compareAtPrice: 320,
     image:
-      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1605980776566-0486c3ac7617?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1613730318129-bf0ca2a12364?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 8,
     rating: 4.9,
@@ -60,9 +60,9 @@ export const products: Product[] = [
       "Luxurious goddess braids wig with natural-looking roots. Pre-styled and ready to wear - zero install time.",
     price: 180,
     image:
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=1200&auto=format&fit=crop",
+      "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=1200&auto=format&fit=crop",
+      "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 12,
     rating: 4.7,
@@ -84,9 +84,9 @@ export const products: Product[] = [
     price: 200,
     compareAtPrice: 260,
     image:
-      "https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1588527962980-72746d95973e?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1588527962980-72746d95973e?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 15,
     rating: 4.9,
@@ -132,9 +132,9 @@ export const products: Product[] = [
       "Trending ginger blonde bundles with premium color. Dimension and vibrancy for eye-catching looks.",
     price: 230,
     image:
-      "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1607093699882-27ca1cb89a3b?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1607093699882-27ca1cb89a3b?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 10,
     rating: 4.6,
@@ -155,9 +155,9 @@ export const products: Product[] = [
       "Professional mink volume lash kit with 10 different lengths. Reusable and cruelty-free for stunning statement eyes.",
     price: 45,
     image:
-      "https://images.unsplash.com/photo-1588515724527-074a7f566168?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1639629509821-c54cdd984227?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1588515724527-074a7f566168?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1639629509821-c54cdd984227?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 30,
     rating: 4.7,
@@ -180,9 +180,9 @@ export const products: Product[] = [
     price: 25,
     compareAtPrice: 35,
     image:
-      "https://images.unsplash.com/photo-1631214496147-fe90620e7e48?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1715195060250-b321e5cd5171?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1631214496147-fe90620e7e48?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1715195060250-b321e5cd5171?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 45,
     rating: 4.5,
@@ -251,9 +251,9 @@ export const products: Product[] = [
       "Sulfate-free shampoo that cleanses while restoring moisture balance. Safe for colored and chemically treated hair.",
     price: 28,
     image:
-      "https://images.unsplash.com/photo-1600455736745-879d5ceed324?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1747858989102-cca0f4dc4a11?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1600455736745-879d5ceed324?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1747858989102-cca0f4dc4a11?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 50,
     rating: 4.6,
@@ -274,9 +274,9 @@ export const products: Product[] = [
       "100% mulberry silk bonnet and scrunchie set. Protects hair overnight while sleeping to prevent breakage and preserve style.",
     price: 35,
     image:
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1661879206759-465a93950df5?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1661879206759-465a93950df5?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 40,
     rating: 4.9,
@@ -293,6 +293,10 @@ export const products: Product[] = [
 
 export function getProductById(id: string): Product | undefined {
   return products.find((p) => p.id === id);
+}
+
+export function getProductBySlug(slug: string): Product | undefined {
+  return products.find((p) => p.id === slug || p.slug === slug);
 }
 
 export function getFeaturedProducts(): Product[] {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getOrders, updateOrderStatus, deleteOrder, getBookings, deleteBooking } from "@/lib/orders";
 import { formatPrice } from "@/lib/data/products";
 import type { Order, Booking } from "@/lib/types";
@@ -15,6 +16,7 @@ const STATUS_STYLES: Record<Order["status"], string> = {
 type Tab = "orders" | "bookings" | "deliveries";
 
 export default function AdminPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -99,7 +101,7 @@ export default function AdminPage() {
             <button
               onClick={() => {
                 fetch("/api/admin/logout", { method: "POST" }).then(() => {
-                  window.location.href = "/";
+                  router.push("/");
                 });
               }}
               className="px-4 py-2 rounded-full text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors cursor-pointer"

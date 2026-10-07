@@ -8,7 +8,7 @@ export default function Hero() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1560067174-c5a3a8f37060?q=80&w=2000&auto=format&fit=crop')",
+            "url('https://images.unsplash.com/photo-1722354142475-5b90b0ff9839?q=80&w=2000&auto=format&fit=crop')",
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-background" />
@@ -30,7 +30,7 @@ export default function Hero() {
           <Button href="/services" size="lg">
             Book a Service
           </Button>
-          <Button href="/products" size="lg" variant="outline">
+          <Button href="/shop" size="lg" variant="outline">
             Shop Products
           </Button>
         </div>

@@ -39,7 +39,7 @@ export default function CartPage() {
           <p className="text-muted mb-8">
             Explore our premium wigs, hair bundles and beauty essentials.
           </p>
-          <Button href="/products" size="lg">
+          <Button href="/shop" size="lg">
             Start Shopping
           </Button>
         </div>
@@ -73,8 +73,8 @@ export default function CartPage() {
                       <p className="text-xs text-gold uppercase tracking-wider mb-1">
                         {item.category}
                       </p>
-                      <Link
-                        href={`/products/${item.productId}`}
+<Link
+                        href={`/shop/${item.productId}`}
                         className="font-serif font-semibold hover:text-gold transition-colors"
                       >
                         {item.name}
@@ -121,7 +121,7 @@ export default function CartPage() {
             ))}
 
             <Link
-              href="/products"
+              href="/shop"
               className="inline-flex items-center gap-2 text-sm text-gold hover:underline"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/lib/context/CartContext";
-import { BUSINESS } from "@/lib/config";
+import { BUSINESS, SITE_URL } from "@/lib/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +23,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
   description:
     `${BUSINESS.description} Wigs, hair revamping, makeup, lash extensions, microblading and skin tag removal in ${BUSINESS.city}. Order online with easy Interac e-Transfer payment.`,
@@ -43,7 +44,14 @@ export const metadata: Metadata = {
     description: BUSINESS.description,
     type: "website",
     locale: "en_CA",
+    siteName: BUSINESS.name,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
+    description: BUSINESS.description,
+  },
+  alternates: { canonical: "/" },
 };
 
 export default function RootLayout({
