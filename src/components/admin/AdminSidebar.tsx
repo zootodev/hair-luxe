@@ -69,7 +69,7 @@ const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
 export default function AdminSidebar({ active, onChange, onLogout }: AdminSidebarProps) {
   return (
     <aside className="w-full lg:w-56 shrink-0 lg:sticky lg:top-28 h-fit">
-      <nav className="flex lg:flex-col gap-1.5 overflow-x-auto pb-2 lg:pb-0">
+      <nav className="flex lg:flex-col gap-1.5 pb-2 lg:pb-0">
         {NAV.map((item) => (
           <button
             key={item.key}

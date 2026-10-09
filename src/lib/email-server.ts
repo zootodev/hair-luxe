@@ -55,14 +55,16 @@ export function sendOrderEmail(order: Order): Promise<SendResult> {
     subtotal: order.subtotal.toFixed(2),
     delivery_fee: order.deliveryFee.toFixed(2),
     total: order.total.toFixed(2),
-    payment_method: "Interac e-Transfer",
+    payment_method: "Bank Transfer",
     order_date: new Date(order.date).toLocaleString("en-CA", {
       dateStyle: "full",
       timeStyle: "short",
     }),
     notes: order.customer.notes || "None",
     business_name: BUSINESS.name,
-    interac_email: BUSINESS.interacEmail,
+    bank_name: BUSINESS.bankDetails.bankName,
+    account_name: BUSINESS.bankDetails.accountName,
+    account_number: BUSINESS.bankDetails.accountNumber,
   });
 }
 
@@ -81,7 +83,9 @@ export function sendOrderStatusEmail(order: Order): Promise<SendResult> {
     order_status: order.status.toUpperCase(),
     status_message: STATUS_NOTES[order.status],
     total: order.total.toFixed(2),
-    interac_email: BUSINESS.interacEmail,
+    bank_name: BUSINESS.bankDetails.bankName,
+    account_name: BUSINESS.bankDetails.accountName,
+    account_number: BUSINESS.bankDetails.accountNumber,
     business_name: BUSINESS.name,
   });
 }

@@ -12,8 +12,8 @@ const SECTIONS = [
   {
     title: "Information We Collect",
     body: [
-      "When you place an order or book a service, we collect the details you provide: your name, email address, phone number, delivery address and city. For orders paid by Interac e-Transfer, a proof-of-payment image you upload is transmitted with your order.",
-      "We never ask for or store credit card numbers. Payment is completed directly between you and your bank through Interac e-Transfer.",
+      "When you place an order or book a service, we collect the details you provide: your name, email address, phone number, delivery address and city. For orders paid by bank transfer, a proof-of-payment image you upload is transmitted with your order.",
+      "We never ask for or store credit card numbers. Payment is completed directly between you and your bank.",
     ],
   },
   {
@@ -33,7 +33,7 @@ const SECTIONS = [
   {
     title: "Payment Proofs",
     body: [
-      "Proof-of-payment images you upload are stored with your order so we can verify e-Transfer payments. If you would prefer to confirm transfer details by phone instead, please contact us and we will arrange an alternative.",
+      "Proof-of-payment images you upload are stored with your order so we can verify bank transfer payments. If you would prefer to confirm transfer details by phone instead, please contact us and we will arrange an alternative.",
     ],
   },
   {

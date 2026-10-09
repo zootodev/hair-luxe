@@ -50,6 +50,12 @@ export interface DeliveryZoneSettings {
   days: string;
 }
 
+export interface BankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+}
+
 export interface SiteSettings {
   businessName: string;
   tagline: string;
@@ -59,7 +65,7 @@ export interface SiteSettings {
   address: string;
   city: string;
   hours: string;
-  interacEmail: string;
+  bankDetails: BankDetails;
   deliveryFee: number;
   freeDeliveryOver: number;
   deliveryZones: DeliveryZoneSettings[];
@@ -95,7 +101,7 @@ export interface Order {
   deliveryFee: number;
   total: number;
   status: "pending" | "processing" | "completed" | "cancelled";
-  paymentMethod: "interac" | "notification";
+  paymentMethod: "bank-transfer" | "notification";
   paymentProof?: string;
   paymentProofName?: string;
   date: string;

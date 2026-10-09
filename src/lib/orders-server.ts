@@ -141,7 +141,7 @@ export async function createOrderServer(
     deliveryFee,
     total,
     status: "pending",
-    paymentMethod: "interac",
+    paymentMethod: "bank-transfer",
     date: new Date().toISOString(),
     paymentProof: input.paymentProof,
     paymentProofName: input.paymentProofName?.slice(0, 200),

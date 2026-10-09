@@ -115,20 +115,28 @@ export default function OrderConfirmationPage() {
               </svg>
             </span>
             <p className="font-semibold text-sm">
-              Complete your Interac e-Transfer to confirm
+              Complete your bank transfer to confirm
             </p>
           </div>
           <div className="space-y-1.5 text-sm">
             <p className="flex justify-between">
-              <span className="text-muted">Send To:</span>
-              <span className="font-medium">{business.interacEmail}</span>
+              <span className="text-muted">Bank:</span>
+              <span className="font-medium">{business.bankDetails.bankName}</span>
+            </p>
+            <p className="flex justify-between">
+              <span className="text-muted">Account Name:</span>
+              <span className="font-medium">{business.bankDetails.accountName}</span>
+            </p>
+            <p className="flex justify-between">
+              <span className="text-muted">Account Number:</span>
+              <span className="font-medium">{business.bankDetails.accountNumber}</span>
             </p>
             <p className="flex justify-between">
               <span className="text-muted">Amount:</span>
               <span className="font-medium text-gold">{formatPrice(order.total)}</span>
             </p>
             <p className="flex justify-between">
-              <span className="text-muted">Message:</span>
+              <span className="text-muted">Reference:</span>
               <span className="font-medium">Order {order.id}</span>
             </p>
           </div>

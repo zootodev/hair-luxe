@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, hashAdminPassword } from "@/lib/admin-auth";
+import { SESSION_COOKIE, createSessionToken, hashAdminPassword, SESSION_TTL_MS, generateCSRFToken } from "@/lib/admin-auth";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -42,13 +42,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
   }
 
+const token = await createSessionToken();
+  const csrfToken = generateCSRFToken();
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(SESSION_COOKIE, submittedHash, {
+  response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
+    maxAge: SESSION_TTL_MS,
   });
-
+  response.cookies.set("csrf-token", csrfToken, {
+    httpOnly: false,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: SESSION_TTL_MS,
+  });
   return response;
 }

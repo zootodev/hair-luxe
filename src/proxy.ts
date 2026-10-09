@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, getExpectedToken, tokenMatches } from "@/lib/admin-auth";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -18,13 +18,15 @@ export async function proxy(request: NextRequest) {
     return redirectToLogin(request);
   }
 
-  const expected = await getExpectedToken();
-  if (tokenMatches(token, expected)) {
-    return NextResponse.next();
+  if (!(await verifySessionToken(token))) {
+    if (pathname.startsWith("/api/admin")) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+    return redirectToLogin(request);
   }
 
   if (pathname.startsWith("/api/admin")) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    return NextResponse.next();
   }
 
   return redirectToLogin(request);

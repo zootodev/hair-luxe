@@ -24,8 +24,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
-  description:
-    `${BUSINESS.description} Wigs, hair revamping, makeup, lash extensions, microblading and skin tag removal in ${BUSINESS.city}. Order online with easy Interac e-Transfer payment.`,
+  description: "Premium hair services and luxury wigs. Hair revamping, wig making, makeup, lash extensions, microblading and skin tag removal. Book online with easy payment.",
   keywords: [
     "hair luxury",
     "hair revamping",
@@ -51,6 +50,11 @@ export const metadata: Metadata = {
     description: BUSINESS.description,
   },
   alternates: { canonical: "/" },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

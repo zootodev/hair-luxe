@@ -4,7 +4,7 @@ import { BUSINESS } from "@/lib/config";
 export const metadata: Metadata = {
   title: `Checkout | ${BUSINESS.name}`,
   description:
-    "Secure checkout with Interac e-Transfer payment. Delivery across Ontario or in-store pickup.",
+    "Secure bank transfer checkout. Delivery within Nigeria or in-store pickup.",
   alternates: { canonical: "/checkout" },
 };
 

@@ -18,7 +18,9 @@ interface SettingsDraft {
   address: string;
   city: string;
   hours: string;
-  interacEmail: string;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
   deliveryFee: string;
   freeDeliveryOver: string;
   deliveryZones: ZoneDraft[];
@@ -56,7 +58,11 @@ export default function SettingsManager() {
             address: string;
             city: string;
             hours: string;
-            interacEmail: string;
+            bankDetails: {
+              bankName: string;
+              accountName: string;
+              accountNumber: string;
+            };
           };
           announcement: { enabled: boolean; text: string };
         };
@@ -71,7 +77,9 @@ export default function SettingsManager() {
         address: s.business.address,
         city: s.business.city,
         hours: s.business.hours,
-        interacEmail: s.business.interacEmail,
+        bankName: s.business.bankDetails?.bankName ?? "",
+        accountName: s.business.bankDetails?.accountName ?? "",
+        accountNumber: s.business.bankDetails?.accountNumber ?? "",
         deliveryFee: String(s.deliveryFee),
         freeDeliveryOver: String(s.freeDeliveryOver),
         deliveryZones: s.deliveryZones.map((z) => ({
@@ -128,7 +136,11 @@ export default function SettingsManager() {
             address: form.address,
             city: form.city,
             hours: form.hours,
-            interacEmail: form.interacEmail,
+            bankDetails: {
+              bankName: form.bankName,
+              accountName: form.accountName,
+              accountNumber: form.accountNumber,
+            },
             deliveryFee: Number(form.deliveryFee),
             freeDeliveryOver: Number(form.freeDeliveryOver),
             deliveryZones: form.deliveryZones
@@ -253,11 +265,27 @@ export default function SettingsManager() {
                 />
               </label>
               <label>
-                <span className="block text-xs text-muted mb-1">Interac e-Transfer Email</span>
+                <span className="block text-xs text-muted mb-1">Bank Name</span>
                 <input
                   className={inputClass}
-                  value={form.interacEmail}
-                  onChange={(e) => set({ interacEmail: e.target.value })}
+                  value={form.bankName}
+                  onChange={(e) => set({ bankName: e.target.value })}
+                />
+              </label>
+              <label>
+                <span className="block text-xs text-muted mb-1">Account Name</span>
+                <input
+                  className={inputClass}
+                  value={form.accountName}
+                  onChange={(e) => set({ accountName: e.target.value })}
+                />
+              </label>
+              <label>
+                <span className="block text-xs text-muted mb-1">Account Number</span>
+                <input
+                  className={inputClass}
+                  value={form.accountNumber}
+                  onChange={(e) => set({ accountNumber: e.target.value })}
                 />
               </label>
             </div>

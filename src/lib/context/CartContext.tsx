@@ -30,7 +30,11 @@ export interface LiveCatalogBusiness {
   address: string;
   city: string;
   hours: string;
-  interacEmail: string;
+  bankDetails: {
+    bankName: string;
+    accountName: string;
+    accountNumber: string;
+  };
 }
 
 interface LiveCatalogPayload {
@@ -120,7 +124,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     address: BUSINESS.address,
     city: BUSINESS.city,
     hours: BUSINESS.hours,
-    interacEmail: BUSINESS.interacEmail,
+    bankDetails: { ...BUSINESS.bankDetails },
   });
   const [announcement, setAnnouncement] = useState({
     enabled: false,

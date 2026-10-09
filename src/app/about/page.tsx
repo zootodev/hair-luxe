@@ -6,7 +6,7 @@ import { BUSINESS } from "@/lib/config";
 export const metadata: Metadata = {
   title: `About Us | ${BUSINESS.name}`,
   description:
-    "The art of luxury beauty. Custom wig making, hair revamping, makeup, lash extensions, microblading and skin tag removal in Ontario, Canada.",
+    "The art of luxury beauty. Custom wig making, hair revamping, makeup, lash extensions, microblading and skin tag removal in Lagos, Nigeria.",
   alternates: { canonical: "/about" },
 };
 

@@ -7,7 +7,10 @@ import { services } from "@/lib/data/services";
 import type { Service } from "@/lib/types";
 import BookingModal from "@/components/services/BookingModal";
 
-export default function ServicesPage() {
+export const metadata: Metadata = {
+  title: `Services | ${BUSINESS.name}`,
+  description: "Expert hair services including hair revamping, wig making, makeup, lash extensions, microblading, and skin tag removal. Book a consultation online.",
+};
   const [bookingService, setBookingService] = useState<Service | null>(null);
   const [catalogServices, setCatalogServices] = useState<Service[]>(services);
 

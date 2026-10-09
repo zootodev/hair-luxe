@@ -100,7 +100,7 @@ export default function ContactPage() {
               },
               {
                 title: "Order Payments",
-                value: `Interac e-Transfer to ${business.interacEmail}`,
+                value: `Bank transfer to ${business.bankDetails.bankName} - ${business.bankDetails.accountNumber}`,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path

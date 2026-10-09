@@ -4,7 +4,7 @@ import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: `Terms & Conditions | ${BUSINESS.name}`,
-  description: `Terms and conditions for placing orders, paying by e-Transfer, and booking services with ${BUSINESS.name} in Ontario, Canada.`,
+  description: `Terms and conditions for placing orders, paying by bank transfer, and booking services with ${BUSINESS.name} in Lagos, Nigeria.`,
   alternates: { canonical: "/terms" },
 };
 
@@ -12,14 +12,14 @@ const SECTIONS = [
   {
     title: "Orders & Payment",
     body: [
-      "Orders are placed through our website and paid by Interac e-Transfer. All prices are in Canadian dollars (CAD). An order is confirmed once a completed e-Transfer is received; we verify payment before preparing your items.",
+      "Orders are placed through our website and paid by bank transfer. An order is confirmed once a completed bank transfer is received; we verify payment before preparing your items.",
       "We reserve the right to cancel or adjust any order that appears fraudulent or was placed with incorrect pricing.",
     ],
   },
   {
     title: "Delivery & Pickup",
     body: [
-      "Delivery is available within our listed zones. Delivery fees and estimated times depend on your zone, and delivery is free on orders over the amount shown at checkout. Pickup orders can be collected from our Ontario location during business hours.",
+      "Delivery is available within our listed zones. Delivery fees and estimated times depend on your zone, and delivery is free on orders over the amount shown at checkout. Pickup orders can be collected from our location during business hours.",
       "While we make every effort to meet estimated delivery times, they are estimates and not guaranteed. We are not liable for delays outside our control (e.g., courier or weather).",
     ],
   },
@@ -59,7 +59,7 @@ const SECTIONS = [
   {
     title: "Governing Law",
     body: [
-      "These terms are governed by the laws of Ontario, Canada, and any disputes will be resolved in the Ontario courts.",
+      "These terms are governed by the laws of Lagos State, Nigeria, and any disputes will be resolved in the Nigerian courts.",
     ],
   },
   {

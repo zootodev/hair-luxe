@@ -28,6 +28,19 @@ function asBoolean(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
+function asany(value: unknown, fallback: Record<string, unknown>): {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+} {
+  const o = value as Record<string, unknown>;
+  return {
+    bankName: (o as any).bankName as string ?? (fallback as any).bankName as string ?? "",
+    accountName: (o as any).accountName as string ?? (fallback as any).accountName as string ?? "",
+    accountNumber: (o as any).accountNumber as string ?? (fallback as any).accountNumber as string ?? "",
+  };
+}
+
 export function defaultSettings(): SiteSettings {
   return {
     businessName: BUSINESS.name,
@@ -38,7 +51,7 @@ export function defaultSettings(): SiteSettings {
     address: BUSINESS.address,
     city: BUSINESS.city,
     hours: BUSINESS.hours,
-    interacEmail: BUSINESS.interacEmail,
+    bankDetails: { ...BUSINESS.bankDetails },
     deliveryFee: BUSINESS.deliveryFee,
     freeDeliveryOver: BUSINESS.freeDeliveryOver,
     deliveryZones: DELIVERY_ZONES.map((z) => ({ ...z })),
@@ -80,7 +93,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
     address: asString(stored.address, defaults.address),
     city: asString(stored.city, defaults.city),
     hours: asString(stored.hours, defaults.hours),
-    interacEmail: asString(stored.interacEmail, defaults.interacEmail),
+    bankDetails: asany(stored.bankDetails as unknown as any, defaults.bankDetails as any),
     deliveryFee: asNumber(stored.deliveryFee, defaults.deliveryFee),
     freeDeliveryOver: asNumber(stored.freeDeliveryOver, defaults.freeDeliveryOver),
     deliveryZones,
@@ -204,7 +217,7 @@ export interface PublicCatalog {
       address: string;
       city: string;
       hours: string;
-      interacEmail: string;
+      bankDetails: { bankName: string; accountName: string; accountNumber: string; };
     };
     announcement: { enabled: boolean; text: string };
   };
@@ -232,7 +245,7 @@ export async function getPublicCatalog(): Promise<PublicCatalog> {
         address: settings.address,
         city: settings.city,
         hours: settings.hours,
-        interacEmail: settings.interacEmail,
+        bankDetails: settings.bankDetails,
       },
       announcement: settings.announcement,
     },

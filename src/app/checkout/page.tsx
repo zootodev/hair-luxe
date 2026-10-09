@@ -12,7 +12,7 @@ import type { DeliveryZoneSettings, Order } from "@/lib/types";
 
 const STATUS_STEPS = [
   { label: "Order Details", step: 1 },
-  { label: "Interac Payment", step: 2 },
+  { label: "Bank Transfer", step: 2 },
   { label: "Confirmation", step: 3 },
 ];
 
@@ -275,20 +275,28 @@ const handlePlaceOrder = async () => {
                 </svg>
               </span>
               <p className="font-semibold text-sm">
-                Complete your Interac e-Transfer to confirm
+                Complete your bank transfer to confirm
               </p>
             </div>
             <div className="space-y-1.5 text-sm">
               <p className="flex justify-between">
-                <span className="text-muted">Send To:</span>
-                <span className="font-medium">{business.interacEmail}</span>
+                <span className="text-muted">Bank:</span>
+                <span className="font-medium">{business.bankDetails.bankName}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-muted">Account Name:</span>
+                <span className="font-medium">{business.bankDetails.accountName}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-muted">Account Number:</span>
+                <span className="font-medium">{business.bankDetails.accountNumber}</span>
               </p>
               <p className="flex justify-between">
                 <span className="text-muted">Amount:</span>
                 <span className="font-medium text-gold">{formatPrice(placedOrder.total)}</span>
               </p>
               <p className="flex justify-between">
-                <span className="text-muted">Message:</span>
+                <span className="text-muted">Reference:</span>
                 <span className="font-medium">Order {placedOrder.id}</span>
               </p>
             </div>
@@ -547,7 +555,7 @@ const handlePlaceOrder = async () => {
               <div className="space-y-6">
                 <div className="rounded-2xl bg-surface border border-surface-light p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-serif text-xl font-bold">Interac e-Transfer</h2>
+                    <h2 className="font-serif text-xl font-bold">Bank Transfer</h2>
                     <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-semibold">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path
@@ -563,20 +571,20 @@ const handlePlaceOrder = async () => {
                   <div className="space-y-4 mb-6">
                     {[
                       {
-                        title: "Step 1: Log into your online banking",
-                        desc: "Open your bank's app or website and navigate to Interac e-Transfer.",
+                        title: "Step 1: Open your banking app",
+                        desc: "Log into your bank's app or website and start a new transfer.",
                       },
                       {
-                        title: `Step 2: Send to ${business.interacEmail}`,
-                        desc: `Enter the email ${business.interacEmail} as the recipient. Does the recipient have the security question set up? No problem, select "No security question" if available.`,
+                        title: `Step 2: Transfer to ${business.bankDetails.bankName}`,
+                        desc: `Send to account number ${business.bankDetails.accountNumber} (${business.bankDetails.accountName}). Confirm the account name matches before sending.`,
                       },
                       {
                         title: `Step 3: Send exactly ${formatPrice(total)}`,
                         desc: `Transfer the exact amount of ${formatPrice(total)}. Double-check to avoid errors.`,
                       },
                       {
-                        title: `Step 4: Include message "Order ${previewId}"`,
-                        desc: "Add your order number as the e-Transfer message so we can match your payment quickly.",
+                        title: `Step 4: Use "Order ${previewId}" as reference`,
+                        desc: "Add your order number as the transfer reference or narration so we can match your payment quickly.",
                       },
                       {
                         title: "Step 5: Confirm below",
@@ -601,8 +609,16 @@ const handlePlaceOrder = async () => {
                     </p>
                     <div className="space-y-2 text-sm">
                       <p className="flex justify-between">
-                        <span className="text-muted">Recipient</span>
-                        <span className="font-medium text-gold">{business.interacEmail}</span>
+                        <span className="text-muted">Bank</span>
+                        <span className="font-medium text-gold">{business.bankDetails.bankName}</span>
+                      </p>
+                      <p className="flex justify-between">
+                        <span className="text-muted">Account Name</span>
+                        <span className="font-medium">{business.bankDetails.accountName}</span>
+                      </p>
+                      <p className="flex justify-between">
+                        <span className="text-muted">Account Number</span>
+                        <span className="font-medium">{business.bankDetails.accountNumber}</span>
                       </p>
                       <p className="flex justify-between">
                         <span className="text-muted">Amount</span>
@@ -611,7 +627,7 @@ const handlePlaceOrder = async () => {
                         </span>
                       </p>
                       <p className="flex justify-between">
-                        <span className="text-muted">Message</span>
+                        <span className="text-muted">Reference</span>
                         <span className="font-medium">Order {previewId}</span>
                       </p>
                     </div>
@@ -678,16 +694,18 @@ const handlePlaceOrder = async () => {
                       className="mt-0.5 w-5 h-5 rounded border border-surface-light accent-[#d4af37] cursor-pointer"
                     />
                     <span className="text-sm text-foreground/85 leading-relaxed">
-                      I confirm I have sent the Interac e-Transfer of{" "}
+                      I confirm I have sent a bank transfer of{" "}
                       <strong className="text-gold">{formatPrice(total)}</strong> to{" "}
-                      <strong>{business.interacEmail}</strong> with message{" "}
-                      <strong>Order {previewId}</strong>.
+                      <strong>
+                        {business.bankDetails.bankName} - {business.bankDetails.accountNumber}
+                      </strong>{" "}
+                      with reference <strong>Order {previewId}</strong>.
                     </span>
                   </label>
 
                   {!agreed && (
                     <p className="text-xs text-muted mb-4">
-                      You must send the e-Transfer first, then confirm to place your order.
+                       You must send the transfer first, then confirm to place your order.
                     </p>
                   )}
 
@@ -765,11 +783,11 @@ const handlePlaceOrder = async () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  Why e-Transfer?
+                  Why Bank Transfer?
                 </p>
                 <p className="text-muted leading-relaxed">
-                  Interac e-Transfer is fast, secure and available with every Canadian bank. No
-                  card fees, no delays - we confirm manually and ship within 24 hours.
+                  Bank transfer is fast, secure and available with any Nigerian bank. No card
+                  fees, no delays - we confirm payments manually and ship within 24 hours.
                 </p>
               </div>
             </div>

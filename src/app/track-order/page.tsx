@@ -206,7 +206,7 @@ export default function TrackOrderPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Your Interac e-Transfer is being verified. Please allow 1-2 business hours.
+                Your bank transfer is being verified. Please allow 1-2 business hours.
               </div>
             )}
           </div>
