@@ -219,8 +219,8 @@ export default function ProductsManager() {
                   </select>
                 </label>
                 <label>
-                  <span className="block text-xs text-muted mb-1">Price ($)</span>
-                  <input
+<span className="block text-xs text-muted mb-1">Price</span>
+                <input
                     className={inputClass}
                     type="number"
                     min="0"
@@ -230,8 +230,8 @@ export default function ProductsManager() {
                   />
                 </label>
                 <label>
-                  <span className="block text-xs text-muted mb-1">Compare At ($)</span>
-                  <input
+<span className="block text-xs text-muted mb-1">Compare At</span>
+                <input
                     className={inputClass}
                     type="number"
                     min="0"
