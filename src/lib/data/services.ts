@@ -7,7 +7,7 @@ export const services: Service[] = [
     category: "Hair Revamping",
     description:
       "Transform worn, dull or damaged hair into a fresh, luxurious look. Our stylists breathe new life into existing hair with deep conditioning, restyling and precision care.",
-    priceRange: "$80 - $150",
+    priceRange: "₦120,000 - ₦250,000",
     startingPrice: 80,
     duration: "2 - 3 hours",
     image:
@@ -26,7 +26,7 @@ export const services: Service[] = [
     category: "Wig Making",
     description:
       "Custom-made luxury wigs tailored to your head size, style and preference. We use premium virgin hair and hand-tied techniques for an undetectable look.",
-    priceRange: "$150 - $300",
+    priceRange: "₦150,000 - ₦300,000",
     startingPrice: 150,
     duration: "3 - 4 hours",
     image:
@@ -45,7 +45,7 @@ export const services: Service[] = [
     category: "Makeup",
     description:
       "Professional makeup artistry for every occasion - weddings, photoshoots, parties and more. Flawless, camera-ready looks that enhance your natural beauty.",
-    priceRange: "$100 - $200",
+    priceRange: "₦150,000 - ₦250,000",
     startingPrice: 100,
     duration: "1 - 2 hours",
     image:
@@ -64,7 +64,7 @@ export const services: Service[] = [
     category: "Lash Extensions",
     description:
       "Volumizing and classic lash extensions for beautiful, wide-awake eyes. Applied safely with premium materials and lasting results.",
-    priceRange: "$80 - $150",
+    priceRange: "₦120,000 - ₦250,000",
     startingPrice: 80,
     duration: "1 - 1.5 hours",
     image:
@@ -83,7 +83,7 @@ export const services: Service[] = [
     category: "Microblading",
     description:
       "Semi-permanent eyebrow enhancement with precise, hair-like strokes. Say goodbye to daily eyebrow makeup with results that last 1-3 years.",
-    priceRange: "$200 - $400",
+    priceRange: "₦350,000 - ₦650,000",
     startingPrice: 200,
     duration: "2 - 3 hours",
     image:
@@ -102,7 +102,7 @@ export const services: Service[] = [
     category: "Skin Tag Removal",
     description:
       "Safe, hygienic and virtually painless removal of skin tags. Quick procedure with minimal downtime and discreet, professional care.",
-    priceRange: "$50 - $150",
+    priceRange: "₦80,000 - ₦250,000",
     startingPrice: 50,
     duration: "30 - 60 minutes",
     image:

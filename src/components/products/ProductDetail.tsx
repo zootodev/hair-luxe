@@ -171,7 +171,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </span>
           <div className="text-sm">
             <p className="font-semibold">Delivery or Pickup</p>
-            <p className="text-muted">Local delivery across Ontario or in-store pickup</p>
+            <p className="text-muted">Local delivery across Lagos or in-store pickup</p>
           </div>
         </div>
 
