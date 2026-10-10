@@ -1,32 +1,16 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { services } from "@/lib/data/services";
 import type { Service } from "@/lib/types";
-import BookingModal from "@/components/services/BookingModal";
+import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: `Services | ${BUSINESS.name}`,
   description: "Expert hair services including hair revamping, wig making, makeup, lash extensions, microblading, and skin tag removal. Book a consultation online.",
 };
-  const [bookingService, setBookingService] = useState<Service | null>(null);
-  const [catalogServices, setCatalogServices] = useState<Service[]>(services);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/catalog", { cache: "no-store" })
-      .then((res) => (res.ok ? (res.json() as Promise<{ services?: Service[] }>) : null))
-      .then((data) => {
-        if (data?.services && !cancelled) setCatalogServices(data.services);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+export default function ServicesPage() {
   return (
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,7 +26,7 @@ export const metadata: Metadata = {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {catalogServices.map((service) => (
+          {services.map((service) => (
             <div
               key={service.id}
               className="group flex flex-col rounded-2xl bg-surface border border-surface-light hover:border-gold/40 overflow-hidden transition-all duration-300 shadow-lg shadow-black/20 hover:-translate-y-1"
@@ -101,7 +85,6 @@ export const metadata: Metadata = {
                     View Details
                   </Link>
                   <button
-                    onClick={() => setBookingService(service)}
                     className="flex-1 h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
                   >
                     Book This Service
@@ -112,14 +95,6 @@ export const metadata: Metadata = {
           ))}
         </div>
       </div>
-
-      {bookingService && (
-        <BookingModal
-          service={bookingService}
-          isOpen={!!bookingService}
-          onClose={() => setBookingService(null)}
-        />
-      )}
     </div>
   );
 }
