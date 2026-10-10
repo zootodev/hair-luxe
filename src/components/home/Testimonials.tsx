@@ -6,16 +6,28 @@ const testimonials = [
     service: "Wig Making",
   },
   {
-    name: "Sarah M.",
-    location: "Lagos",
-    text: "The hair revamping service saved my damaged hair. Three weeks later it's shinier and healthier than ever. I can't recommend them enough!",
+    name: "Chinedu K.",
+    location: "Abuja",
+    text: "The hair revamping service completely transformed my relaxed hair. After just one session, my curls are defined, bouncy, and healthy. Finally, a salon that understands textured hair!",
     service: "Hair Revamping",
   },
   {
-    name: "Jennifer P.",
-    location: "Lagos",
-    text: "From microblading to lashes, every service is top tier. The studio is clean, elegant, and the team treats you like royalty. 10/10 experience.",
+    name: "Funmi A.",
+    location: "Kano",
+    text: "I drove down from the north just for the microblading, and it was worth every kilometer. My brows look natural and perfect. The team was professional and the environment was so relaxing.",
     service: "Microblading",
+  },
+  {
+    name: "Bolanle S.",
+    location: "Ibadan",
+    text: "The lace front wig I purchased exceeded my expectations. The quality is premium and the pricing is fair. My friends can't stop asking where I got it from.",
+    service: "Wig Making",
+  },
+  {
+    name: "Emem E.",
+    location: "Port Harcourt",
+    text: "Lash extensions from Hair Luxe have become my daily confidence booster. They look so natural and last longer than any other salon I've tried. Excellent service!",
+    service: "Lash Extensions",
   },
 ];
 
