@@ -1,19 +1,19 @@
 const testimonials = [
   {
     name: "Adebisi O.",
-    location: "Toronto",
+    location: "Lagos",
     text: "My custom wig from Hair Luxe is absolutely stunning! The install was seamless and I get compliments everywhere I go. Truly luxury from start to finish.",
     service: "Wig Making",
   },
   {
     name: "Sarah M.",
-    location: "Mississauga",
+    location: "Lagos",
     text: "The hair revamping service saved my damaged hair. Three weeks later it's shinier and healthier than ever. I can't recommend them enough!",
     service: "Hair Revamping",
   },
   {
     name: "Jennifer P.",
-    location: "North York",
+    location: "Lagos",
     text: "From microblading to lashes, every service is top tier. The studio is clean, elegant, and the team treats you like royalty. 10/10 experience.",
     service: "Microblading",
   },

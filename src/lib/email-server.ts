@@ -14,7 +14,7 @@ export interface SendResult {
 
 export function formatOrderItems(items: Order["items"]): string {
   return items
-    .map((i) => `${i.name} (x${i.quantity}) - $${(i.price * i.quantity).toFixed(2)}`)
+    .map((i) => `${i.name} (x${i.quantity}) - ₦${(i.price * i.quantity).toFixed(2)}`)
     .join("\n");
 }
 

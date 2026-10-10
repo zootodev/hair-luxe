@@ -457,7 +457,7 @@ const handlePlaceOrder = async () => {
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
                         errors.phone ? "border-red-500" : "border-surface-light focus:border-gold"
                       }`}
-                      placeholder="(647) 555-0123"
+                      placeholder="+234 812 345 6789"
                     />
                     {errors.phone && (
                       <p className="text-xs text-red-400 mt-1">{errors.phone}</p>
@@ -477,7 +477,7 @@ const handlePlaceOrder = async () => {
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
                         errors.city ? "border-red-500" : "border-surface-light focus:border-gold"
                       }`}
-                      placeholder="Toronto"
+                      placeholder="Lagos"
                     />
                     {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city}</p>}
                   </label>

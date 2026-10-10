@@ -231,7 +231,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
-                placeholder="(647) 555-0123"
+                placeholder="+234 812 345 6789"
               />
             </label>
           </div>

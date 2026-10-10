@@ -108,7 +108,7 @@ export default function TrackOrderPage() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="(647) 555-0123"
+              placeholder="+234 812 345 6789"
               className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
             />
           </label>
