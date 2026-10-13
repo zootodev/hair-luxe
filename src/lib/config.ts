@@ -15,8 +15,8 @@ export const BUSINESS = {
   address: "Lagos, Nigeria",
   city: "Lagos",
   hours: "Mon - Sat: 9:00 AM - 7:00 PM",
-  deliveryFee: 9000,
-  freeDeliveryOver: 150000,
+  deliveryFee: 5000,
+  freeDeliveryOver: 100000,
 };
 
 export const SOCIAL_LINKS = {

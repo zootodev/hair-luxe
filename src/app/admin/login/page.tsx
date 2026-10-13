@@ -6,6 +6,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -71,7 +72,7 @@ export default function AdminLoginPage() {
               </label>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
@@ -79,6 +80,11 @@ export default function AdminLoginPage() {
                 required
                 className="w-full h-12 rounded-xl bg-background border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
               />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted cursor-pointer hover:text-gold transition-colors" onClick={e => setShowPassword(prev => !prev)}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.053 10.053 0 0112 19c-2.875 0-5.328-.6-7.125-1.5M9.954 5.308a9.973 9.973 0 0114.72 0 9.973 9.973 0 01-9.972 9.93M5.338 7.313a7.962 7.962 0 017.73-5.397 7.962 7.962 0 00-7.73 5.397zm0 0a4.99 4.99 0 014.995 4.994H4.343a4.99 4.99 0 01-4.995-4.994z" />
+                </svg>
+              </div>
             </div>
 
             {error && (
