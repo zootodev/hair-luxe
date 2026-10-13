@@ -27,8 +27,6 @@ export const SOCIAL_LINKS = {
 };
 
 export const PUBLIC_KEY = "GeLrfdQC6goeir_m2";
-export const SERVICE_ID = "service_tlbd789";
-export const TEMPLATE_ID = "template_rg8t7gm";
 
 export const DELIVERY_ZONES = [
   {

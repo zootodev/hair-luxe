@@ -21,6 +21,9 @@ export default function CheckoutPage() {
   const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, clearCart, business, deliveryZones } =
     useCart();
 
+  // Demo mode: no real orders or payments - bank details are placeholder
+  const isDemoMode = business.bankDetails.accountNumber === "0123456789";
+
   const zoneInfo =
     deliveryZones.find((z) => z.name === deliveryZone) ??
     ({ name: deliveryZone, zones: [], fee: 0, days: "2-3 business days" } satisfies DeliveryZoneSettings);
@@ -352,6 +355,20 @@ const handlePlaceOrder = async () => {
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-8 text-center">Checkout</h1>
+
+        <div className="rounded-2xl bg-gold/5 border border-gold/20 p-6 mb-8 text-left">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-semibold text-sm mb-1">Demo Store</p>
+              <p className="text-xs text-muted">This is a demo store. No real orders or payments will be processed. Bank details (GTBank 0123456789) are placeholder only.</p>
+            </div>
+          </div>
+        </div>
 
         <div className="flex items-center justify-center gap-2 sm:gap-4 mb-10">
           {STATUS_STEPS.map((s, i) => (

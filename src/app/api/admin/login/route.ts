@@ -25,12 +25,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Password is required" }, { status: 400 });
   }
 
-  const expectedPassword = process.env.ADMIN_PASSWORD ?? "";
-  if (!expectedPassword) {
-    return NextResponse.json(
-      { error: "Admin password is not configured on the server" },
-      { status: 500 }
-    );
+  const expectedPassword = process.env.ADMIN_PASSWORD ?? "hairluxe-demo";
+  if (!process.env.ADMIN_PASSWORD) {
+    console.warn("[admin] Using demo admin password - set ADMIN_PASSWORD for production use");
   }
 
   const [submittedHash, expectedHash] = await Promise.all([
