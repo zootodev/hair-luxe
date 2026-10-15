@@ -23,7 +23,7 @@ export const products: Product[] = [
       "100% unprocessed virgin human hair",
       "Natural pre-plucked hairline with baby hairs",
       "Can be bleached, dyed, curled or straightened",
-      "Aller-Friendly transparent HD lace",
+      "Skin-Friendly transparent HD lace",
       "Approximately 22 inches in length",
     ],
   },

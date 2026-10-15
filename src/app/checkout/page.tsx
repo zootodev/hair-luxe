@@ -677,7 +677,7 @@ const handlePlaceOrder = async () => {
                             <svg className="w-6 h-6 text-muted mb-1" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                             </svg>
-                            <span className="text-xs text-muted">Attach screenshot of e-Transfer</span>
+                            <span className="text-xs text-muted">Attach screenshot of your bank transfer receipt</span>
                           </>
                         )}
                       </label>
@@ -696,7 +696,7 @@ const handlePlaceOrder = async () => {
                       <p className="text-xs text-red-400 mt-2">{proofError}</p>
                     )}
                     <p className="text-xs text-muted/60 mt-2">
-                      Upload a screenshot of your e-Transfer confirmation to help us verify your payment faster.
+                      Upload a screenshot of your bank transfer confirmation to help us verify your payment faster.
                     </p>
                   </div>
 

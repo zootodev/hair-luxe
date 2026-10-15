@@ -215,7 +215,7 @@ export default function TrackOrderPage() {
         {!found && (
           <p className="text-center text-xs text-muted mt-6">
             Your Order ID is shown on the checkout confirmation screen (e.g.{" "}
-            <span className="text-gold">HL-2026-0001</span>). Please check your email
+            <span className="text-gold">HL-2026-0123</span>). Please check your email
             for a copy.
           </p>
         )}

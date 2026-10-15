@@ -52,7 +52,7 @@ export default function AboutPage() {
               <p>
                 {BUSINESS.name} was founded on a simple belief: every woman deserves to feel
                 luxurious. What began as a passion for hair artistry has grown into
-                {BUSINESS.city}&apos;s most loved beauty destination.
+                {" "}{BUSINESS.city}&apos;s most loved beauty destination.
               </p>
               <p>
                 From custom wig making and hair revamping to flawless makeup, lash

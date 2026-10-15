@@ -204,7 +204,7 @@ export default function ContactPage() {
                   <option>Order Inquiry</option>
                   <option>Booking Appointment</option>
                   <option>Product Question</option>
-                  <option>Payment / e-Transfer</option>
+                  <option>Payment / Bank transfer</option>
                   <option>Delivery / Pickup</option>
                   <option>Other</option>
                 </select>

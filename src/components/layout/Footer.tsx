@@ -5,12 +5,12 @@ import { SOCIAL_LINKS } from "@/lib/config";
 import { useCart } from "@/lib/context/CartContext";
 
 const SERVICE_LINKS = [
-  "Hair Revamping",
-  "Wig Making",
-  "Makeup",
-  "Lash Extensions",
-  "Microblading",
-  "Skin Tag Removal",
+  { name: "Hair Revamping", slug: "hair-revamping" },
+  { name: "Wig Making", slug: "wig-making" },
+  { name: "Makeup", slug: "makeup" },
+  { name: "Lash Extensions", slug: "lash-extensions" },
+  { name: "Microblading", slug: "microblading" },
+  { name: "Skin Tag Removal", slug: "skin-tag-removal" },
 ];
 
 export default function Footer() {
@@ -38,12 +38,12 @@ export default function Footer() {
             <h3 className="font-serif text-lg mb-4 text-gold">Services</h3>
             <ul className="space-y-2">
               {SERVICE_LINKS.map((s) => (
-                <li key={s}>
+                <li key={s.name}>
                   <Link
-                    href="/services"
+                    href={`/services/${s.slug}`}
                     className="text-sm text-muted hover:text-gold transition-colors"
                   >
-                    {s}
+                    {s.name}
                   </Link>
                 </li>
               ))}
@@ -80,27 +80,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/track-order"
-                  className="text-sm text-muted hover:text-gold transition-colors"
-                >
+                <Link href="/track-order" className="text-sm text-muted hover:text-gold transition-colors">
                   Track Order
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-muted hover:text-gold transition-colors"
-                >
+                <Link href="/privacy" className="text-sm text-muted hover:text-gold transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-muted hover:text-gold transition-colors"
-                >
-                  Terms &amp; Conditions
+                <Link href="/terms" className="text-sm text-muted hover:text-gold transition-colors">
+                  Terms & Conditions
                 </Link>
               </li>
             </ul>
@@ -128,15 +119,6 @@ export default function Footer() {
                   </svg>
                 </span>
                 <span>{business.phone}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-gold mt-0.5">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                </span>
-                <span>{business.email}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-gold mt-0.5">
