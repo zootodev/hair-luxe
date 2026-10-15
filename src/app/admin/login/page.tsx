@@ -80,9 +80,9 @@ export default function AdminLoginPage() {
                 required
                 className="w-full h-12 rounded-xl bg-background border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
               />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted cursor-pointer hover:text-gold transition-colors" onClick={e => setShowPassword(prev => !prev)}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.053 10.053 0 0112 19c-2.875 0-5.328-.6-7.125-1.5M9.954 5.308a9.973 9.973 0 0114.72 0 9.973 9.973 0 01-9.972 9.93M5.338 7.313a7.962 7.962 0 017.73-5.397 7.962 7.962 0 00-7.73 5.397zm0 0a4.99 4.99 0 014.995 4.994H4.343a4.99 4.99 0 01-4.995-4.994z" />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gold cursor-pointer hover:text-gold transition-colors" onClick={e => setShowPassword(prev => !prev)}>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2c5.523 0 10 4.477 10 9.997 4.478-10 9.997 10-4.477 9.997 2 5.523 0 10-4.477-10-9.997-4.477-10 9.997-10 4.477-9.997 10 5.523 0 10 4.477 10zM12 22c1.103 0 2-.897 2-2v-6.375c.371-1.55 1.538-2.648 3.117-2.153v5.85h2.075v-5.85c1.579.504 3.156.058 3.117-2.153v-5.85h-2.075v5.85z" />
                 </svg>
               </div>
             </div>
