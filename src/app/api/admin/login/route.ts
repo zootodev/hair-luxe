@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
   }
 
-const token = await createSessionToken();
+  const token = await createSessionToken();
   const csrfToken = generateCSRFToken();
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, token, {
@@ -47,14 +47,14 @@ const token = await createSessionToken();
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: SESSION_TTL_MS,
+    maxAge: SESSION_TTL_MS / 1000,
   });
   response.cookies.set("csrf-token", csrfToken, {
     httpOnly: false,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: SESSION_TTL_MS,
+    maxAge: SESSION_TTL_MS / 1000,
   });
   return response;
 }

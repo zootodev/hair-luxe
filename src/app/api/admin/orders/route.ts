@@ -10,13 +10,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  // CSRF validation
-  const csrfToken = request.headers.get("x-csrf-token");
-  const cookieToken = request.cookies.get("csrf-token")?.value;
-  if (!csrfToken || !cookieToken || csrfToken !== cookieToken) {
-    return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
-  }
-
   const [orders, bookings] = await Promise.all([getOrders(), getBookings()]);
   return NextResponse.json(
     {

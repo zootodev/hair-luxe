@@ -52,8 +52,7 @@ export async function verifySessionToken(token: string): Promise<boolean> {
 
 export function generateCSRFToken(): string {
   // Generate a random CSRF token; stored in a cookie for form submissions
-  const token = Math.random().toString(36).substring(2, 32);
-  return token;
+  return crypto.randomUUID();
 }
 
 async function hmac(message: string): Promise<string> {

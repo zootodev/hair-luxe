@@ -15,31 +15,19 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith("/api/admin")) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
-    return redirectToLogin(request);
+    return NextResponse.next();
   }
 
   if (!(await verifySessionToken(token))) {
     if (pathname.startsWith("/api/admin")) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
-    return redirectToLogin(request);
+    return NextResponse.next();
   }
 
   if (pathname.startsWith("/api/admin")) {
     return NextResponse.next();
   }
 
-  return redirectToLogin(request);
+  return NextResponse.next();
 }
-
-function redirectToLogin(request: NextRequest) {
-  const loginUrl = new URL("/admin/login", request.url);
-  if (request.nextUrl.pathname !== "/admin") {
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
-  }
-  return NextResponse.redirect(loginUrl);
-}
-
-export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
-};
