@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
                 className="absolute inset-y-0 right-0 w-12 flex items-center justify-center text-muted hover:text-gold focus-visible:text-gold transition-colors cursor-pointer"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 aria-pressed={showPassword}
-                onClick={e => setShowPassword(prev => !prev)}
+                onClick={() => setShowPassword(prev => !prev)}
               >
                 {showPassword ? (
                   <svg

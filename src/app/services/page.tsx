@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { services } from "@/lib/data/services";
-import type { Service } from "@/lib/types";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
