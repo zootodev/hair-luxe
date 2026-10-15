@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
 
 interface ZoneDraft {
   name: string;
@@ -122,7 +123,7 @@ export default function SettingsManager() {
     setNotice("");
     setError("");
     try {
-      const res = await fetch("/api/admin/catalog", {
+      const res = await adminFetch("/api/admin/catalog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -161,10 +162,14 @@ export default function SettingsManager() {
           },
         }),
       });
-      if (!res.ok) throw new Error();
-      setNotice("Settings saved and live on the site.");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        setError(err.error ?? "Failed to save settings. Please try again.");
+      } else {
+        setNotice("Settings saved and live on the site.");
+      }
     } catch {
-      setError("Failed to save settings. Please try again.");
+      setError("Network error. Please try again.");
     } finally {
       setSaving(false);
     }

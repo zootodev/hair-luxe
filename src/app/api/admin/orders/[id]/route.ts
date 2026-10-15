@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import { isAdmin, verifyCsrf } from "@/lib/admin-session";
 import { deleteOrder } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -12,7 +12,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  if (!(await import("@/lib/admin-auth")).verifyCsrf(request)) {
+  if (!verifyCsrf(request)) {
     return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
   }
 

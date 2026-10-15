@@ -74,10 +74,6 @@ export function verifyCsrf(request: NextRequest): boolean {
   const csrfToken = request.headers.get("x-csrf-token");
   const cookieToken = request.cookies.get("csrf-token")?.value;
   if (!csrfToken || !cookieToken) return false;
-  // Constant-time comparison for security
-  // @ts-expect-error - crypto.timingSafeEqual is available in Node.js 15+
-  return crypto.timingSafeEqual(
-    new TextEncoder().encode(csrfToken),
-    new TextEncoder().encode(cookieToken)
-  ) === 0 ? false : csrfToken === cookieToken;
+  // Constant-time comparison using the already-imported safeEqual
+  return safeEqual(csrfToken, cookieToken);
 }

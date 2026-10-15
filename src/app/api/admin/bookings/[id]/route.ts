@@ -1,16 +1,21 @@
-import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import { NextResponse, NextRequest } from "next/server";
+import { isAdmin, verifyCsrf } from "@/lib/admin-session";
 import { deleteBooking } from "@/lib/store";
 
 export const runtime = "nodejs";
 
 export async function DELETE(
-  _request: Request,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
+
+  if (!verifyCsrf(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
+  }
+
   const { id } = await context.params;
   const deleted = await deleteBooking(id);
   if (!deleted) {
