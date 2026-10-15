@@ -12,22 +12,22 @@ import {
 export type LiveProduct = Product & { sold: number; visible: boolean };
 export type LiveService = Service & { visible: boolean };
 
-function asString(value: unknown, fallback: string): string {
+function asString(value: any, fallback: string): string {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
   return fallback;
 }
 
-function asNumber(value: unknown, fallback: number): number {
+function asNumber(value: any, fallback: number): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
 
-function asBoolean(value: unknown, fallback: boolean): boolean {
+function asBoolean(value: any, fallback: boolean): boolean {
   return value === true ? true : fallback;
 }
 
-function asany(value: unknown, fallback: Record<string, unknown>): { bankName: string; accountName: string; accountNumber: string; } {
-  const o = value as Record<string, unknown>;
+function asany(value: any, fallback: Record<string, any>): { bankName: string; accountName: string; accountNumber: string; } {
+  const o = value as Record<string, any>;
   return {
     bankName: o.bankName ?? fallback.bankName,
     accountName: o.accountName ?? fallback.accountName,
@@ -60,12 +60,12 @@ export async function getLiveSettings(): Promise<SiteSettings> {
 
   const zonesRaw = Array.isArray(stored.deliveryZones) ? stored.deliveryZones : defaults.deliveryZones;
   const deliveryZones = zonesRaw.map((z) => {
-    const zone = z as Partial<{ name: string; zones: unknown; fee: unknown; days: string }>;
+    const zone = z as Partial<{ name: string; zones: any; fee: any; days: string }>;
     const base = defaults.deliveryZones.find((d) => d.name === zone.name) ?? defaults.deliveryZones[defaults.deliveryZones.length - 1];
     return {
       name: asString(zone.name, base.name),
       zones: Array.isArray(zone.zones)
-        ? (zone.zones as unknown[]).map((c) => String(c))
+        ? (zone.zones as any[]).map((c) => String(c))
         : base.zones,
       fee: asNumber(zone.fee, base.fee),
       days: asString(zone.days, base.days),
@@ -73,7 +73,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
   });
 
   const announcementRaw = stored.announcement as
-    | { enabled?: unknown; text?: unknown }
+    | { enabled?: any; text?: any }
     | undefined;
 
   return {
@@ -85,7 +85,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
     address: asString(stored.address, defaults.address),
     city: asString(stored.city, defaults.city),
     hours: asString(stored.hours, defaults.hours),
-    bankDetails: asany(stored.bankDetails as unknown, defaults.bankDetails as any),
+    bankDetails: asany(stored.bankDetails as any, defaults.bankDetails as any),
     deliveryFee: asNumber(stored.deliveryFee, defaults.deliveryFee),
     freeDeliveryOver: asNumber(stored.freeDeliveryOver, defaults.freeDeliveryOver),
     deliveryZones,
@@ -99,7 +99,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
 export async function getLiveProducts(): Promise<LiveProduct[]> {
   const [overrides, sold] = await Promise.all([getCatalogProducts(), getSold()]);
   return baseProducts.map((base) => {
-    const o = (overrides[base.id] ?? {}) as Record<string, unknown>;
+    const o = (overrides[base.id] ?? {}) as Record<string, any>;
     const price = asNumber(o.price, base.price);
     const compareAtRaw = o.compareAtPrice;
     const compareAtPrice =
@@ -125,7 +125,7 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
 export async function getLiveServices(): Promise<LiveService[]> {
   const overrides = await getCatalogServices();
   return baseServices.map((base) => {
-    const o = (overrides[base.id] ?? {}) as Record<string, unknown>;
+    const o = (overrides[base.id] ?? {}) as Record<string, any>;
     return {
       ...base,
       category: (o.category as Service["category"]) ?? base.category,
