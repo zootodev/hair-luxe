@@ -21,9 +21,6 @@ export default function CheckoutPage() {
   const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, clearCart, business, deliveryZones } =
     useCart();
 
-  // Demo mode: no real orders or payments - bank details are placeholder
-  const isDemoMode = business.bankDetails.accountNumber === "0123456789";
-
   const zoneInfo =
     deliveryZones.find((z) => z.name === deliveryZone) ??
     ({ name: deliveryZone, zones: [], fee: 0, days: "2-3 business days" } satisfies DeliveryZoneSettings);

@@ -1,43 +1,37 @@
-import {
-  products as baseProducts,
-  getProductBySlug as baseGetProductBySlug,
-} from "@/lib/data/products";
+import { products as baseProducts, getProductBySlug as baseGetProductBySlug } from "@/lib/data/products";
 import { services as baseServices } from "@/lib/data/services";
 import { BUSINESS, DELIVERY_ZONES } from "@/lib/config";
+import type { Product, Service, SiteSettings } from "@/lib/types";
 import {
   getCatalogProducts,
   getCatalogServices,
   getSold,
   getStoredSettings,
 } from "@/lib/store";
-import type { Product, Service, SiteSettings } from "@/lib/types";
 
 export type LiveProduct = Product & { sold: number; visible: boolean };
 export type LiveService = Service & { visible: boolean };
 
 function asString(value: unknown, fallback: string): string {
-  return typeof value === "string" && value.trim() !== "" ? value.trim() : fallback;
+  if (typeof value === "string" && value.trim() !== "") return value.trim();
+  return fallback;
 }
 
 function asNumber(value: unknown, fallback: number): number {
-  const n = typeof value === "number" ? value : Number(value);
+  const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
-  return typeof value === "boolean" ? value : fallback;
+  return value === true ? true : fallback;
 }
 
-function asany(value: unknown, fallback: Record<string, unknown>): {
-  bankName: string;
-  accountName: string;
-  accountNumber: string;
-} {
+function asany(value: unknown, fallback: Record<string, unknown>): { bankName: string; accountName: string; accountNumber: string; } {
   const o = value as Record<string, unknown>;
   return {
-    bankName: (o as any).bankName as string ?? (fallback as any).bankName as string ?? "",
-    accountName: (o as any).accountName as string ?? (fallback as any).accountName as string ?? "",
-    accountNumber: (o as any).accountNumber as string ?? (fallback as any).accountNumber as string ?? "",
+    bankName: o.bankName ?? fallback.bankName,
+    accountName: o.accountName ?? fallback.accountName,
+    accountNumber: o.accountNumber ?? fallback.accountNumber,
   };
 }
 
@@ -67,9 +61,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
   const zonesRaw = Array.isArray(stored.deliveryZones) ? stored.deliveryZones : defaults.deliveryZones;
   const deliveryZones = zonesRaw.map((z) => {
     const zone = z as Partial<{ name: string; zones: unknown; fee: unknown; days: string }>;
-    const base =
-      defaults.deliveryZones.find((d) => d.name === zone.name) ??
-      defaults.deliveryZones[defaults.deliveryZones.length - 1];
+    const base = defaults.deliveryZones.find((d) => d.name === zone.name) ?? defaults.deliveryZones[defaults.deliveryZones.length - 1];
     return {
       name: asString(zone.name, base.name),
       zones: Array.isArray(zone.zones)
@@ -93,7 +85,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
     address: asString(stored.address, defaults.address),
     city: asString(stored.city, defaults.city),
     hours: asString(stored.hours, defaults.hours),
-    bankDetails: asany(stored.bankDetails as unknown as any, defaults.bankDetails as any),
+    bankDetails: asany(stored.bankDetails as unknown, defaults.bankDetails as any),
     deliveryFee: asNumber(stored.deliveryFee, defaults.deliveryFee),
     freeDeliveryOver: asNumber(stored.freeDeliveryOver, defaults.freeDeliveryOver),
     deliveryZones,
@@ -116,8 +108,7 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
         : asNumber(compareAtRaw, base.compareAtPrice ?? 0) || undefined;
     return {
       ...base,
-      category:
-        (o.category as Product["category"]) ?? base.category,
+      category: (o.category as Product["category"]) ?? base.category,
       name: asString(o.name, base.name),
       description: asString(o.description, base.description),
       price,
@@ -224,11 +215,7 @@ export interface PublicCatalog {
 }
 
 export async function getPublicCatalog(): Promise<PublicCatalog> {
-  const [products, services, settings] = await Promise.all([
-    getVisibleProducts(),
-    getVisibleServices(),
-    getLiveSettings(),
-  ]);
+  const [products, services, settings] = await Promise.all([getVisibleProducts(), getVisibleServices(), getLiveSettings()]);
   return {
     products,
     services,
