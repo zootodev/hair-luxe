@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import { isAdmin, verifyCsrf } from "@/lib/admin-session";
 import { getOrderById, updateOrderStatus } from "@/lib/store";
-import { sendOrderStatusEmail } from "@/lib/email-server";
 import type { Order } from "@/lib/types";
+import { sendOrderStatusEmail } from "@/lib/email-server";
 
 export const runtime = "nodejs";
 
@@ -16,10 +16,7 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  // CSRF validation
-  const csrfToken = request.headers.get("x-csrf-token");
-  const cookieToken = request.cookies.get("csrf-token")?.value;
-  if (!csrfToken || !cookieToken || csrfToken !== cookieToken) {
+  if (!verifyCsrf(request)) {
     return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
   }
 

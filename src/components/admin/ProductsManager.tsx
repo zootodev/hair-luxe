@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
 import type { Product, ProductCategory } from "@/lib/types";
 
 type LiveProduct = Product & { sold: number };
@@ -73,7 +74,7 @@ export default function ProductsManager() {
     setNotice("");
     setError("");
     try {
-      const res = await fetch("/api/admin/catalog", {
+      const res = await adminFetch("/api/admin/catalog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,7 +106,7 @@ export default function ProductsManager() {
     setError("");
     setNotice("");
     try {
-      const res = await fetch("/api/admin/catalog", {
+      const res = await adminFetch("/api/admin/catalog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "product", id, reset: true }),

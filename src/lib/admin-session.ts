@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+import { SESSION_COOKIE, verifySessionToken, verifyCsrf } from "@/lib/admin-auth";
 
 export async function isAdmin(): Promise<boolean> {
   const store = await cookies();
@@ -7,3 +7,5 @@ export async function isAdmin(): Promise<boolean> {
   if (!token) return false;
   return await verifySessionToken(token);
 }
+
+export { verifyCsrf };

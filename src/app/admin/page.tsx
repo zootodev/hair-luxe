@@ -8,6 +8,7 @@ import AdminSidebar, { type AdminView } from "@/components/admin/AdminSidebar";
 import ProductsManager from "@/components/admin/ProductsManager";
 import ServicesManager from "@/components/admin/ServicesManager";
 import SettingsManager from "@/components/admin/SettingsManager";
+import { adminFetch } from "@/lib/admin-fetch";
 
 const STATUS_STYLES: Record<Order["status"], string> = {
   pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
@@ -118,13 +119,19 @@ export default function AdminPage() {
 
   const handleStatus = async (orderId: string, status: Order["status"]) => {
     try {
-      await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
+      const res = await adminFetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        alert(err.error ?? "Failed to update status. Please try again.");
+        if (res.status === 401) router.push("/admin/login");
+        return;
+      }
     } catch {
-      // fall through; refresh shows whether it succeeded
+      alert("Network error. Please try again.");
     }
     await fetchData();
   };
@@ -132,11 +139,17 @@ export default function AdminPage() {
   const handleDeleteOrder = async (orderId: string) => {
     if (!confirm(`Delete order ${orderId}? This cannot be undone.`)) return;
     try {
-      await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
+      const res = await adminFetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
         method: "DELETE",
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        alert(err.error ?? "Failed to delete order. Please try again.");
+        if (res.status === 401) router.push("/admin/login");
+        return;
+      }
     } catch {
-      // fall through
+      alert("Network error. Please try again.");
     }
     await fetchData();
   };
@@ -144,11 +157,17 @@ export default function AdminPage() {
   const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm(`Delete booking ${bookingId}?`)) return;
     try {
-      await fetch(`/api/admin/bookings/${encodeURIComponent(bookingId)}`, {
+      const res = await adminFetch(`/api/admin/bookings/${encodeURIComponent(bookingId)}`, {
         method: "DELETE",
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        alert(err.error ?? "Failed to delete booking. Please try again.");
+        if (res.status === 401) router.push("/admin/login");
+        return;
+      }
     } catch {
-      // fall through
+      alert("Network error. Please try again.");
     }
     await fetchData();
   };
@@ -182,7 +201,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = () => {
-    fetch("/api/admin/logout", { method: "POST" }).then(() => {
+    adminFetch("/api/admin/logout", { method: "POST" }).then(() => {
       router.push("/");
     });
   };
@@ -197,7 +216,7 @@ export default function AdminPage() {
     setEmailError("");
     setEmailSent("");
     try {
-      const res = await fetch("/api/admin/email", {
+      const res = await adminFetch("/api/admin/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -206,13 +225,18 @@ export default function AdminPage() {
           message: emailMessage,
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        setEmailError(err.error ?? "Failed to send email. Please try again.");
+        setEmailSending(false);
+        return;
+      }
       setEmailSent(`Email sent to ${emailTarget.customerName}.`);
       setEmailSubject("");
       setEmailMessage("");
       setEmailTarget(null);
     } catch {
-      setEmailError("Failed to send email. Please try again.");
+      setEmailError("Network error. Please try again.");
     } finally {
       setEmailSending(false);
     }

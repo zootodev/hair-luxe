@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import type { NextRequest } from "next/server";
+import { isAdmin, verifyCsrf } from "@/lib/admin-session";
 import {
   deleteCatalogProduct,
   deleteCatalogService,
@@ -18,9 +19,13 @@ interface CatalogBody {
   data?: Record<string, unknown>;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
   }
 
   let body: CatalogBody;

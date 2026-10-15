@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
 import type { Service, ServiceCategory } from "@/lib/types";
 
 const CATEGORIES: ServiceCategory[] = [
@@ -78,7 +79,7 @@ export default function ServicesManager() {
     setNotice("");
     setError("");
     try {
-      const res = await fetch("/api/admin/catalog", {
+      const res = await adminFetch("/api/admin/catalog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,7 +111,7 @@ export default function ServicesManager() {
     setError("");
     setNotice("");
     try {
-      const res = await fetch("/api/admin/catalog", {
+      const res = await adminFetch("/api/admin/catalog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "service", id, reset: true }),

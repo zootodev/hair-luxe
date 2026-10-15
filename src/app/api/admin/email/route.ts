@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin-session";
+import type { NextRequest } from "next/server";
+import { isAdmin, verifyCsrf } from "@/lib/admin-session";
 import { getBookings, getOrders } from "@/lib/store";
 import { sendCustomerMessage } from "@/lib/email-server";
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  if (!verifyCsrf(req)) {
+    return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
   }
 
   let body: {

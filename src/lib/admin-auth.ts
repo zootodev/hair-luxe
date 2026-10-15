@@ -1,4 +1,5 @@
 import { safeEqual } from "@/lib/timing-safe";
+import type { NextRequest } from "next/server";
 
 export const SESSION_COOKIE = "hair-luxe-admin-session";
 
@@ -31,6 +32,19 @@ function base64url(value: Uint8Array | string): string {
   return Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+async function hmac(message: string): Promise<string> {
+  const secret = getSecret();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const rawSig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
+  return base64url(new Uint8Array(rawSig));
+}
+
 export async function createSessionToken(): Promise<string> {
   const issuedAt = Date.now().toString(36);
   const sig = await hmac(`admin-session:${issuedAt}`);
@@ -55,15 +69,15 @@ export function generateCSRFToken(): string {
   return crypto.randomUUID();
 }
 
-async function hmac(message: string): Promise<string> {
-  const secret = getSecret();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const rawSig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
-  return base64url(new Uint8Array(rawSig));
+export function verifyCsrf(request: NextRequest): boolean {
+  // In Next.js server routes, access cookies from the request
+  const csrfToken = request.headers.get("x-csrf-token");
+  const cookieToken = request.cookies.get("csrf-token")?.value;
+  if (!csrfToken || !cookieToken) return false;
+  // Constant-time comparison for security
+  // @ts-expect-error - crypto.timingSafeEqual is available in Node.js 15+
+  return crypto.timingSafeEqual(
+    new TextEncoder().encode(csrfToken),
+    new TextEncoder().encode(cookieToken)
+  ) === 0 ? false : csrfToken === cookieToken;
 }
