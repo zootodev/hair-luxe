@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: `Order Confirmation | ${BUSINESS.name}`,
+  title: `Your Order | ${BUSINESS.name}`,
   robots: { index: false, follow: false },
 };
 

@@ -300,7 +300,7 @@ export default function SettingsManager() {
             <h2 className="font-serif text-lg text-gold mb-4">Delivery &amp; Fees</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
               <label>
-                <span className="block text-xs text-muted mb-1">Default Delivery Fee</span>
+                <span className="block text-xs text-muted mb-1">Default Delivery Fee (₦)</span>
                 <input
                   className={inputClass}
                   type="number"
@@ -311,7 +311,7 @@ export default function SettingsManager() {
                 />
               </label>
               <label>
-                <span className="block text-xs text-muted mb-1">Free Delivery Over</span>
+                <span className="block text-xs text-muted mb-1">Free Delivery Over (₦)</span>
                 <input
                   className={inputClass}
                   type="number"
@@ -357,7 +357,7 @@ export default function SettingsManager() {
                     />
                   </label>
                   <label>
-                    <span className="block text-xs text-muted mb-1">Fee</span>
+                    <span className="block text-xs text-muted mb-1">Fee (₦)</span>
                     <input
                       className={inputClass}
                       type="number"

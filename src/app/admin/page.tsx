@@ -754,7 +754,7 @@ export default function AdminPage() {
               <div>
                 <p className="font-semibold text-sm">Delivery Queue</p>
                 <p className="text-xs text-muted">
-                  {allDeliveries.length} active delivery ${allDeliveries.length === 1 ? "order" : "orders"} to fulfill.
+                  {allDeliveries.length} active delivery orders to fulfill.
                 </p>
               </div>
             </div>

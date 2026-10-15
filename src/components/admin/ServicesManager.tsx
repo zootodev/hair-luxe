@@ -225,7 +225,7 @@ export default function ServicesManager() {
                   </select>
                 </label>
                 <label>
-                  <span className="block text-xs text-muted mb-1">Start Price ($)</span>
+                  <span className="block text-xs text-muted mb-1">Start Price (₦)</span>
                   <input
                     className={inputClass}
                     type="number"

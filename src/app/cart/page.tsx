@@ -175,7 +175,7 @@ export default function CartPage() {
                   >
                     {deliveryZones.map((z) => (
                       <option key={z.name} value={z.name}>
-                        {z.name} - ₦{z.fee.toFixed(2)} ({z.days})
+                        {z.name} - {formatPrice(z.fee)} ({z.days})
                       </option>
                     ))}
                   </select>

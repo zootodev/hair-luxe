@@ -1,7 +1,11 @@
+"use client";
+
 import Button from "@/components/ui/Button";
-import { BUSINESS } from "@/lib/config";
+import { useCart } from "@/lib/context/CartContext";
 
 export default function CtaBanner() {
+  const { business } = useCart();
+
   return (
     <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,8 +27,8 @@ export default function CtaBanner() {
             </h2>
             <p className="text-foreground/80 mb-8 leading-relaxed">
               Reserve your spot for wigs, makeup, lashes, microblading and more. Call us at{" "}
-              <a href={`tel:${BUSINESS.phoneFormatted}`} className="text-gold hover:underline">
-                {BUSINESS.phone}
+              <a href={`tel:${business.phoneFormatted}`} className="text-gold hover:underline">
+                {business.phone}
               </a>{" "}
               or book instantly online.
             </p>
