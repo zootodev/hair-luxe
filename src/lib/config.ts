@@ -16,7 +16,7 @@ export const BUSINESS = {
   city: "Lagos",
   hours: "Mon - Sat: 9:00 AM - 7:00 PM",
   deliveryFee: 5000,
-  freeDeliveryOver: 100000,
+  freeDeliveryOver: 250000,
 };
 
 export const SOCIAL_LINKS = {
@@ -30,47 +30,28 @@ export const PUBLIC_KEY = "GeLrfdQC6goeir_m2";
 
 export const DELIVERY_ZONES = [
   {
-    name: "Lagos Island",
-    zones: [
-      "Lekki Phase 1",
-      "Victoria Island",
-      "Ikoyi",
-      "Oniru",
-      "Banana Island",
-      "Chevron",
-      "Lagos Island",
-    ],
-    fee: 6000,
-    days: "1-2 business days",
-  },
-  {
     name: "Lagos Mainland",
-    zones: [
-      "Ikeja",
-      "Yaba",
-      "Surulere",
-      "Gbagada",
-      "Ojota",
-      "Ilupeju",
-      "Apapa",
-      "Ogba",
-    ],
-    fee: 9000,
-    days: "2-3 business days",
+    zones: ["Lagos Mainland"],
+    fee: 3000,
+    days: "same day–1 day",
   },
   {
-    name: "Greater Lagos",
-    zones: [
-      "Ajah",
-      "Sangotedo",
-      "Badore",
-      "Ikorodu",
-      "Epe",
-      "Badagry",
-      "Other Lagos areas",
-    ],
-    fee: 15000,
-    days: "3-5 business days",
+    name: "Lagos Island & Lekki",
+    zones: ["Lagos Island", "Lekki"],
+    fee: 4000,
+    days: "1 day",
+  },
+  {
+    name: "Ibadan/Abeokuta",
+    zones: ["Ibadan", "Abeokuta"],
+    fee: 7000,
+    days: "2–3 days",
+  },
+  {
+    name: "Other South-West",
+    zones: ["Other South-West"],
+    fee: 10000,
+    days: "3–5 days",
   },
 ];
 

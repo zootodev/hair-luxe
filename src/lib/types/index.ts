@@ -1,10 +1,7 @@
 export type ServiceCategory =
-  | "Hair Revamping"
-  | "Wig Making"
-  | "Makeup"
-  | "Lash Extensions"
-  | "Microblading"
-  | "Skin Tag Removal";
+  | "Hair"
+  | "Beauty"
+  | "Skin";
 
 export type ProductCategory = "Wigs" | "Hair Bundles" | "Lashes" | "Hair Care";
 

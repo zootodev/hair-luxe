@@ -245,11 +245,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const deliveryFee = (() => {
     if (deliveryMethod === "pickup") return 0;
     const info = deliveryZones.find((z) => z.name === deliveryZone);
-    const fee = info?.fee ?? deliveryFeeDefaults.fee;
-    if (deliveryFeeDefaults.freeOver > 0 && subtotal >= deliveryFeeDefaults.freeOver) {
+    const zoneFee = info?.fee ?? BUSINESS.deliveryFee;
+    // Use the same free delivery logic as the server: computeLiveDeliveryFee
+    if (BUSINESS.freeDeliveryOver > 0 && subtotal >= BUSINESS.freeDeliveryOver) {
       return 0;
     }
-    return fee;
+    return zoneFee;
   })();
   const total = subtotal + deliveryFee;
 

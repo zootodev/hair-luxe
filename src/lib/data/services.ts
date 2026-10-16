@@ -4,7 +4,7 @@ export const services: Service[] = [
   {
     id: "hair-revamping",
     name: "Hair Revamping",
-    category: "Hair Revamping",
+    category: "Hair",
     description:
       "Transform worn, dull or damaged hair into a fresh, luxurious look. Our stylists breathe new life into existing hair with deep conditioning, restyling and precision care.",
     priceRange: "₦120,000 - ₦250,000",
@@ -23,7 +23,7 @@ export const services: Service[] = [
   {
     id: "wig-making",
     name: "Wig Making",
-    category: "Wig Making",
+    category: "Hair",
     description:
       "Custom-made luxury wigs tailored to your head size, style and preference. We use premium virgin hair and hand-tied techniques for an undetectable look.",
     priceRange: "₦150,000 - ₦300,000",
@@ -42,7 +42,7 @@ export const services: Service[] = [
   {
     id: "makeup",
     name: "Makeup",
-    category: "Makeup",
+    category: "Beauty",
     description:
       "Professional makeup artistry for every occasion - weddings, photoshoots, parties and more. Flawless, camera-ready looks that enhance your natural beauty.",
     priceRange: "₦150,000 - ₦250,000",
@@ -61,7 +61,7 @@ export const services: Service[] = [
   {
     id: "lash-extensions",
     name: "Lash Extensions",
-    category: "Lash Extensions",
+    category: "Beauty",
     description:
       "Volumizing and classic lash extensions for beautiful, wide-awake eyes. Applied safely with premium materials and lasting results.",
     priceRange: "₦120,000 - ₦250,000",
@@ -80,7 +80,7 @@ export const services: Service[] = [
   {
     id: "microblading",
     name: "Microblading",
-    category: "Microblading",
+    category: "Skin",
     description:
       "Semi-permanent eyebrow enhancement with precise, hair-like strokes. Say goodbye to daily eyebrow makeup with results that last 1-3 years.",
     priceRange: "₦350,000 - ₦650,000",
@@ -99,7 +99,7 @@ export const services: Service[] = [
   {
     id: "skin-tag-removal",
     name: "Skin Tag Removal",
-    category: "Skin Tag Removal",
+    category: "Skin",
     description:
       "Safe, hygienic and virtually painless removal of skin tags. Quick procedure with minimal downtime and discreet, professional care.",
     priceRange: "₦80,000 - ₦250,000",
