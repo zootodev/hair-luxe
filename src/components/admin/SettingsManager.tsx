@@ -405,7 +405,7 @@ export default function SettingsManager() {
               <input
                 className={inputClass}
                 value={form.announcementText}
-                placeholder="e.g. Free delivery on orders over ₦200"
+                placeholder="₦200,000"
                 onChange={(e) => set({ announcementText: e.target.value })}
               />
             </div>

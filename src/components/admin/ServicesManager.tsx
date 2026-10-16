@@ -5,12 +5,9 @@ import { adminFetch } from "@/lib/admin-fetch";
 import type { Service, ServiceCategory } from "@/lib/types";
 
 const CATEGORIES: ServiceCategory[] = [
-  "Hair Revamping",
-  "Wig Making",
-  "Makeup",
-  "Lash Extensions",
-  "Microblading",
-  "Skin Tag Removal",
+  "Hair",
+  "Beauty",
+  "Skin",
 ];
 
 interface Draft {

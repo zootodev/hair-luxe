@@ -16,6 +16,7 @@ interface Draft {
   price: string;
   compareAtPrice: string;
   stockCount: string;
+  sold: number;
   featured: boolean;
   visible: boolean;
   dirty: boolean;
@@ -45,6 +46,7 @@ export default function ProductsManager() {
           price: String(p.price),
           compareAtPrice: p.compareAtPrice ? String(p.compareAtPrice) : "",
           stockCount: String(p.stockCount),
+          sold: p.sold ?? 0,
           featured: !!p.featured,
           visible: p.visible !== false,
           dirty: false,
@@ -283,7 +285,7 @@ export default function ProductsManager() {
                   <span className="text-muted">Featured on home</span>
                 </label>
                 <span className="ml-auto text-xs text-muted">
-                  In stock: {row.stockCount} &middot; Active listings update instantly
+                  Stock (total): {row.stockCount} &middot; Available: {Number(row.stockCount) - Number(row.sold)} &bull; Active listings update instantly
                 </span>
               </div>
             </div>
