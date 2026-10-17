@@ -20,6 +20,7 @@ export default function CartPage() {
     deliveryZone,
     setDeliveryZone,
     deliveryZones,
+    freeDeliveryOver,
   } = useCart();
 
   if (items.length === 0) {
@@ -197,6 +198,19 @@ export default function CartPage() {
                     {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)}
                   </span>
                 </div>
+                {deliveryMethod === "delivery" && freeDeliveryOver > 0 && (
+                  <div
+                    className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${
+                      subtotal >= freeDeliveryOver
+                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                        : "bg-gold/10 border-gold/30 text-gold"
+                    }`}
+                  >
+                    {subtotal >= freeDeliveryOver
+                      ? "You've unlocked free delivery"
+                      : `Add ${formatPrice(freeDeliveryOver - subtotal)} more for free delivery`}
+                  </div>
+                )}
                 <div className="flex justify-between font-bold text-base border-t border-surface-light pt-3">
                   <span>Total</span>
                   <span className="text-gold">{formatPrice(total)}</span>

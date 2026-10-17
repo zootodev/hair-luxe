@@ -254,7 +254,12 @@ export default function AdminPage() {
 
   const allDeliveries = useMemo(() => {
     return orders
-      .filter((o) => o.customer.deliveryMethod === "delivery" && o.status !== "cancelled")
+      .filter(
+        (o) =>
+          o.customer.deliveryMethod === "delivery" &&
+          o.status !== "completed" &&
+          o.status !== "cancelled"
+      )
       .sort(
         (a, b) =>
           new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -462,7 +467,7 @@ export default function AdminPage() {
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${STATUS_STYLES[order.status]}`}
                             >
-                              {order.status}
+                              {statusLabel(order.status)}
                             </span>
                           </div>
                           <p className="text-xs text-muted truncate mt-0.5">
@@ -764,7 +769,9 @@ export default function AdminPage() {
               <div>
                 <p className="font-semibold text-sm">Delivery Queue</p>
                 <p className="text-xs text-muted">
-                  {allDeliveries.length} active delivery orders to fulfill.
+                  {allDeliveries.length === 1
+                    ? "1 active delivery order to fulfill."
+                    : `${allDeliveries.length} active delivery orders to fulfill.`}
                 </p>
               </div>
             </div>
@@ -783,7 +790,7 @@ export default function AdminPage() {
                     <span
                       className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${STATUS_STYLES[order.status]}`}
                     >
-                      {order.status}
+                      {statusLabel(order.status)}
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold">

@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/data/products";
 import { useCart } from "@/lib/context/CartContext";
+import { getAvailableStock } from "@/lib/stock";
 
 interface ProductCardProps {
   product: Product;
@@ -12,8 +14,20 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
-  const available = Math.max(0, product.stockCount - (product.sold ?? 0));
+  // Seed with the SSR-safe value so hydration matches, then adopt the
+  // localStorage-backed stock from getAvailableStock() on the client.
+  const [available, setAvailable] = useState(() =>
+    Math.max(0, product.stockCount - (product.sold ?? 0))
+  );
+
+  /* eslint-disable react-hooks/set-state-in-effect -- local stock is only known after mount */
+  useEffect(() => {
+    setAvailable(getAvailableStock(product.id));
+  }, [product.id, product.stockCount]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
   const outOfStock = available <= 0;
+  const lowStock = available > 0 && available <= 5;
 
   const handleQuickAdd = () => {
     if (outOfStock) return;
@@ -78,6 +92,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
         </div>
+
+        <p
+          className={`mt-2 text-[11px] font-semibold uppercase tracking-wide ${
+            outOfStock ? "text-red-400" : lowStock ? "text-amber-400" : "text-emerald-400"
+          }`}
+        >
+          {outOfStock ? "Out of stock" : lowStock ? `Only ${available} left` : "In stock"}
+        </p>
 
         <div className="flex items-center gap-2 mt-4">
           <button

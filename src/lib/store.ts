@@ -1,4 +1,5 @@
 import type { Order, Booking } from "@/lib/types";
+import { BUSINESS, DELIVERY_ZONES } from "@/lib/config";
 import { Pool } from "pg";
 
 const ORDERS_KEY = "hl:orders:v1";
@@ -498,7 +499,7 @@ export async function deleteCatalogService(key: string): Promise<void> {
   delete mem.catalogServices[key];
 }
 
-export async function getStoredSettings(): Promise<Record<string, unknown>> {
+async function readStoredSettings(): Promise<Record<string, unknown>> {
   try {
     if (isPostgres()) {
       const stored = await pgGetSettingsObject();
@@ -513,6 +514,18 @@ export async function getStoredSettings(): Promise<Record<string, unknown>> {
   return mem.settings;
 }
 
+export async function getStoredSettings(): Promise<Record<string, unknown>> {
+  const stored = await readStoredSettings();
+  // migrateSettings() is idempotent: legacy (Toronto) data self-heals on read,
+  // and already-migrated settings are returned untouched.
+  try {
+    return await migrateSettings(stored);
+  } catch (error) {
+    console.error("[store] failed to persist settings migration", error);
+    return stored;
+  }
+}
+
 export async function saveStoredSettings(obj: Record<string, unknown>): Promise<void> {
   if (isPostgres()) {
     await pgSaveSettingsObject(obj);
@@ -522,34 +535,72 @@ export async function saveStoredSettings(obj: Record<string, unknown>): Promise<
   mem.settings = obj;
 }
 
-/** Idempotent migration: replaces Toronto zone/phone settings with Lagos defaults. */
-export async function migrateSettings(): Promise<void> {
-  const current = await getStoredSettings();
-  const deliveryZones = current.deliveryZones as unknown as { name: string; fee: number; days: string }[];
-  const isToronto =
-    // Check for Toronto zone names or phone pattern
-    (deliveryZones.some((z: any) => z.name?.includes("Toronto")) ||
-      (current.phone as string)?.includes("(416)"));
+/** Legacy (Canadian) markers still found in stored production settings. */
+const LEGACY_MARKERS = ["toronto", "gta", "ontario", "416"];
+const LEGACY_PHONE_FIELDS = ["phone", "phoneFormatted", "whatsapp", "whatsappPhone"];
+const LEGACY_TEXT_FIELDS = ["city", "address"];
+const PHONE_DEFAULTS: Record<string, string> = {
+  phone: BUSINESS.phone,
+  phoneFormatted: BUSINESS.phoneFormatted,
+  whatsapp: BUSINESS.phone,
+  whatsappPhone: BUSINESS.phone,
+};
 
-  if (!isToronto) return; // already migrated
+interface StoredZone {
+  name?: unknown;
+  zones?: unknown;
+}
+
+function hasLegacyMarker(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  const lower = value.toLowerCase();
+  return LEGACY_MARKERS.some((marker) => lower.includes(marker));
+}
+
+function zoneMatchesLegacy(zone: StoredZone): boolean {
+  const name = typeof zone.name === "string" ? zone.name : "";
+  const subzones = Array.isArray(zone.zones) ? zone.zones.map((c) => String(c)).join(" ") : "";
+  return hasLegacyMarker(name) || hasLegacyMarker(subzones);
+}
+
+function needsMigration(settings: Record<string, unknown>): boolean {
+  const zones = Array.isArray(settings.deliveryZones)
+    ? (settings.deliveryZones as StoredZone[])
+    : [];
+  if (zones.some(zoneMatchesLegacy)) return true;
+  return [...LEGACY_PHONE_FIELDS, ...LEGACY_TEXT_FIELDS].some((field) =>
+    hasLegacyMarker(settings[field])
+  );
+}
+
+/**
+ * Idempotent migration: replaces Toronto zone/phone settings with Lagos defaults.
+ * Pass the already-read settings to avoid a second store round-trip; when called
+ * with no argument it reads the store itself.
+ */
+export async function migrateSettings(
+  current?: Record<string, unknown>
+): Promise<Record<string, unknown>> {
+  const settings = current ?? (await readStoredSettings());
+  if (!needsMigration(settings)) return settings; // already migrated
 
   // Replace with Lagos defaults
-  const LagosZones = [
-    { name: "Lagos Mainland", zones: ["Lagos Mainland"], fee: 3000, days: "same day–1 day" },
-    { name: "Lagos Island & Lekki", zones: ["Lagos Island", "Lekki"], fee: 4000, days: "1 day" },
-    { name: "Ibadan/Abeokuta", zones: ["Ibadan", "Abeokuta"], fee: 7000, days: "2–3 days" },
-    { name: "Other South-West", zones: ["Other South-West"], fee: 10000, days: "3–5 days" },
-  ];
-
   const updated: Record<string, unknown> = {
-    ...current,
-    deliveryZones: LagosZones,
-    deliveryFee: 3000,
-    freeDeliveryOver: 250000,
-    phone: "+234 812 345 6789",
+    ...settings,
+    deliveryZones: DELIVERY_ZONES.map((z) => ({ ...z })),
+    deliveryFee: DELIVERY_ZONES[0].fee,
+    freeDeliveryOver: BUSINESS.freeDeliveryOver,
   };
 
-  await saveStoredSettings(updated as Record<string, unknown>);
+  for (const field of [...LEGACY_PHONE_FIELDS, ...LEGACY_TEXT_FIELDS]) {
+    if (!hasLegacyMarker(updated[field])) continue;
+    if (field === "city") updated.city = BUSINESS.city;
+    else if (field === "address") updated.address = BUSINESS.address;
+    else updated[field] = PHONE_DEFAULTS[field];
+  }
+
+  await saveStoredSettings(updated);
+  return updated;
 }
 
 export async function bumpSold(

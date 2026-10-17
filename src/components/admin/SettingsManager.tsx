@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/admin-fetch";
+import Modal from "@/components/ui/Modal";
 
 interface ZoneDraft {
   name: string;
@@ -40,6 +41,7 @@ export default function SettingsManager() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [zonePendingRemoval, setZonePendingRemoval] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -376,11 +378,7 @@ export default function SettingsManager() {
                     />
                   </label>
                   <button
-                    onClick={() =>
-                      set({
-                        deliveryZones: form.deliveryZones.filter((_, idx) => idx !== i),
-                      })
-                    }
+                    onClick={() => setZonePendingRemoval(i)}
                     className="sm:col-span-4 lg:col-span-1 w-fit px-3 py-1.5 rounded-full text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors mt-auto cursor-pointer"
                   >
                     Remove
@@ -422,6 +420,42 @@ export default function SettingsManager() {
           </div>
         </div>
       )}
+
+      <Modal
+        isOpen={form !== null && zonePendingRemoval !== null}
+        onClose={() => setZonePendingRemoval(null)}
+        title="Remove delivery zone?"
+      >
+        <p className="text-sm text-muted mb-5">
+          Remove{" "}
+          <span className="text-gold font-semibold">
+            {form?.deliveryZones[zonePendingRemoval ?? 0]?.name?.trim() || "this zone"}
+          </span>
+          ? Customers will no longer be able to select it at checkout. This only takes
+          effect once you save your settings.
+        </p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => setZonePendingRemoval(null)}
+            className="px-4 py-2 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (form && zonePendingRemoval !== null) {
+                set({
+                  deliveryZones: form.deliveryZones.filter((_, idx) => idx !== zonePendingRemoval),
+                });
+              }
+              setZonePendingRemoval(null);
+            }}
+            className="px-4 py-2 rounded-full text-sm font-semibold text-red-400 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors cursor-pointer"
+          >
+            Remove Zone
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

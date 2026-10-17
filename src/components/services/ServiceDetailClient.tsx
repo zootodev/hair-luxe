@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { Service } from "@/lib/types";
 import BookingModal from "@/components/services/BookingModal";
 
 export default function ServiceDetailClient({ service }: { service: Service }) {
   const [bookingOpen, setBookingOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const bookParam = searchParams.get("book");
+
+  /* eslint-disable react-hooks/set-state-in-effect -- open the modal for ?book=1 links */
+  useEffect(() => {
+    if (bookParam === "1" || bookParam === "true") setBookingOpen(true);
+  }, [bookParam]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
     <div>

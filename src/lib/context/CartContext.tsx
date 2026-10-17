@@ -64,6 +64,7 @@ interface CartContextValue {
   deliveryZone: string;
   setDeliveryZone: (zone: string) => void;
   deliveryZones: DeliveryZoneSettings[];
+  freeDeliveryOver: number;
   business: LiveCatalogBusiness;
   announcement: { enabled: boolean; text: string };
 }
@@ -111,10 +112,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [deliveryZones, setDeliveryZones] = useState<DeliveryZoneSettings[]>(
     DELIVERY_ZONES.map((z) => ({ ...z }))
   );
-  const [deliveryFeeDefaults, setDeliveryFeeDefaults] = useState({
-    fee: BUSINESS.deliveryFee,
-    freeOver: BUSINESS.freeDeliveryOver,
-  });
+  const [defaultDeliveryFee, setDefaultDeliveryFee] = useState(BUSINESS.deliveryFee);
+  const [freeDeliveryOver, setFreeDeliveryOver] = useState(BUSINESS.freeDeliveryOver);
   const [business, setBusiness] = useState<LiveCatalogBusiness>({
     name: BUSINESS.name,
     tagline: BUSINESS.tagline,
@@ -155,16 +154,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (!data || cancelled) return;
         if (data.settings.deliveryZones.length > 0) {
           setDeliveryZones(data.settings.deliveryZones);
-          setDeliveryFeeDefaults({
-            fee: data.settings.deliveryFee,
-            freeOver: data.settings.freeDeliveryOver,
-          });
           setDeliveryZone((zone) =>
             data.settings.deliveryZones.some((z) => z.name === zone)
               ? zone
               : data.settings.deliveryZones[0].name
           );
         }
+        // Mirror the server (computeLiveDeliveryFee) so totals always match.
+        setDefaultDeliveryFee(data.settings.deliveryFee);
+        setFreeDeliveryOver(data.settings.freeDeliveryOver);
         setBusiness(data.settings.business);
         setAnnouncement(data.settings.announcement);
         setItems((prev) => reconcileItems(prev, data.products));
@@ -245,9 +243,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const deliveryFee = (() => {
     if (deliveryMethod === "pickup") return 0;
     const info = deliveryZones.find((z) => z.name === deliveryZone);
-    const zoneFee = info?.fee ?? BUSINESS.deliveryFee;
-    // Use the same free delivery logic as the server: computeLiveDeliveryFee
-    if (BUSINESS.freeDeliveryOver > 0 && subtotal >= BUSINESS.freeDeliveryOver) {
+    const zoneFee = info?.fee ?? defaultDeliveryFee;
+    // Same free-delivery logic as the server: computeLiveDeliveryFee
+    if (freeDeliveryOver > 0 && subtotal >= freeDeliveryOver) {
       return 0;
     }
     return zoneFee;
@@ -270,6 +268,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     deliveryZone,
     setDeliveryZone,
     deliveryZones,
+    freeDeliveryOver,
     business,
     announcement,
   };
