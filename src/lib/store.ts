@@ -522,6 +522,36 @@ export async function saveStoredSettings(obj: Record<string, unknown>): Promise<
   mem.settings = obj;
 }
 
+/** Idempotent migration: replaces Toronto zone/phone settings with Lagos defaults. */
+export async function migrateSettings(): Promise<void> {
+  const current = await getStoredSettings();
+  const deliveryZones = current.deliveryZones as unknown as { name: string; fee: number; days: string }[];
+  const isToronto =
+    // Check for Toronto zone names or phone pattern
+    (deliveryZones.some((z: any) => z.name?.includes("Toronto")) ||
+      (current.phone as string)?.includes("(416)"));
+
+  if (!isToronto) return; // already migrated
+
+  // Replace with Lagos defaults
+  const LagosZones = [
+    { name: "Lagos Mainland", zones: ["Lagos Mainland"], fee: 3000, days: "same day–1 day" },
+    { name: "Lagos Island & Lekki", zones: ["Lagos Island", "Lekki"], fee: 4000, days: "1 day" },
+    { name: "Ibadan/Abeokuta", zones: ["Ibadan", "Abeokuta"], fee: 7000, days: "2–3 days" },
+    { name: "Other South-West", zones: ["Other South-West"], fee: 10000, days: "3–5 days" },
+  ];
+
+  const updated: Record<string, unknown> = {
+    ...current,
+    deliveryZones: LagosZones,
+    deliveryFee: 3000,
+    freeDeliveryOver: 250000,
+    phone: "+234 812 345 6789",
+  };
+
+  await saveStoredSettings(updated as Record<string, unknown>);
+}
+
 export async function bumpSold(
   items: { productId: string; quantity: number }[]
 ): Promise<void> {
