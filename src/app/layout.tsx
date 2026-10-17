@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     BUSINESS.city,
   ],
   openGraph: {
+    url: "/",
     title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
     description: BUSINESS.description,
     type: "website",

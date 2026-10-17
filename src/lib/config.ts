@@ -55,4 +55,4 @@ export const DELIVERY_ZONES = [
   },
 ];
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zooto-luxe.vercel.app";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://hairluxe-zootodev.vercel.app";
