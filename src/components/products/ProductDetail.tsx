@@ -3,28 +3,38 @@
 import { useState } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/data/products";
+import { swatchColor } from "@/lib/format";
 import { useCart } from "@/lib/context/CartContext";
+import Toast from "@/components/ui/Toast";
 import type { Product } from "@/lib/types";
 
 export default function ProductDetailClient({ product }: { product: Product }) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
-  const [added, setAdded] = useState(false);
+  const [color, setColor] = useState<string | null>(product.colors?.[0] ?? null);
+  const [length, setLength] = useState<string | null>(product.lengths?.[0] ?? null);
+  const [adding, setAdding] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const available = Math.max(0, product.stockCount - (product.sold ?? 0));
   const outOfStock = available <= 0;
 
   const handleAdd = () => {
-    addItem({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity,
-      category: product.category,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    if (outOfStock || adding) return;
+    setAdding(true);
+    // Brief loading state guards against double-clicks before the item lands.
+    window.setTimeout(() => {
+      addItem({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity,
+        category: product.category,
+      });
+      setAdding(false);
+      setToast("Added to cart");
+    }, 350);
   };
 
   const discount = product.compareAtPrice
@@ -127,6 +137,83 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </p>
         </div>
 
+        {product.colors && product.colors.length > 0 && (
+          <div className="mb-5">
+            <p className="text-xs text-muted uppercase tracking-wide mb-2">
+              Color: <span className="text-foreground font-semibold normal-case">{color}</span>
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              {product.colors.map((c) => {
+                const selected = color === c;
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    aria-label={`Color: ${c}`}
+                    aria-pressed={selected}
+                    title={c}
+                    className={`relative w-9 h-9 rounded-full border-2 transition-all cursor-pointer hover:scale-110 ${
+                      selected ? "border-gold ring-2 ring-gold/40 scale-110" : "border-surface-light"
+                    }`}
+                    style={{ backgroundColor: swatchColor(c) }}
+                  >
+                    {selected && (
+                      <svg
+                        className="w-4 h-4 absolute inset-0 m-auto text-white drop-shadow"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {product.lengths && product.lengths.length > 0 && (
+          <div className="mb-5">
+            {product.lengths.length === 1 ? (
+              <p className="text-sm">
+                <span className="text-muted">Length:</span>{" "}
+                <span className="font-semibold">{product.lengths[0]}</span>
+              </p>
+            ) : (
+              <>
+                <p className="text-xs text-muted uppercase tracking-wide mb-2">
+                  Length: <span className="text-foreground font-semibold normal-case">{length}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.lengths.map((l) => (
+                    <button
+                      key={l}
+                      type="button"
+                      onClick={() => setLength(l)}
+                      aria-pressed={length === l}
+                      title={l}
+                      className={`px-3 h-9 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                        length === l
+                          ? "bg-gold text-background border-gold"
+                          : "bg-surface text-muted border-surface-light hover:border-gold/40 hover:text-gold"
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center gap-4 mb-6">
           <div className="flex items-center rounded-full border border-surface-light bg-surface">
             <button
@@ -148,14 +235,14 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
           <button
             onClick={handleAdd}
-            disabled={outOfStock}
+            disabled={outOfStock || adding}
             className={`flex-1 h-12 rounded-full font-semibold text-sm transition-all ${
-              added
-                ? "bg-emerald-500 text-white"
+              adding
+                ? "bg-gold/60 text-background"
                 : "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90"
-            } disabled:opacity-40 disabled:cursor-not-allowed`}
+            } disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer`}
           >
-            {outOfStock ? "Sold Out" : added ? "Added to Cart!" : "Add to Cart"}
+            {outOfStock ? "Sold Out" : adding ? "Adding..." : "Add to Cart"}
           </button>
         </div>
 
@@ -193,6 +280,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           </ul>
         </div>
       </div>
+
+      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }

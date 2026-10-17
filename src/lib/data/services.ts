@@ -8,7 +8,7 @@ export const services: Service[] = [
     description:
       "Transform worn, dull or damaged hair into a fresh, luxurious look. Our stylists breathe new life into existing hair with deep conditioning, restyling and precision care.",
     priceRange: "₦120,000 - ₦250,000",
-    startingPrice: 80,
+    startingPrice: 120000,
     duration: "2 - 3 hours",
     image:
       "https://images.unsplash.com/photo-1560869713-7d0a29430803?q=80&w=1200&auto=format&fit=crop",
@@ -27,7 +27,7 @@ export const services: Service[] = [
     description:
       "Custom-made luxury wigs tailored to your head size, style and preference. We use premium virgin hair and hand-tied techniques for an undetectable look.",
     priceRange: "₦150,000 - ₦300,000",
-    startingPrice: 150,
+    startingPrice: 150000,
     duration: "3 - 4 hours",
     image:
       "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
@@ -46,7 +46,7 @@ export const services: Service[] = [
     description:
       "Professional makeup artistry for every occasion - weddings, photoshoots, parties and more. Flawless, camera-ready looks that enhance your natural beauty.",
     priceRange: "₦150,000 - ₦250,000",
-    startingPrice: 100,
+    startingPrice: 150000,
     duration: "1 - 2 hours",
     image:
       "https://plus.unsplash.com/premium_photo-1718626725888-c62ace546f1d?q=80&w=1200&auto=format&fit=crop",
@@ -65,7 +65,7 @@ export const services: Service[] = [
     description:
       "Volumizing and classic lash extensions for beautiful, wide-awake eyes. Applied safely with premium materials and lasting results.",
     priceRange: "₦120,000 - ₦250,000",
-    startingPrice: 80,
+    startingPrice: 120000,
     duration: "1 - 1.5 hours",
     image:
       "https://images.unsplash.com/photo-1583001931096-959e9a1a6223?q=80&w=1200&auto=format&fit=crop",
@@ -84,7 +84,7 @@ export const services: Service[] = [
     description:
       "Semi-permanent eyebrow enhancement with precise, hair-like strokes. Say goodbye to daily eyebrow makeup with results that last 1-3 years.",
     priceRange: "₦350,000 - ₦650,000",
-    startingPrice: 200,
+    startingPrice: 350000,
     duration: "2 - 3 hours",
     image:
       "https://plus.unsplash.com/premium_photo-1661582563489-e40604c3ac97?q=80&w=1200&auto=format&fit=crop",
@@ -103,7 +103,7 @@ export const services: Service[] = [
     description:
       "Safe, hygienic and virtually painless removal of skin tags. Quick procedure with minimal downtime and discreet, professional care.",
     priceRange: "₦80,000 - ₦250,000",
-    startingPrice: 50,
+    startingPrice: 80000,
     duration: "30 - 60 minutes",
     image:
       "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1200&auto=format&fit=crop",

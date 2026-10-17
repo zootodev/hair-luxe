@@ -1,6 +1,6 @@
 # Hair Luxe - Premium Hair Business Ecommerce Website
 
-**Hair Luxe** is a modern, luxury-themed ecommerce website for a hair business, rebuilt from Zooto Luxe with a Nigerian focus. Live at: https://hair-luxe-28n0ri27g-zootodev.vercel.app
+**Hair Luxe** is a modern, luxury-themed ecommerce website for a hair business, rebuilt from Zooto Luxe with a Nigerian focus. Live at: https://hairluxe-zootodev.vercel.app
 
 ## 🎯 Overview
 

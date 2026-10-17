@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Button from "@/components/ui/Button";
-import { BUSINESS } from "@/lib/config";
 
 export default function Hero() {
   return (
@@ -16,10 +15,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-background" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32">
-        <p className="text-gold uppercase tracking-[0.3em] text-sm font-medium animate-fade-in-up mb-4">
-          {BUSINESS.tagline}
-        </p>
-        <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-in-up animate-delay-200">
+        <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-in-up">
           <span className="text-gradient-gold">Where Luxury</span>
           <br />
           Meets Your Beautiful Hair

@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/data/products";
 import { useCart } from "@/lib/context/CartContext";
-import { getAvailableStock } from "@/lib/stock";
+import { getSoldCount } from "@/lib/stock";
+import Toast from "@/components/ui/Toast";
 
 interface ProductCardProps {
   product: Product;
@@ -15,14 +16,16 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   // Seed with the SSR-safe value so hydration matches, then adopt the
-  // localStorage-backed stock from getAvailableStock() on the client.
+  // localStorage-backed stock from the client on mount.
   const [available, setAvailable] = useState(() =>
     Math.max(0, product.stockCount - (product.sold ?? 0))
   );
+  const [adding, setAdding] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   /* eslint-disable react-hooks/set-state-in-effect -- local stock is only known after mount */
   useEffect(() => {
-    setAvailable(getAvailableStock(product.id));
+    setAvailable(Math.max(0, product.stockCount - getSoldCount(product.id)));
   }, [product.id, product.stockCount]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -30,15 +33,21 @@ export default function ProductCard({ product }: ProductCardProps) {
   const lowStock = available > 0 && available <= 5;
 
   const handleQuickAdd = () => {
-    if (outOfStock) return;
-    addItem({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: 1,
-      category: product.category,
-    });
+    if (outOfStock || adding) return;
+    setAdding(true);
+    // Brief loading state guards against double-clicks before the item lands.
+    window.setTimeout(() => {
+      addItem({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+        category: product.category,
+      });
+      setAdding(false);
+      setToast("Added to cart");
+    }, 350);
   };
 
   return (
@@ -104,10 +113,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center gap-2 mt-4">
           <button
             onClick={handleQuickAdd}
-            disabled={outOfStock}
+            disabled={outOfStock || adding}
             className="flex-1 h-10 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
-            {outOfStock ? "Sold Out" : "Add to Cart"}
+            {outOfStock ? "Sold Out" : adding ? "Adding..." : "Add to Cart"}
           </button>
           <Link
             href={`/shop/${product.slug ?? product.id}`}
@@ -121,6 +130,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           </Link>
         </div>
       </div>
+
+      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }

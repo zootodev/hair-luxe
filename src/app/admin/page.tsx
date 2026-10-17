@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/data/products";
+import { formatIntlPhone, telHref } from "@/lib/format";
 import type { Order, Booking } from "@/lib/types";
 import AdminSidebar, { type AdminView } from "@/components/admin/AdminSidebar";
 import ProductsManager from "@/components/admin/ProductsManager";
 import ServicesManager from "@/components/admin/ServicesManager";
 import SettingsManager from "@/components/admin/SettingsManager";
+import Modal from "@/components/ui/Modal";
+import Toast from "@/components/ui/Toast";
 import { adminFetch } from "@/lib/admin-fetch";
 
 const STATUS_STYLES: Record<Order["status"], string> = {
@@ -64,12 +67,22 @@ export default function AdminPage() {
     kind: "order" | "booking";
     id: string;
     customerName: string;
+    email: string;
   } | null>(null);
   const [emailSubject, setEmailSubject] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [emailError, setEmailError] = useState("");
-  const [emailSent, setEmailSent] = useState("");
+  const [toast, setToast] = useState<{ message: string; variant: "success" | "error" } | null>(
+    null
+  );
+  // Confirmation modal for status changes and deletions (item 12).
+  const [confirmAction, setConfirmAction] = useState<{
+    kind: "status" | "delete";
+    orderId: string;
+    from: Order["status"];
+    to?: Order["status"];
+  } | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -121,10 +134,14 @@ export default function AdminPage() {
       .filter((o) => o.status !== "cancelled")
       .reduce((sum, o) => sum + o.total, 0);
     const pending = orders.filter((o) => o.status === "pending").length;
-    const deliveries = orders.filter(
-      (o) => o.customer.deliveryMethod === "delivery"
+    // Same definition as the Deliveries tab: in-flight delivery orders only.
+    const activeDeliveries = orders.filter(
+      (o) =>
+        o.customer.deliveryMethod === "delivery" &&
+        o.status !== "completed" &&
+        o.status !== "cancelled"
     ).length;
-    return { totalRevenue, pending, deliveries, total: orders.length };
+    return { totalRevenue, pending, activeDeliveries, total: orders.length };
   }, [orders]);
 
   const handleStatus = async (orderId: string, status: Order["status"]) => {
@@ -136,30 +153,31 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Unknown error" }));
-        alert(err.error ?? "Failed to update status. Please try again.");
+        setToast({ message: err.error ?? "Failed to update status.", variant: "error" });
         if (res.status === 401) router.push("/admin/login");
         return;
       }
+      setToast({ message: `Status updated to ${statusLabel(status)}.`, variant: "success" });
     } catch {
-      alert("Network error. Please try again.");
+      setToast({ message: "Network error. Please try again.", variant: "error" });
     }
     await fetchData();
   };
 
   const handleDeleteOrder = async (orderId: string) => {
-    if (!confirm(`Delete order ${orderId}? This cannot be undone.`)) return;
     try {
       const res = await adminFetch(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
         method: "DELETE",
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Unknown error" }));
-        alert(err.error ?? "Failed to delete order. Please try again.");
+        setToast({ message: err.error ?? "Failed to delete order.", variant: "error" });
         if (res.status === 401) router.push("/admin/login");
         return;
       }
+      setToast({ message: `Order ${orderId} deleted.`, variant: "success" });
     } catch {
-      alert("Network error. Please try again.");
+      setToast({ message: "Network error. Please try again.", variant: "error" });
     }
     await fetchData();
   };
@@ -224,7 +242,7 @@ export default function AdminPage() {
     }
     setEmailSending(true);
     setEmailError("");
-    setEmailSent("");
+    const targetName = emailTarget.customerName;
     try {
       const res = await adminFetch("/api/admin/email", {
         method: "POST",
@@ -241,10 +259,10 @@ export default function AdminPage() {
         setEmailSending(false);
         return;
       }
-      setEmailSent(`Email sent to ${emailTarget.customerName}.`);
       setEmailSubject("");
       setEmailMessage("");
       setEmailTarget(null);
+      setToast({ message: `Email sent to ${targetName}.`, variant: "success" });
     } catch {
       setEmailError("Network error. Please try again.");
     } finally {
@@ -345,18 +363,35 @@ export default function AdminPage() {
           <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Orders", value: stats.total, color: "text-gold" },
-            { label: "Pending Payment", value: stats.pending, color: "text-yellow-400" },
-            { label: "Deliveries", value: stats.deliveries, color: "text-blue-400" },
             {
-              label: "Revenue (est.)",
+              label: "Total Orders",
+              value: stats.total,
+              color: "text-gold",
+              title: "All orders placed on the site, regardless of status.",
+            },
+            {
+              label: "Pending Payment",
+              value: stats.pending,
+              color: "text-yellow-400",
+              title: "Orders still awaiting payment confirmation.",
+            },
+            {
+              label: "Active Deliveries",
+              value: stats.activeDeliveries,
+              color: "text-blue-400",
+              title: "Delivery orders that are not completed or cancelled — same orders shown in the Deliveries tab.",
+            },
+            {
+              label: "Estimated revenue",
               value: formatPrice(stats.totalRevenue),
               color: "text-emerald-400",
+              title: "Sum of order totals, excluding cancelled orders. Estimates only — based on reported bank transfers.",
             },
           ].map((s) => (
             <div
               key={s.label}
-              className="rounded-2xl bg-surface border border-surface-light p-5"
+              title={s.title}
+              className="rounded-2xl bg-surface border border-surface-light p-5 cursor-help"
             >
               <p className={`font-serif text-2xl font-bold ${s.color}`}>{s.value}</p>
               <p className="text-xs text-muted mt-1 uppercase tracking-wide">{s.label}</p>
@@ -393,6 +428,11 @@ export default function AdminPage() {
             <button
               onClick={exportOrders}
               disabled={orders.length === 0}
+              title={
+                orders.length === 0
+                  ? "No orders to export yet."
+                  : "Download all orders as a CSV file."
+              }
               className="px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               Export Orders
@@ -400,6 +440,11 @@ export default function AdminPage() {
             <button
               onClick={exportBookings}
               disabled={bookings.length === 0}
+              title={
+                bookings.length === 0
+                  ? "No bookings to export yet — bookings appear here once clients book a service."
+                  : "Download all bookings as a CSV file."
+              }
               className="px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               Export Bookings
@@ -438,10 +483,30 @@ export default function AdminPage() {
 
             {filteredOrders.length === 0 ? (
               <div className="text-center py-16 rounded-2xl bg-surface border border-surface-light">
-                <p className="text-muted">No orders found.</p>
-                <p className="text-xs text-muted mt-2">
-                  When customers place orders through the site, they will appear here.
-                </p>
+                {orders.length === 0 ? (
+                  <>
+                    <p className="text-muted">No orders yet.</p>
+                    <p className="text-xs text-muted mt-2">
+                      When customers place orders through the site, they will appear here.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-muted">No orders match the current filters.</p>
+                    <p className="text-xs text-muted mt-2">
+                      Try a different status or delivery method filter.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setStatusFilter("all");
+                        setDeliveryFilter("all");
+                      }}
+                      className="mt-4 px-4 py-2 rounded-full text-xs font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                    >
+                      Clear filters
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -472,7 +537,7 @@ export default function AdminPage() {
                           </div>
                           <p className="text-xs text-muted truncate mt-0.5">
                             {order.customer.firstName} {order.customer.lastName} &middot;{" "}
-                            {order.customer.phone}
+                            {formatIntlPhone(order.customer.phone)}
                           </p>
                         </div>
                       </div>
@@ -530,10 +595,10 @@ export default function AdminPage() {
                               <p className="flex justify-between">
                                 <span className="text-muted">Phone</span>
                                 <a
-                                  href={`tel:${order.customer.phone.replace(/\s/g, "")}`}
+                                  href={`tel:${telHref(order.customer.phone)}`}
                                   className="font-medium text-gold hover:underline"
                                 >
-                                  {order.customer.phone}
+                                  {formatIntlPhone(order.customer.phone)}
                                 </a>
                               </p>
                               <p className="flex justify-between">
@@ -636,7 +701,20 @@ export default function AdminPage() {
                             (status) => (
                               <button
                                 key={status}
-                                onClick={() => handleStatus(order.id, status)}
+                                onClick={() =>
+                                  order.status !== status &&
+                                  setConfirmAction({
+                                    kind: "status",
+                                    orderId: order.id,
+                                    from: order.status,
+                                    to: status,
+                                  })
+                                }
+                                title={
+                                  order.status === status
+                                    ? "Current status"
+                                    : `Change status from ${statusLabel(order.status)} to ${statusLabel(status)}`
+                                }
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                                   order.status === status
                                     ? "bg-gold text-background"
@@ -651,13 +729,13 @@ export default function AdminPage() {
                           <button
                             onClick={() => {
                               setEmailError("");
-                              setEmailSent("");
                               setEmailSubject(`Regarding your order ${order.id}`);
                               setEmailMessage("");
                               setEmailTarget({
                                 kind: "order",
                                 id: order.id,
                                 customerName: `${order.customer.firstName} ${order.customer.lastName}`,
+                                email: order.customer.email,
                               });
                             }}
                             className="px-3 py-1.5 rounded-full text-xs font-medium text-gold hover:bg-gold/10 border border-gold/30 transition-colors cursor-pointer"
@@ -665,10 +743,16 @@ export default function AdminPage() {
                             Email customer
                           </button>
                           <button
-                            onClick={() => handleDeleteOrder(order.id)}
-                            className="px-3 py-1.5 rounded-full text-xs font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors cursor-pointer"
+                            onClick={() =>
+                              setConfirmAction({
+                                kind: "delete",
+                                orderId: order.id,
+                                from: order.status,
+                              })
+                            }
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold text-white bg-red-500/90 hover:bg-red-500 transition-colors cursor-pointer"
                           >
-                            Delete
+                            Delete order
                           </button>
                         </div>
                       </div>
@@ -709,7 +793,13 @@ export default function AdminPage() {
                       <div>
                         <p className="font-semibold text-sm">{booking.service}</p>
                         <p className="text-xs text-muted mt-0.5">
-                          {booking.name} &middot; {booking.phone}
+                          {booking.name} &middot;{" "}
+                          <a
+                            href={`tel:${telHref(booking.phone)}`}
+                            className="text-gold hover:underline"
+                          >
+                            {formatIntlPhone(booking.phone)}
+                          </a>
                         </p>
                       </div>
                     </div>
@@ -727,10 +817,14 @@ export default function AdminPage() {
                       <button
                         onClick={() => {
                           setEmailError("");
-                          setEmailSent("");
                           setEmailSubject(`Regarding your ${booking.service} booking`);
                           setEmailMessage("");
-                          setEmailTarget({ kind: "booking", id: booking.id, customerName: booking.name });
+                          setEmailTarget({
+                            kind: "booking",
+                            id: booking.id,
+                            customerName: booking.name,
+                            email: booking.email,
+                          });
                         }}
                         className="text-gold hover:bg-gold/10 p-1.5 rounded-lg transition-colors cursor-pointer"
                         aria-label={`Email ${booking.name}`}
@@ -843,12 +937,13 @@ export default function AdminPage() {
                   {emailError}
                 </div>
               )}
-              {emailSent && (
-                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 mb-4 text-sm text-emerald-400">
-                  {emailSent}
-                </div>
-              )}
               <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between rounded-lg bg-background border border-surface-light px-3 h-9">
+                  <span className="text-xs text-muted">To:</span>
+                  <span className="text-sm font-medium break-all text-right">
+                    {emailTarget.email}
+                  </span>
+                </div>
                 <label className="block">
                   <span className="block text-xs text-muted mb-1">Subject</span>
                   <input
@@ -885,6 +980,96 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+        )}
+
+        <Modal
+          isOpen={!!confirmAction}
+          onClose={() => setConfirmAction(null)}
+          title={confirmAction?.kind === "delete" ? "Delete order?" : "Change order status?"}
+        >
+          {confirmAction && (
+            <>
+              <div className="text-sm space-y-3 mb-6">
+                <p className="text-muted">
+                  Order{" "}
+                  <span className="text-foreground font-semibold">{confirmAction.orderId}</span>
+                </p>
+                {confirmAction.kind === "status" && confirmAction.to && (
+                  <div className="flex items-center gap-2 rounded-xl bg-surface-light/60 border border-surface-light px-4 py-3">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_STYLES[confirmAction.from]}`}
+                    >
+                      {statusLabel(confirmAction.from)}
+                    </span>
+                    <svg
+                      className="w-4 h-4 text-muted shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_STYLES[confirmAction.to]}`}
+                    >
+                      {statusLabel(confirmAction.to)}
+                    </span>
+                  </div>
+                )}
+                {confirmAction.kind === "delete" && (
+                  <p className="text-red-400">
+                    This permanently removes the order and its payment proof. This cannot be
+                    undone.
+                  </p>
+                )}
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setConfirmAction(null)}
+                  className="px-4 h-10 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                {confirmAction.kind === "status" && confirmAction.to && (
+                  <button
+                    onClick={async () => {
+                      const to = confirmAction.to;
+                      if (!to) return;
+                      const orderId = confirmAction.orderId;
+                      setConfirmAction(null);
+                      await handleStatus(orderId, to);
+                    }}
+                    className="px-4 h-10 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity cursor-pointer"
+                  >
+                    Change status
+                  </button>
+                )}
+                {confirmAction.kind === "delete" && (
+                  <button
+                    onClick={async () => {
+                      const { orderId } = confirmAction;
+                      setConfirmAction(null);
+                      await handleDeleteOrder(orderId);
+                    }}
+                    className="px-4 h-10 rounded-full text-sm font-semibold text-white bg-red-500/90 hover:bg-red-500 transition-colors cursor-pointer"
+                  >
+                    Delete order
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </Modal>
+
+        {toast && (
+          <Toast
+            message={toast.message}
+            variant={toast.variant}
+            onDismiss={() => setToast(null)}
+            duration={4000}
+          />
         )}
         </div>
         </div>

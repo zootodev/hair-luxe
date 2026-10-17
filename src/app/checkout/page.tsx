@@ -18,7 +18,7 @@ const STATUS_STEPS = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, clearCart, business, deliveryZones } =
+  const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, setDeliveryZone, clearCart, business, deliveryZones } =
     useCart();
 
   const zoneInfo =
@@ -112,6 +112,9 @@ const [submitting, setSubmitting] = useState(false);
     if (!/^[\d\s()+-]{7,}$/.test(form.phone)) newErrors.phone = "Enter a valid phone number";
     if (!form.city.trim()) newErrors.city = "Required";
     if (deliveryMethod === "delivery" && !form.address.trim()) newErrors.address = "Required";
+    if (deliveryMethod === "delivery" && !deliveryZone) {
+      newErrors.deliveryZone = "Select a delivery zone";
+    }
     return newErrors;
   };
 
@@ -471,7 +474,7 @@ const handlePlaceOrder = async () => {
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
                         errors.phone ? "border-red-500" : "border-surface-light focus:border-gold"
                       }`}
-                      placeholder="+234 812 345 6789"
+                      placeholder="+234 800 000 0000"
                     />
                     {errors.phone && (
                       <p className="text-xs text-red-400 mt-1">{errors.phone}</p>
@@ -480,7 +483,9 @@ const handlePlaceOrder = async () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <label className="block">
+                  <label
+                    className={`block ${deliveryMethod === "delivery" ? "" : "sm:col-span-2"}`}
+                  >
                     <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
                       City *
                     </span>
@@ -495,14 +500,32 @@ const handlePlaceOrder = async () => {
                     />
                     {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city}</p>}
                   </label>
-                  <label className="block">
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                      Delivery Zone
-                    </span>
-                    <div className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm flex items-center text-muted">
-                      {deliveryZone}
-                    </div>
-                  </label>
+                  {deliveryMethod === "delivery" && (
+                    <label className="block">
+                      <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+                        Delivery Zone
+                      </span>
+                      <select
+                        value={deliveryZone}
+                        onChange={(e) => setDeliveryZone(e.target.value)}
+                        className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
+                          errors.deliveryZone
+                            ? "border-red-500"
+                            : "border-surface-light focus:border-gold"
+                        }`}
+                      >
+                        <option value="">Select delivery zone</option>
+                        {deliveryZones.map((z) => (
+                          <option key={z.name} value={z.name}>
+                            {z.name} — {formatPrice(z.fee)} ({z.days})
+                          </option>
+                        ))}
+                      </select>
+                      {errors.deliveryZone && (
+                        <p className="text-xs text-red-400 mt-1">{errors.deliveryZone}</p>
+                      )}
+                    </label>
+                  )}
                 </div>
 
                 {deliveryMethod === "delivery" && (
@@ -537,24 +560,44 @@ const handlePlaceOrder = async () => {
                   />
                 </label>
 
-                <div className="rounded-xl bg-gold/5 border border-gold/20 p-4 mb-6 text-sm flex items-start gap-3">
-                  <svg
-                    className="w-5 h-5 text-gold shrink-0 mt-0.5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-<p className="text-muted">
-                    Delivery is {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)} to{" "}
-                    {deliveryZone} and takes {zoneInfo.days}. We&apos;ll call you on your
-                    phone number before delivery.
-                  </p>
-                </div>
+                {deliveryMethod === "delivery" ? (
+                  <div className="rounded-xl bg-gold/5 border border-gold/20 p-4 mb-6 text-sm flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-gold shrink-0 mt-0.5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="text-muted">
+                      Delivery is {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)} to{" "}
+                      {deliveryZone || "your zone"} and takes {zoneInfo.days}. We&apos;ll call you
+                      on your phone number before delivery.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-gold/5 border border-gold/20 p-4 mb-6 text-sm flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-gold shrink-0 mt-0.5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 0110 18v-5H6a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="text-muted">
+                      Pick up your order at {business.address}. Please call{" "}
+                      {business.phoneFormatted || business.phone} when you&apos;re on the way.
+                    </p>
+                  </div>
+                )}
 
                 <button
                   onClick={handleNext}
@@ -777,7 +820,11 @@ const handlePlaceOrder = async () => {
                   <span className="text-foreground">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted">
-                  <span>{deliveryMethod === "delivery" ? `Delivery (${deliveryZone})` : "Pickup"}</span>
+                  <span>
+                    {deliveryMethod === "delivery"
+                      ? `Delivery${deliveryZone ? ` (${deliveryZone})` : ""}`
+                      : "Pickup"}
+                  </span>
                   <span className="text-foreground">
                     {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)}
                   </span>

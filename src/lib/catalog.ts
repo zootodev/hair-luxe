@@ -1,4 +1,4 @@
-import { products as baseProducts, getProductBySlug as baseGetProductBySlug } from "@/lib/data/products";
+import { products as baseProducts } from "@/lib/data/products";
 import { services as baseServices } from "@/lib/data/services";
 import { BUSINESS, DELIVERY_ZONES } from "@/lib/config";
 import type { Product, Service, SiteSettings } from "@/lib/types";
@@ -12,6 +12,12 @@ import {
 export type LiveProduct = Product & { sold: number; visible: boolean };
 export type LiveService = Service & { visible: boolean };
 
+const PRODUCT_CATEGORIES: Product["category"][] = ["Wigs", "Hair Bundles", "Lashes", "Hair Care"];
+const SERVICE_CATEGORIES: Service["category"][] = ["Hair", "Beauty", "Skin"];
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop";
+
 function asString(value: unknown, fallback: string): string {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
   return fallback;
@@ -24,6 +30,12 @@ function asNumber(value: unknown, fallback: number): number {
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
   return value === true ? true : fallback;
+}
+
+function asStringArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const arr = value.map((v) => String(v).trim()).filter(Boolean);
+  return arr.length > 0 ? arr : undefined;
 }
 
 function asBankDetails(value: unknown, fallback: SiteSettings["bankDetails"]): SiteSettings["bankDetails"] {
@@ -98,7 +110,7 @@ export async function getLiveSettings(): Promise<SiteSettings> {
 
 export async function getLiveProducts(): Promise<LiveProduct[]> {
   const [overrides, sold] = await Promise.all([getCatalogProducts(), getSold()]);
-  return baseProducts.map((base) => {
+  const fromSeed = baseProducts.map((base) => {
     const o = (overrides[base.id] ?? {}) as Record<string, unknown>;
     const price = asNumber(o.price, base.price);
     const compareAtRaw = o.compareAtPrice;
@@ -120,11 +132,49 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
       sold: sold[base.id] ?? 0,
     };
   });
+
+  // Products created from the admin that are not part of the seed catalog.
+  const seedIds = new Set(baseProducts.map((p) => p.id));
+  const created: LiveProduct[] = Object.entries(overrides).flatMap(([id, oRaw]) => {
+    if (seedIds.has(id)) return [];
+    const o = (oRaw ?? {}) as Record<string, unknown>;
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    const price = Number(o.price);
+    if (!name || !Number.isFinite(price) || price <= 0) return [];
+    const category = PRODUCT_CATEGORIES.includes(o.category as Product["category"])
+      ? (o.category as Product["category"])
+      : "Wigs";
+    const image = asString(o.image, FALLBACK_IMAGE);
+    return [
+      {
+        id,
+        slug: id,
+        name,
+        category,
+        description: asString(o.description, ""),
+        price,
+        compareAtPrice: o.compareAtPrice ? asNumber(o.compareAtPrice, 0) || undefined : undefined,
+        image,
+        images: [image],
+        stockCount: Math.max(0, asNumber(o.stockCount, 0)),
+        rating: asNumber(o.rating, 0),
+        reviewCount: asNumber(o.reviewCount, 0),
+        featured: asBoolean(o.featured, false),
+        visible: o.visible === false ? false : true,
+        sold: sold[id] ?? 0,
+        details: asStringArray(o.details) ?? [],
+        colors: asStringArray(o.colors),
+        lengths: asStringArray(o.lengths),
+      },
+    ];
+  });
+
+  return [...fromSeed, ...created];
 }
 
 export async function getLiveServices(): Promise<LiveService[]> {
   const overrides = await getCatalogServices();
-  return baseServices.map((base) => {
+  const fromSeed = baseServices.map((base) => {
     const o = (overrides[base.id] ?? {}) as Record<string, unknown>;
     return {
       ...base,
@@ -139,6 +189,35 @@ export async function getLiveServices(): Promise<LiveService[]> {
       visible: o.visible === false ? false : true,
     };
   });
+
+  // Services created from the admin that are not part of the seed catalog.
+  const seedIds = new Set(baseServices.map((s) => s.id));
+  const created: LiveService[] = Object.entries(overrides).flatMap(([id, oRaw]) => {
+    if (seedIds.has(id)) return [];
+    const o = (oRaw ?? {}) as Record<string, unknown>;
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (!name) return [];
+    const category = SERVICE_CATEGORIES.includes(o.category as Service["category"])
+      ? (o.category as Service["category"])
+      : "Hair";
+    return [
+      {
+        id,
+        name,
+        category,
+        description: asString(o.description, ""),
+        priceRange: asString(o.priceRange, ""),
+        startingPrice: asNumber(o.startingPrice, 0),
+        duration: asString(o.duration, ""),
+        image: asString(o.image, FALLBACK_IMAGE),
+        includes: asStringArray(o.includes) ?? [],
+        featured: asBoolean(o.featured, false),
+        visible: o.visible === false ? false : true,
+      },
+    ];
+  });
+
+  return [...fromSeed, ...created];
 }
 
 export async function getVisibleProducts(): Promise<LiveProduct[]> {
@@ -152,10 +231,8 @@ export async function getVisibleServices(): Promise<LiveService[]> {
 }
 
 export async function getLiveProductById(idOrSlug: string): Promise<LiveProduct | undefined> {
-  const base = baseGetProductBySlug(idOrSlug);
-  if (!base) return undefined;
   const all = await getLiveProducts();
-  return all.find((p) => p.id === base.id);
+  return all.find((p) => p.id === idOrSlug || p.slug === idOrSlug);
 }
 
 export async function getVisibleProductById(
@@ -166,10 +243,8 @@ export async function getVisibleProductById(
 }
 
 export async function getLiveServiceById(id: string): Promise<LiveService | undefined> {
-  const base = baseServices.find((s) => s.id === id);
-  if (!base) return undefined;
   const all = await getLiveServices();
-  return all.find((s) => s.id === base.id);
+  return all.find((s) => s.id === id);
 }
 
 export async function getVisibleServiceById(id: string): Promise<LiveService | undefined> {

@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { CartItem, DeliveryMethod, DeliveryZoneSettings } from "@/lib/types";
 import { BUSINESS, DELIVERY_ZONES } from "@/lib/config";
+import { getProductById } from "@/lib/data/products";
 import { getAvailableStock } from "@/lib/stock";
 
 export interface LiveCatalogProduct {
@@ -79,7 +80,13 @@ function loadCart(): CartItem[] {
     const stored = localStorage.getItem(STORAGE_KEY);
     const parsed = stored ? (JSON.parse(stored) as CartItem[]) : [];
     return parsed
-      .map((i) => ({ ...i, quantity: Math.min(i.quantity, getAvailableStock(i.productId)) }))
+      .map((i) => {
+        // Products outside the seed catalog can't be checked here; they are
+        // validated against the live catalog by reconcileItems once loaded.
+        const known = getProductById(i.productId) !== undefined;
+        const max = known ? getAvailableStock(i.productId) : i.quantity;
+        return { ...i, quantity: Math.min(i.quantity, max) };
+      })
       .filter((i) => i.quantity > 0);
   } catch {
     return [];
@@ -108,7 +115,7 @@ function reconcileItems(items: CartItem[], products: LiveCatalogProduct[]): Cart
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("delivery");
-  const [deliveryZone, setDeliveryZone] = useState<string>(DELIVERY_ZONES[1].name);
+  const [deliveryZone, setDeliveryZone] = useState<string>("");
   const [deliveryZones, setDeliveryZones] = useState<DeliveryZoneSettings[]>(
     DELIVERY_ZONES.map((z) => ({ ...z }))
   );
@@ -129,6 +136,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     enabled: false,
     text: "",
   });
+  // Live availability (stockCount − sold) per product id so admin-created
+  // products also cap correctly; falls back to local stock for seed items.
+  const [catalogStock, setCatalogStock] = useState<Record<string, number>>({});
   const [loaded, setLoaded] = useState(false);
 
   /* eslint-disable react-hooks/set-state-in-effect -- one-time local storage hydrate after mount */
@@ -154,17 +164,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (!data || cancelled) return;
         if (data.settings.deliveryZones.length > 0) {
           setDeliveryZones(data.settings.deliveryZones);
-          setDeliveryZone((zone) =>
-            data.settings.deliveryZones.some((z) => z.name === zone)
+          setDeliveryZone((zone) => {
+            // No zone chosen yet — keep the "Select delivery zone" placeholder.
+            if (!zone) return zone;
+            return data.settings.deliveryZones.some((z) => z.name === zone)
               ? zone
-              : data.settings.deliveryZones[0].name
-          );
+              : data.settings.deliveryZones[0].name;
+          });
         }
         // Mirror the server (computeLiveDeliveryFee) so totals always match.
         setDefaultDeliveryFee(data.settings.deliveryFee);
         setFreeDeliveryOver(data.settings.freeDeliveryOver);
         setBusiness(data.settings.business);
         setAnnouncement(data.settings.announcement);
+        setCatalogStock(
+          Object.fromEntries(data.products.map((p) => [p.id, Math.max(0, p.stockCount - p.sold)]))
+        );
         setItems((prev) => reconcileItems(prev, data.products));
       })
       .catch(() => {});
@@ -192,7 +207,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((i) => i.productId === item.productId);
       const newQty = (existing?.quantity ?? 0) + item.quantity;
-      const maxQty = getAvailableStock(item.productId);
+      const maxQty = catalogStock[item.productId] ?? getAvailableStock(item.productId);
       const capped = Math.max(0, Math.min(newQty, maxQty));
       if (capped <= 0) return prev;
       if (existing) {
@@ -215,7 +230,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem(productId);
       return;
     }
-    const maxQty = getAvailableStock(productId);
+    const maxQty = catalogStock[productId] ?? getAvailableStock(productId);
     const capped = Math.min(quantity, maxQty);
     if (capped <= 0) {
       removeItem(productId);
@@ -232,7 +247,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return itemsToCheck
       .filter((i) => i.quantity > 0)
       .map((i) => {
-        const maxQty = getAvailableStock(i.productId);
+        const maxQty = catalogStock[i.productId] ?? getAvailableStock(i.productId);
         return { ...i, quantity: Math.min(i.quantity, maxQty) };
       })
       .filter((i) => i.quantity > 0);

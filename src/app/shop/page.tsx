@@ -37,8 +37,8 @@ export default async function ShopPage({ searchParams }: Props) {
           {q && q.trim().length > 0 && (
             <div className="mt-4 text-center text-gold text-xs uppercase tracking-wider mb-2">
               Results for{" "}
-              <span className="font-semibold text-gold">{q}</span>
-              {products.length > 0 ? ` ({products.length})` : ""}
+              <span className="font-semibold text-gold">&quot;{q}&quot;</span>
+              {products.length > 0 ? ` (${products.length})` : ""}
             </div>
           )}
         </div>

@@ -172,8 +172,10 @@ export default function CartPage() {
                   <select
                     value={deliveryZone}
                     onChange={(e) => setDeliveryZone(e.target.value)}
+                    aria-label="Delivery zone"
                     className="w-full h-10 rounded-lg bg-surface-light border border-surface-light px-3 text-sm focus:border-gold focus:outline-none"
                   >
+                    <option value="">Select delivery zone</option>
                     {deliveryZones.map((z) => (
                       <option key={z.name} value={z.name}>
                         {z.name} - {formatPrice(z.fee)} ({z.days})

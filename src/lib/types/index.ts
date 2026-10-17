@@ -38,6 +38,8 @@ export interface Product {
   visible?: boolean;
   sold?: number;
   details: string[];
+  colors?: string[];
+  lengths?: string[];
 }
 
 export interface DeliveryZoneSettings {

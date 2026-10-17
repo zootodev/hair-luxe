@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
 import { BUSINESS } from "@/lib/config";
@@ -26,12 +26,50 @@ export default function Header() {
   const mobileOpen = mobileNav.open && mobileNav.path === pathname;
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const menuRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Accessible mobile menu: move focus in, trap Tab, close on Escape.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    menu.querySelector<HTMLElement>("a[href]")?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileNav({ open: false, path: pathname });
+        toggleRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusables = Array.from(
+        menu.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+        )
+      ).filter((el) => el.offsetParent !== null);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen, pathname]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,9 +167,12 @@ export default function Header() {
             </Link>
 
             <button
+              ref={toggleRef}
               onClick={() => setMobileNav((v) => ({ open: !v.open, path: pathname }))}
               className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold"
               aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 {mobileOpen ? (
@@ -162,6 +203,7 @@ export default function Header() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search wigs, bundles, lashes..."
+              aria-label="Search products"
               className="w-full h-11 rounded-full bg-surface border border-gold/30 pl-11 pr-4 text-sm focus:border-gold focus:outline-none"
             />
           </div>
@@ -169,7 +211,11 @@ export default function Header() {
       )}
 
       {mobileOpen && (
-        <nav className="md:hidden bg-background/98 backdrop-blur-md border-t border-gold/20 px-4 pb-6 pt-2">
+        <nav
+          id="mobile-menu"
+          ref={menuRef}
+          className="md:hidden bg-background/98 backdrop-blur-md border-t border-gold/20 px-4 pb-6 pt-2"
+        >
           <form onSubmit={submitSearch} className="relative mb-3">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -181,6 +227,7 @@ export default function Header() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products..."
+              aria-label="Search products"
               className="w-full h-11 rounded-full bg-surface-light border border-surface-light pl-10 pr-4 text-sm focus:border-gold focus:outline-none"
             />
           </form>

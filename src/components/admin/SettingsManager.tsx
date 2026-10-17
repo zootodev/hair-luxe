@@ -390,23 +390,28 @@ export default function SettingsManager() {
 
           <section className="rounded-2xl bg-surface border border-surface-light p-5">
             <h2 className="font-serif text-lg text-gold mb-4">Announcement Bar</h2>
-            <div className="flex flex-col sm:flex-row gap-3 text-sm">
-              <label className="flex items-center gap-2 cursor-pointer shrink-0">
-                <input
-                  type="checkbox"
-                  checked={form.announcementEnabled}
-                  onChange={(e) => set({ announcementEnabled: e.target.checked })}
-                  className="accent-gold w-4 h-4"
-                />
-                <span className="text-muted">Show announcement</span>
-              </label>
+            <label className="flex items-center gap-2 cursor-pointer w-fit text-sm mb-3">
               <input
+                type="checkbox"
+                checked={form.announcementEnabled}
+                onChange={(e) => set({ announcementEnabled: e.target.checked })}
+                className="accent-gold w-4 h-4"
+              />
+              <span className="text-muted">Show announcement</span>
+            </label>
+            <label className="block text-sm" htmlFor="settings-announcement-text">
+              <span className="block text-xs text-muted mb-1">Announcement text</span>
+              <input
+                id="settings-announcement-text"
                 className={inputClass}
                 value={form.announcementText}
-                placeholder="₦200,000"
+                placeholder="Free delivery on orders over ₦250,000 this week"
                 onChange={(e) => set({ announcementText: e.target.value })}
               />
-            </div>
+              <span className="block text-xs text-muted mt-1.5">
+                Shown in the bar at the top of every page. Keep it short — one line.
+              </span>
+            </label>
           </section>
 
           <div className="flex justify-end">

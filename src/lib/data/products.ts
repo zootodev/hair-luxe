@@ -7,8 +7,8 @@ export const products: Product[] = [
     category: "Wigs",
     description:
       "Premium 100% virgin human hair lace front wig with 5x5 closure. Pre-plucked hairline for a natural, undetectable finish.",
-    price: 250,
-    compareAtPrice: 320,
+    price: 250000,
+    compareAtPrice: 320000,
     image:
       "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -18,6 +18,8 @@ export const products: Product[] = [
     stockCount: 8,
     rating: 4.9,
     reviewCount: 42,
+    colors: ["Natural Black", "Dark Brown"],
+    lengths: ["22 inches"],
     featured: true,
     details: [
       "100% unprocessed virgin human hair",
@@ -33,8 +35,8 @@ export const products: Product[] = [
     category: "Wigs",
     description:
       "360-degree full lace human hair wig offering natural parting from every angle. Lightweight construction with maximum comfort.",
-    price: 350,
-    compareAtPrice: 420,
+    price: 350000,
+    compareAtPrice: 420000,
     image:
       "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -43,6 +45,8 @@ export const products: Product[] = [
     stockCount: 5,
     rating: 4.8,
     reviewCount: 28,
+    colors: ["Natural Black", "Off Black"],
+    lengths: ["24 inches"],
     featured: true,
     details: [
       "360 lace for unlimited parting options",
@@ -58,7 +62,7 @@ export const products: Product[] = [
     category: "Wigs",
     description:
       "Luxurious goddess braids wig with natural-looking roots. Pre-styled and ready to wear - zero install time.",
-    price: 180,
+    price: 180000,
     image:
       "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -67,6 +71,8 @@ export const products: Product[] = [
     stockCount: 12,
     rating: 4.7,
     reviewCount: 19,
+    colors: ["Natural Black", "Dark Brown", "Honey Blonde"],
+    lengths: ["16 inches", "20 inches", "24 inches"],
     details: [
       "Handmade Goddess crochet braids",
       "Natural-looking with a realistic hairline",
@@ -81,8 +87,8 @@ export const products: Product[] = [
     category: "Hair Bundles",
     description:
       "Lush body wave bundles in a 3-piece set. Thick, full and bouncy with minimal shedding. Perfect for sew-ins or crochet styles.",
-    price: 200,
-    compareAtPrice: 260,
+    price: 200000,
+    compareAtPrice: 260000,
     image:
       "https://images.unsplash.com/photo-1588527962980-72746d95973e?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -91,6 +97,7 @@ export const products: Product[] = [
     stockCount: 15,
     rating: 4.9,
     reviewCount: 56,
+    lengths: ["24 inches"],
     featured: true,
     details: [
       "100% virgin Brazilian human hair",
@@ -106,8 +113,8 @@ export const products: Product[] = [
     category: "Hair Bundles",
     description:
       "Buttery silk straight bundles for ice-cold sleek looks. 4-piece set with double weft for extra fullness.",
-    price: 280,
-    compareAtPrice: 350,
+    price: 280000,
+    compareAtPrice: 350000,
     image:
       "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -130,7 +137,7 @@ export const products: Product[] = [
     category: "Hair Bundles",
     description:
       "Trending ginger blonde bundles with premium color. Dimension and vibrancy for eye-catching looks.",
-    price: 230,
+    price: 230000,
     image:
       "https://images.unsplash.com/photo-1607093699882-27ca1cb89a3b?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -139,6 +146,8 @@ export const products: Product[] = [
     stockCount: 10,
     rating: 4.6,
     reviewCount: 22,
+    colors: ["Ginger Blonde"],
+    lengths: ["16 inches", "18 inches", "20 inches"],
     details: [
       "Premium blond-highlighted virgin hair",
       "3 bundles set (16, 18, 20 inches)",
@@ -153,7 +162,7 @@ export const products: Product[] = [
     category: "Lashes",
     description:
       "Professional mink volume lash kit with 10 different lengths. Reusable and cruelty-free for stunning statement eyes.",
-    price: 45,
+    price: 45000,
     image:
       "https://images.unsplash.com/photo-1639629509821-c54cdd984227?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -177,8 +186,8 @@ export const products: Product[] = [
     category: "Lashes",
     description:
       "Wispy glamour strip lashes perfect for events and photoshoots. 5 pairs with band flexibility for polished everyday wear.",
-    price: 25,
-    compareAtPrice: 35,
+    price: 25000,
+    compareAtPrice: 35000,
     image:
       "https://images.unsplash.com/photo-1715195060250-b321e5cd5171?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -201,8 +210,8 @@ export const products: Product[] = [
     category: "Hair Care",
     description:
       "Strong-hold edge control finished with a luxurious shine. Lays edges flat and smooth without flaking.",
-    price: 18,
-    compareAtPrice: 24,
+    price: 18000,
+    compareAtPrice: 24000,
     image:
       "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -225,7 +234,7 @@ export const products: Product[] = [
     category: "Hair Care",
     description:
       "Nourishing hair growth serum with biotin, castor oil and rosemary. Promotes healthy, thicker-looking hair.",
-    price: 32,
+    price: 32000,
     image:
       "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -249,7 +258,7 @@ export const products: Product[] = [
     category: "Hair Care",
     description:
       "Sulfate-free shampoo that cleanses while restoring moisture balance. Safe for colored and chemically treated hair.",
-    price: 28,
+    price: 28000,
     image:
       "https://images.unsplash.com/photo-1747858989102-cca0f4dc4a11?q=80&w=1200&auto=format&fit=crop",
     images: [
@@ -272,7 +281,7 @@ export const products: Product[] = [
     category: "Hair Care",
     description:
       "100% mulberry silk bonnet and scrunchie set. Protects hair overnight while sleeping to prevent breakage and preserve style.",
-    price: 35,
+    price: 35000,
     image:
       "https://images.unsplash.com/photo-1661879206759-465a93950df5?q=80&w=1200&auto=format&fit=crop",
     images: [

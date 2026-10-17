@@ -24,7 +24,7 @@ export default function FeaturedServices({ services }: { services: Service[] }) 
           {featured.map((service) => (
             <Link
               key={service.id}
-              href="/services"
+              href={`/services/${service.id}`}
               className="group relative flex flex-col rounded-2xl overflow-hidden bg-surface border border-surface-light hover:border-gold/40 transition-all duration-300 shadow-lg shadow-black/20 hover:-translate-y-1"
             >
               <div

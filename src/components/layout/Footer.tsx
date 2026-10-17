@@ -168,9 +168,9 @@ export default function Footer() {
             >
               TikTok
             </a>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-2 h-2 rounded-full bg-gold animate-pulse" />
-              {business.city}
+            <span className="inline-flex items-center gap-1.5" title="Studio location">
+              <span className="inline-block w-2 h-2 rounded-full bg-gold animate-pulse" aria-hidden="true" />
+              Based in {business.city}
             </span>
           </div>
         </div>

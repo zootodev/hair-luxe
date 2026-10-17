@@ -12,6 +12,10 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
+      setSendError("Please fill in all required fields (marked with *).");
+      return;
+    }
     setSending(true);
     setSendError("");
     try {
@@ -138,7 +142,13 @@ export default function ContactPage() {
               onSubmit={handleSubmit}
               className="rounded-2xl bg-surface border border-surface-light p-6 sm:p-8"
             >
-              <h2 className="font-serif text-xl font-bold mb-6">Send Us a Message</h2>
+              <h2 className="font-serif text-xl font-bold mb-1">Send Us a Message</h2>
+              <p className="text-xs text-muted mb-6">
+                <span className="text-gold" aria-hidden="true">
+                  *
+                </span>{" "}
+                required
+              </p>
               <div aria-hidden="true" className="hidden">
                 <label>
                   Leave this field empty
@@ -159,6 +169,7 @@ export default function ContactPage() {
                   <input
                     type="text"
                     required
+                    aria-required="true"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
@@ -174,7 +185,7 @@ export default function ContactPage() {
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
-                    placeholder="+234 812 345 6789"
+                    placeholder="+234 800 000 0000"
                   />
                 </label>
               </div>
@@ -185,6 +196,7 @@ export default function ContactPage() {
                 <input
                   type="email"
                   required
+                  aria-required="true"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
@@ -193,14 +205,18 @@ export default function ContactPage() {
               </label>
               <label className="block mb-4">
                 <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                  Subject
+                  Subject *
                 </span>
                 <select
+                  required
+                  aria-required="true"
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
                   className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none appearance-none"
                 >
-                  <option value="">Select a topic</option>
+                  <option value="" disabled>
+                    Select a topic
+                  </option>
                   <option>Order Inquiry</option>
                   <option>Booking Appointment</option>
                   <option>Product Question</option>
@@ -215,6 +231,7 @@ export default function ContactPage() {
                 </span>
                 <textarea
                   required
+                  aria-required="true"
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-gold focus:outline-none min-h-[140px] resize-none"
