@@ -84,7 +84,7 @@ export default function AboutPage() {
             </div>
             <div className="absolute -bottom-6 -left-6 rounded-2xl bg-surface border border-gold/20 p-5 shadow-2xl shadow-black/40 max-w-[220px]">
               <p className="font-serif text-lg font-bold text-gradient-gold mb-1">
-                {BUSINESS.hours.split(":")[0]}
+                {BUSINESS.hours}
               </p>
               <p className="text-xs text-muted">Open hours for your booking</p>
             </div>

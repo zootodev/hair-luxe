@@ -17,6 +17,16 @@ const STATUS_STYLES: Record<Order["status"], string> = {
   cancelled: "bg-red-500/15 text-red-400 border-red-500/30",
 };
 
+function statusLabel(status: Order["status"]): string {
+    switch (status) {
+      case "pending": return "Pending";
+      case "processing": return "Processing";
+      case "completed": return "Completed";
+      case "cancelled": return "Cancelled";
+      default: return status;
+    }
+  }
+
 type Tab = "orders" | "bookings" | "deliveries";
 
 function csvValue(value: string | number): string {
