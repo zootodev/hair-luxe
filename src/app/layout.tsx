@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import SiteShell from "@/components/layout/SiteShell";
@@ -50,11 +50,13 @@ export const metadata: Metadata = {
     description: BUSINESS.description,
   },
   alternates: { canonical: "/" },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+};
+
+// Favicon, apple-touch and OG images are supplied by the file-based
+// metadata conventions: icon.svg, favicon.ico, apple-icon.png,
+// opengraph-image.png and manifest.ts in this directory.
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({

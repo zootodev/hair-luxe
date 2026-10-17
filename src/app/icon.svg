@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Hair Luxe "HL" monogram — gold (#d4af37) on the site background (#0a0a0a).
+       Thick 6/64 strokes with round caps keep it legible down to 16x16. -->
+  <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+  <g fill="none" stroke="#d4af37" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- H -->
+    <path d="M17 18V47"/>
+    <path d="M29 18V47"/>
+    <path d="M17 32H29"/>
+    <!-- L -->
+    <path d="M39 18V47"/>
+    <path d="M39 47H47"/>
+  </g>
+</svg>
