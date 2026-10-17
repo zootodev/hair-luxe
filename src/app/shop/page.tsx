@@ -34,6 +34,13 @@ export default async function ShopPage({ searchParams }: Props) {
           <p className="text-muted max-w-2xl mx-auto">
             Luxury wigs, virgin hair bundles, lashes and hair care essentials.
           </p>
+          {q && q.trim().length > 0 && (
+            <div className="mt-4 text-center text-gold text-xs uppercase tracking-wider mb-2">
+              Results for{" "}
+              <span className="font-semibold text-gold">{q}</span>
+              {products.length > 0 ? ` ({products.length})` : ""}
+            </div>
+          )}
         </div>
 
         <Suspense fallback={null}>

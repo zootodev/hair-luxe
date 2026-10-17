@@ -96,7 +96,7 @@ export default function TrackOrderPage() {
               type="text"
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
-              placeholder="HL-2026-0001"
+              placeholder="HL-2026-0123"
               className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
             />
           </label>
@@ -175,8 +175,8 @@ export default function TrackOrderPage() {
                 <span className="font-medium">Method: </span>
                 {found.customer.deliveryMethod === "delivery" ? (
                   <>
-                    Delivery to {found.customer.address}, {found.customer.city}
-                    {found.customer.deliveryZone && ` (${found.customer.deliveryZone})`}
+                    Delivery to {found.customer.address}, {found.customer.city} ·
+                    {found.customer.deliveryZone && found.customer.deliveryZone}
                   </>
                 ) : (
                   "Pickup at our studio"

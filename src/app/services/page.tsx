@@ -83,11 +83,11 @@ export default function ServicesPage() {
                   >
                     View Details
                   </Link>
-                  <button
+                  <Link href={`/services/${service.id}?book=1`}
                     className="flex-1 h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
                   >
                     Book This Service
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
