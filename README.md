@@ -14,7 +14,7 @@ Hair Luxe offers premium hair services and products including wigs, hair revampi
 - **Bank transfer only** - Interac e-Transfer has been fully refactored out; checkout uses GTBank Nigeria bank transfer with placeholder account details (0123456789) for demo purposes
 - **Nigeria-focused localization** - Phone format +234, city Lagos, NGN currency, 6 Nigerian state testimonials (Lagos, Abuja, Kano, Ibadan, Port Harcourt, Benin City)
 - **Persistent order storage** - Supabase Postgres integration keeps orders and bookings across browser visits and redeploys (set `DATABASE_URL` env var)
-- **Email notifications** - Order details sent via EmailJS (configure your `NEXT_PUBLIC_EMAILJS_SERVICE_ID` and `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`)
+- **Email notifications** - Order, booking and contact emails sent via EmailJS with separate templates for the business and the customer (`EMAILJS_OWNER_TEMPLATE_ID` / `EMAILJS_CUSTOMER_TEMPLATE_ID`, with `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` kept as the owner fallback)
 - **Responsive admin dashboard** - Full order management, bookings, deliveries, CSV export, customer email, and product/catalog management
 
 ## 📸 Screenshots
@@ -36,7 +36,7 @@ _(Add screenshots of the checkout page, admin dashboard, and product pages here)
 1. Clone the repo: `git clone https://github.com/zootodev/hair-luxe.git`
 2. Install dependencies: `npm install`
 3. Copy `.env.example` to `.env.local` and fill in the values:
-   - `NEXT_PUBLIC_EMAILJS_SERVICE_ID` and `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` (from EmailJS dashboard)
+   - `NEXT_PUBLIC_EMAILJS_SERVICE_ID`, `EMAILJS_OWNER_TEMPLATE_ID` and `EMAILJS_CUSTOMER_TEMPLATE_ID` (from EmailJS dashboard; the owner template falls back to `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` when unset)
    - `ADMIN_PASSWORD=hairluxe-demo` (or set your own secure password)
    - `DATABASE_URL` (Supabase Postgres URL, optional for demo mode)
    - `NEXT_PUBLIC_BUSINESS_EMAIL`, `NEXT_PUBLIC_WHATSAPP`, etc.
