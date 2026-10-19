@@ -3,14 +3,10 @@
 import { useState } from "react";
 import { getOrders } from "@/lib/orders";
 import { formatPrice } from "@/lib/data/products";
+import { studioLocation } from "@/lib/format";
+import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
+import { useCart } from "@/lib/context/CartContext";
 import type { Order } from "@/lib/types";
-
-const STATUS_STYLES: Record<Order["status"], string> = {
-  pending: "bg-yellow-500/15 text-yellow-400",
-  processing: "bg-blue-500/15 text-blue-400",
-  completed: "bg-emerald-500/15 text-emerald-400",
-  cancelled: "bg-red-500/15 text-red-400",
-};
 
 export default function TrackOrderPage() {
   const [orderId, setOrderId] = useState("");
@@ -18,6 +14,7 @@ export default function TrackOrderPage() {
   const [error, setError] = useState("");
   const [found, setFound] = useState<Order | null>(null);
   const [searching, setSearching] = useState(false);
+  const { business } = useCart();
 
   const checkoutLocal = (id: string, ph: string) => {
     const orders = getOrders();
@@ -136,11 +133,11 @@ export default function TrackOrderPage() {
                 <p className="font-serif text-xl font-bold text-gold">{found.id}</p>
               </div>
               <span
-                className={`inline-block px-3 py-1 rounded-full text-xs font-bold capitalize ${
-                  STATUS_STYLES[found.status]
-                } border border-current/20`}
+                className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                  STATUS_BADGE_CLASSES[found.status]
+                }`}
               >
-                {found.status}
+                {statusLabel(found.status)}
               </span>
             </div>
 
@@ -179,7 +176,7 @@ export default function TrackOrderPage() {
                     {found.customer.deliveryZone && found.customer.deliveryZone}
                   </>
                 ) : (
-                  "Pickup at our studio"
+                  <>Pickup at {studioLocation(business.address, business.city)}</>
                 )}
               </p>
               {found.paymentProofName && (

@@ -5,6 +5,10 @@ const SERVICE_ID =
   process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "YOUR_EMAILJS_SERVICE_ID";
 const TEMPLATE_ID =
   process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "YOUR_EMAILJS_TEMPLATE_ID";
+// Private key from EmailJS (Account > API keys). Sent as `accessToken` so the
+// REST API accepts requests from server environments (Node/serverless), which
+// EmailJS otherwise rejects with HTTP 403.
+const PRIVATE_KEY = process.env.EMAILJS_PRIVATE_KEY?.trim() || undefined;
 
 export interface SendResult {
   ok: boolean;
@@ -29,11 +33,17 @@ async function send(
         service_id: SERVICE_ID,
         template_id: TEMPLATE_ID,
         user_id: PUBLIC_KEY,
+        ...(PRIVATE_KEY ? { accessToken: PRIVATE_KEY } : {}),
         template_params,
       }),
       cache: "no-store",
     });
     const text = await res.text();
+    if (res.status !== 200) {
+      console.error(
+        `[email] EmailJS send failed (status ${res.status}): ${text}`
+      );
+    }
     return { ok: res.status === 200, status: res.status, text };
   } catch (error) {
     console.error("Failed to send email server-side ->", error);

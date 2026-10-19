@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductCard from "@/components/products/ProductCard";
+import { productMatchesQuery } from "@/lib/search";
 import type { Product, ProductCategory } from "@/lib/types";
 
 const CATEGORIES: ("All" | ProductCategory)[] = [
@@ -57,10 +58,7 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
   const filtered = useMemo(() => {
     let result = products.filter(
       (p) =>
-        (category === "All" || p.category === category) &&
-        (search.trim() === "" ||
-          p.name.toLowerCase().includes(search.toLowerCase()) ||
-          p.description.toLowerCase().includes(search.toLowerCase()))
+        (category === "All" || p.category === category) && productMatchesQuery(p, search)
     );
 
     switch (sort) {
@@ -81,6 +79,13 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
 
   return (
     <>
+      {search.trim().length > 0 && (
+        <div className="text-center text-gold text-xs uppercase tracking-wider mb-6">
+          Results for{" "}
+          <span className="font-semibold text-gold">&quot;{search.trim()}&quot;</span>
+          {filtered.length > 0 ? ` (${filtered.length})` : ""}
+        </div>
+      )}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-8">
         <div className="flex flex-wrap items-center gap-2">
           {CATEGORIES.map((c) => (

@@ -50,3 +50,15 @@ export function formatIntlPhone(raw: string): string {
   if (m) return `+${m[1]} ${m[2]} ${m[3]} ${m[4]}`;
   return intl;
 }
+
+/**
+ * Studio pickup location from Settings: "address, city". Skips the city when
+ * the address already contains it (e.g. "Lagos, Nigeria" + "Lagos") so the
+ * line never reads "Lagos, Nigeria, Lagos".
+ */
+export function studioLocation(address: string, city: string): string {
+  const a = (address ?? "").trim();
+  const c = (city ?? "").trim();
+  if (a && c && !a.toLowerCase().includes(c.toLowerCase())) return `${a}, ${c}`;
+  return a || c;
+}

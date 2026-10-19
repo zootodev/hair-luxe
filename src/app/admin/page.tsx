@@ -12,23 +12,7 @@ import SettingsManager from "@/components/admin/SettingsManager";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import { adminFetch } from "@/lib/admin-fetch";
-
-const STATUS_STYLES: Record<Order["status"], string> = {
-  pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-  processing: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-  completed: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-  cancelled: "bg-red-500/15 text-red-400 border-red-500/30",
-};
-
-function statusLabel(status: Order["status"]): string {
-    switch (status) {
-      case "pending": return "Pending";
-      case "processing": return "Processing";
-      case "completed": return "Completed";
-      case "cancelled": return "Cancelled";
-      default: return status;
-    }
-  }
+import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
 
 type Tab = "orders" | "bookings" | "deliveries";
 
@@ -83,6 +67,8 @@ export default function AdminPage() {
     from: Order["status"];
     to?: Order["status"];
   } | null>(null);
+  // Confirmation modal for deleting a booking (styled, like orders).
+  const [pendingDeleteBooking, setPendingDeleteBooking] = useState<Booking | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -183,19 +169,19 @@ export default function AdminPage() {
   };
 
   const handleDeleteBooking = async (bookingId: string) => {
-    if (!confirm(`Delete booking ${bookingId}?`)) return;
     try {
       const res = await adminFetch(`/api/admin/bookings/${encodeURIComponent(bookingId)}`, {
         method: "DELETE",
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Unknown error" }));
-        alert(err.error ?? "Failed to delete booking. Please try again.");
+        setToast({ message: err.error ?? "Failed to delete booking.", variant: "error" });
         if (res.status === 401) router.push("/admin/login");
         return;
       }
+      setToast({ message: `Booking ${bookingId} deleted.`, variant: "success" });
     } catch {
-      alert("Network error. Please try again.");
+      setToast({ message: "Network error. Please try again.", variant: "error" });
     }
     await fetchData();
   };
@@ -530,7 +516,7 @@ export default function AdminPage() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold text-sm">{order.id}</p>
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${STATUS_STYLES[order.status]}`}
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${STATUS_BADGE_CLASSES[order.status]}`}
                             >
                               {statusLabel(order.status)}
                             </span>
@@ -834,7 +820,7 @@ export default function AdminPage() {
                         </svg>
                       </button>
                       <button
-                        onClick={() => handleDeleteBooking(booking.id)}
+                        onClick={() => setPendingDeleteBooking(booking)}
                         className="text-red-400 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors cursor-pointer"
                         aria-label="Delete booking"
                       >
@@ -882,7 +868,7 @@ export default function AdminPage() {
                     className="rounded-2xl bg-surface border border-surface-light p-4 flex items-center gap-4"
                   >
                     <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${STATUS_STYLES[order.status]}`}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${STATUS_BADGE_CLASSES[order.status]}`}
                     >
                       {statusLabel(order.status)}
                     </span>
@@ -997,7 +983,7 @@ export default function AdminPage() {
                 {confirmAction.kind === "status" && confirmAction.to && (
                   <div className="flex items-center gap-2 rounded-xl bg-surface-light/60 border border-surface-light px-4 py-3">
                     <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_STYLES[confirmAction.from]}`}
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_BADGE_CLASSES[confirmAction.from]}`}
                     >
                       {statusLabel(confirmAction.from)}
                     </span>
@@ -1012,7 +998,7 @@ export default function AdminPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                     <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_STYLES[confirmAction.to]}`}
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_BADGE_CLASSES[confirmAction.to]}`}
                     >
                       {statusLabel(confirmAction.to)}
                     </span>
@@ -1058,6 +1044,46 @@ export default function AdminPage() {
                     Delete order
                   </button>
                 )}
+              </div>
+            </>
+          )}
+        </Modal>
+
+        <Modal
+          isOpen={!!pendingDeleteBooking}
+          onClose={() => setPendingDeleteBooking(null)}
+          title="Delete booking?"
+        >
+          {pendingDeleteBooking && (
+            <>
+              <div className="text-sm space-y-3 mb-6">
+                <p className="text-muted">
+                  Booking{" "}
+                  <span className="text-foreground font-semibold">{pendingDeleteBooking.id}</span>{" "}
+                  &mdash; {pendingDeleteBooking.service} for{" "}
+                  <span className="text-foreground font-semibold">{pendingDeleteBooking.name}</span>
+                </p>
+                <p className="text-red-400">
+                  This permanently removes the booking. This cannot be undone.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setPendingDeleteBooking(null)}
+                  className="px-4 h-10 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    const { id } = pendingDeleteBooking;
+                    setPendingDeleteBooking(null);
+                    await handleDeleteBooking(id);
+                  }}
+                  className="px-4 h-10 rounded-full text-sm font-semibold text-white bg-red-500/90 hover:bg-red-500 transition-colors cursor-pointer"
+                >
+                  Delete booking
+                </button>
               </div>
             </>
           )}

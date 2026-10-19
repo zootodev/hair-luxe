@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/admin-fetch";
 import Modal from "@/components/ui/Modal";
+import Toast from "@/components/ui/Toast";
 
 interface ZoneDraft {
   name: string;
@@ -40,7 +41,9 @@ export default function SettingsManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [toast, setToast] = useState<{ message: string; variant: "success" | "error" } | null>(
+    null
+  );
   const [zonePendingRemoval, setZonePendingRemoval] = useState<number | null>(null);
 
   const load = useCallback(async () => {
@@ -92,7 +95,7 @@ export default function SettingsManager() {
           days: z.days,
         })),
         announcementEnabled: s.announcement.enabled,
-        announcementText: s.announcement.text,
+        announcementText: s.announcement.text ?? "",
       });
     } catch {
       setError("Could not load settings.");
@@ -122,7 +125,7 @@ export default function SettingsManager() {
   const save = async () => {
     if (!form) return;
     setSaving(true);
-    setNotice("");
+    setToast(null);
     setError("");
     try {
       const res = await adminFetch("/api/admin/catalog", {
@@ -159,19 +162,23 @@ export default function SettingsManager() {
               })),
             announcement: {
               enabled: form.announcementEnabled,
-              text: form.announcementText,
+              text: form.announcementText ?? "",
             },
           },
         }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Unknown error" }));
-        setError(err.error ?? "Failed to save settings. Please try again.");
+        const message = err.error ?? "Failed to save settings. Please try again.";
+        setError(message);
+        setToast({ message, variant: "error" });
       } else {
-        setNotice("Settings saved and live on the site.");
+        setToast({ message: "Settings saved.", variant: "success" });
       }
     } catch {
-      setError("Network error. Please try again.");
+      const message = "Network error. Please try again.";
+      setError(message);
+      setToast({ message, variant: "error" });
     } finally {
       setSaving(false);
     }
@@ -192,11 +199,6 @@ export default function SettingsManager() {
       {error && (
         <div className="rounded-2xl bg-red-500/10 border border-red-500/30 p-4 mb-5 text-sm text-red-400">
           {error}
-        </div>
-      )}
-      {notice && (
-        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 mb-5 text-sm text-emerald-400">
-          {notice}
         </div>
       )}
 
@@ -404,12 +406,13 @@ export default function SettingsManager() {
               <input
                 id="settings-announcement-text"
                 className={inputClass}
-                value={form.announcementText}
-                placeholder="Free delivery on orders over ₦250,000 this week"
+                value={form.announcementText ?? ""}
+                placeholder="e.g. Free delivery on orders over ₦250,000 this week"
                 onChange={(e) => set({ announcementText: e.target.value })}
               />
               <span className="block text-xs text-muted mt-1.5">
-                Shown in the bar at the top of every page. Keep it short — one line.
+                Shown in the bar at the top of every page. Keep it short — one line. Leave empty
+                to show no text.
               </span>
             </label>
           </section>
@@ -461,6 +464,15 @@ export default function SettingsManager() {
           </button>
         </div>
       </Modal>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          variant={toast.variant}
+          onDismiss={() => setToast(null)}
+          duration={4000}
+        />
+      )}
     </div>
   );
 }

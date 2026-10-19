@@ -17,7 +17,16 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
-  const deleted = await deleteBooking(id);
+  let deleted: boolean;
+  try {
+    deleted = await deleteBooking(id);
+  } catch (error) {
+    console.error("[api/admin/bookings] delete failed", error);
+    return NextResponse.json(
+      { error: "Failed to delete booking. Please try again." },
+      { status: 500 }
+    );
+  }
   if (!deleted) {
     return NextResponse.json({ error: "Booking not found." }, { status: 404 });
   }

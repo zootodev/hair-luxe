@@ -7,6 +7,8 @@ import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { getOrders } from "@/lib/orders";
 import { formatPrice } from "@/lib/data/products";
+import { studioLocation } from "@/lib/format";
+import { statusLabel } from "@/lib/order-status";
 import { useCart } from "@/lib/context/CartContext";
 import type { Order } from "@/lib/types";
 
@@ -57,7 +59,7 @@ export default function OrderConfirmationPage() {
               <p className="text-xs text-muted uppercase tracking-wide">Order Reference</p>
               <p className="font-serif text-xl font-bold text-gold">{order.id}</p>
             </div>
-            <p className="text-xs text-muted">Status: Pending</p>
+            <p className="text-xs text-muted">Status: {statusLabel(order.status)}</p>
           </div>
 
           {order.items.map((item) => {
@@ -149,7 +151,8 @@ export default function OrderConfirmationPage() {
             </>
           ) : (
             <>
-              Pickup at {business.address}. Please call {business.phone} when you arrive.
+              Pickup at {studioLocation(business.address, business.city)}. Please call{" "}
+              {business.phone} when you arrive.
             </>
           )}
         </p>

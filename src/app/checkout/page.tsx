@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
 import { formatPrice } from "@/lib/data/products";
+import { studioLocation } from "@/lib/format";
+import { statusLabel } from "@/lib/order-status";
 import { generateOrderId, saveOrder } from "@/lib/orders";
 import { recordSold } from "@/lib/stock";
 import type { DeliveryZoneSettings, Order } from "@/lib/types";
@@ -236,7 +238,7 @@ const handlePlaceOrder = async () => {
                 <p className="text-xs text-muted uppercase tracking-wide">Order Reference</p>
                 <p className="font-serif text-xl font-bold text-gold">{placedOrder.id}</p>
               </div>
-              <p className="text-xs text-muted">Status: Pending</p>
+              <p className="text-xs text-muted">Status: {statusLabel(placedOrder.status)}</p>
             </div>
 
             <div className="space-y-3 mb-4">
@@ -312,7 +314,8 @@ const handlePlaceOrder = async () => {
               </>
             ) : (
               <>
-                Pickup at {business.address}. Please call {business.phone} when you arrive.
+                Pickup at {studioLocation(business.address, business.city)}. Please call{" "}
+                {business.phone} when you arrive.
               </>
             )}
           </p>
@@ -593,7 +596,8 @@ const handlePlaceOrder = async () => {
                       />
                     </svg>
                     <p className="text-muted">
-                      Pick up your order at {business.address}. Please call{" "}
+                      Pick up your order at {studioLocation(business.address, business.city)}.
+                      Please call{" "}
                       {business.phoneFormatted || business.phone} when you&apos;re on the way.
                     </p>
                   </div>

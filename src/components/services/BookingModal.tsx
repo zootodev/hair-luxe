@@ -175,10 +175,18 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
               <span className="text-muted">Phone:</span>{" "}
               <span className="font-semibold">{success.phone}</span>
             </p>
+            <p>
+              <span className="text-muted">Email:</span>{" "}
+              <span className="font-semibold break-all">{success.email}</span>
+            </p>
           </div>
+          <p className="text-xs text-muted mb-2">
+            We&apos;ll contact you on <span className="text-gold">{success.phone}</span> or{" "}
+            <span className="text-gold break-all">{success.email}</span> to confirm your
+            appointment. See you soon!
+          </p>
           <p className="text-xs text-muted mb-6">
-            Our team will contact you on <span className="text-gold">{BUSINESS.phone}</span> to
-            confirm your appointment. See you soon!
+            Questions? Call us on <span className="text-gold">{BUSINESS.phone}</span>.
           </p>
           <button
             onClick={close}
