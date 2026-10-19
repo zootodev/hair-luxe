@@ -13,6 +13,11 @@ import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import { adminFetch } from "@/lib/admin-fetch";
 import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
+import {
+  LAST_SEEN_KEYS,
+  countNewSinceLastSeen,
+  countUpcomingBookings,
+} from "@/lib/admin-activity";
 
 type Tab = "orders" | "bookings" | "deliveries";
 
@@ -60,6 +65,11 @@ export default function AdminPage() {
   const [toast, setToast] = useState<{ message: string; variant: "success" | "error" } | null>(
     null
   );
+  // When each tab was last opened (epoch ms), for the "new" badges.
+  const [lastSeen, setLastSeen] = useState<{ orders: number | null; bookings: number | null }>({
+    orders: null,
+    bookings: null,
+  });
   // Confirmation modal for status changes and deletions (item 12).
   const [confirmAction, setConfirmAction] = useState<{
     kind: "status" | "delete";
@@ -104,6 +114,56 @@ export default function AdminPage() {
   }, [fetchData]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  // Restore the stored "last seen" timestamps once on mount (client only),
+  // before the tab-open stamp below overwrites the initially open tab.
+  /* eslint-disable react-hooks/set-state-in-effect -- reads localStorage-backed UI state once on mount */
+  useEffect(() => {
+    const read = (key: string): number | null => {
+      try {
+        const value = Number(localStorage.getItem(key));
+        return Number.isFinite(value) && value > 0 ? value : null;
+      } catch {
+        return null; // Storage unavailable — badges just start from "never seen".
+      }
+    };
+    setLastSeen({ orders: read(LAST_SEEN_KEYS.orders), bookings: read(LAST_SEEN_KEYS.bookings) });
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Stamp the open tab as seen (localStorage + state) so its badge resets.
+  /* eslint-disable react-hooks/set-state-in-effect -- syncs the tab-open timestamp into state */
+  useEffect(() => {
+    const field = tab === "orders" ? "orders" : tab === "bookings" ? "bookings" : null;
+    if (!field) return;
+    const now = Date.now();
+    try {
+      localStorage.setItem(LAST_SEEN_KEYS[field], String(now));
+    } catch {
+      // Storage unavailable — the in-memory stamp still works for this session.
+    }
+    setLastSeen((prev) => (field === "orders" ? { ...prev, orders: now } : { ...prev, bookings: now }));
+  }, [tab]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Keep orders/bookings fresh: refetch when the window regains focus and
+  // every 60 seconds while the admin page is open.
+  useEffect(() => {
+    const refetch = () => {
+      void fetchData();
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") refetch();
+    };
+    window.addEventListener("focus", refetch);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    const timer = setInterval(refetch, 60_000);
+    return () => {
+      window.removeEventListener("focus", refetch);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearInterval(timer);
+    };
+  }, [fetchData]);
+
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
       const sOk = statusFilter === "all" || o.status === statusFilter;
@@ -127,8 +187,24 @@ export default function AdminPage() {
         o.status !== "completed" &&
         o.status !== "cancelled"
     ).length;
-    return { totalRevenue, pending, activeDeliveries, total: orders.length };
-  }, [orders]);
+    return {
+      totalRevenue,
+      pending,
+      activeDeliveries,
+      upcomingBookings: countUpcomingBookings(bookings),
+      total: orders.length,
+    };
+  }, [orders, bookings]);
+
+  // Records created since the admin last opened each tab ("new" badges).
+  const newOrders = useMemo(
+    () => countNewSinceLastSeen(orders.map((o) => o.date), lastSeen.orders),
+    [orders, lastSeen.orders]
+  );
+  const newBookings = useMemo(
+    () => countNewSinceLastSeen(bookings.map((b) => b.dateCreated), lastSeen.bookings),
+    [bookings, lastSeen.bookings]
+  );
 
   const handleStatus = async (orderId: string, status: Order["status"]) => {
     try {
@@ -347,7 +423,7 @@ export default function AdminPage() {
 
         {!loading && (
           <>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           {[
             {
               label: "Total Orders",
@@ -360,6 +436,12 @@ export default function AdminPage() {
               value: stats.pending,
               color: "text-yellow-400",
               title: "Orders still awaiting payment confirmation.",
+            },
+            {
+              label: "Upcoming Bookings",
+              value: stats.upcomingBookings,
+              color: "text-gold",
+              title: "Bookings dated today or later.",
             },
             {
               label: "Active Deliveries",
@@ -389,10 +471,20 @@ export default function AdminPage() {
           <div className="flex gap-2 flex-wrap">
             {(
               [
-                { key: "orders", label: "Orders" },
-                { key: "bookings", label: "Bookings" },
-                { key: "deliveries", label: "Deliveries" },
-              ] as { key: Tab; label: string }[]
+                { key: "orders", label: "Orders", count: orders.length, newCount: newOrders },
+                {
+                  key: "bookings",
+                  label: "Bookings",
+                  count: bookings.length,
+                  newCount: newBookings,
+                },
+                {
+                  key: "deliveries",
+                  label: "Deliveries",
+                  count: stats.activeDeliveries,
+                  newCount: 0,
+                },
+              ] as { key: Tab; label: string; count: number; newCount: number }[]
             ).map((t) => (
               <button
                 key={t.key}
@@ -404,8 +496,17 @@ export default function AdminPage() {
                 }`}
               >
                 {t.label}
-                {t.key === "orders" && orders.length > 0 && (
-                  <span className="ml-1.5 opacity-70">({orders.length})</span>
+                {t.count > 0 && <span className="ml-1.5 opacity-70">({t.count})</span>}
+                {t.newCount > 0 && (
+                  <span
+                    className={`ml-1.5 inline-block px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none ${
+                      tab === t.key
+                        ? "bg-background/85 text-gold"
+                        : "bg-gold/15 text-gold border border-gold/40"
+                    }`}
+                  >
+                    • {t.newCount} new
+                  </span>
                 )}
               </button>
             ))}
