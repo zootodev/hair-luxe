@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "shots:auth": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/save-auth.ts",
+    "shots:mobile": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/mobile-shots.ts"
   },
   "dependencies": {
     "next": "16.3.8",
@@ -17,6 +19,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
