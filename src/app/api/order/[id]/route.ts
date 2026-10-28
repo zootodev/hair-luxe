@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { getOrderById, storeConfigured } from "@/lib/store";
+import { phonesMatch } from "@/lib/format";
 
 export const runtime = "nodejs";
 
@@ -18,12 +19,12 @@ export async function GET(
   }
 
   const { id } = await context.params;
-  const phone = request.nextUrl.searchParams.get("phone")?.replace(/\D/g, "");
+  const phone = request.nextUrl.searchParams.get("phone")?.trim() ?? "";
 
   if (!storeConfigured()) {
     return NextResponse.json({ error: "Store not configured." }, { status: 503 });
   }
-  if (!phone || phone.length < 7) {
+  if (!phone || phone.replace(/\D/g, "").length < 7) {
     return NextResponse.json({ error: "A phone number is required." }, { status: 400 });
   }
 
@@ -32,8 +33,9 @@ export async function GET(
     return NextResponse.json({ error: "Order not found." }, { status: 404 });
   }
 
-  const orderPhone = order.customer.phone.replace(/\D/g, "");
-  if (orderPhone !== phone) {
+  // phonesMatch normalises both sides, so 08123456789, 2348123456789 and
+  // +2348123456789 all find the same order (legacy digits still match too).
+  if (!phonesMatch(order.customer.phone, phone)) {
     return NextResponse.json({ error: "Order not found." }, { status: 404 });
   }
 

@@ -454,12 +454,15 @@ export default function AdminPage() {
               value: formatPrice(stats.totalRevenue),
               color: "text-emerald-400",
               title: "Sum of order totals, excluding cancelled orders. Estimates only — based on reported bank transfers.",
+              full: true,
             },
           ].map((s) => (
             <div
               key={s.label}
               title={s.title}
-              className="rounded-2xl bg-surface border border-surface-light p-5 cursor-help"
+              className={`rounded-2xl bg-surface border border-surface-light p-5 cursor-help ${
+                "full" in s && s.full ? "col-span-2 lg:col-span-1" : ""
+              }`}
             >
               <p className={`font-serif text-2xl font-bold ${s.color}`}>{s.value}</p>
               <p className="text-xs text-muted mt-1 uppercase tracking-wide">{s.label}</p>
@@ -467,8 +470,9 @@ export default function AdminPage() {
           ))}
         </div>
 
-        <div className="flex gap-2 mb-6 flex-wrap items-center justify-between">
-          <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-col gap-3 mb-6 lg:flex-row lg:items-center lg:justify-between">
+          {/* Section tabs: one row - horizontally scrollable on mobile. */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
             {(
               [
                 { key: "orders", label: "Orders", count: orders.length, newCount: newOrders },
@@ -489,7 +493,7 @@ export default function AdminPage() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
                   tab === t.key
                     ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background"
                     : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
@@ -511,7 +515,8 @@ export default function AdminPage() {
               </button>
             ))}
           </div>
-          <div className="flex gap-2 flex-wrap">
+          {/* Exports + delivery-method filter: one row that wraps, left aligned. */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={exportOrders}
               disabled={orders.length === 0}
@@ -520,7 +525,7 @@ export default function AdminPage() {
                   ? "No orders to export yet."
                   : "Download all orders as a CSV file."
               }
-              className="px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="shrink-0 px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               Export Orders
             </button>
@@ -532,40 +537,42 @@ export default function AdminPage() {
                   ? "No bookings to export yet — bookings appear here once clients book a service."
                   : "Download all bookings as a CSV file."
               }
-              className="px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="shrink-0 px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               Export Bookings
             </button>
-          </div>
-        </div>
-
-        {tab === "orders" && (
-          <div>
-            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3 mb-5">
-              <div className="flex flex-wrap gap-2">
-                {["all", "pending", "processing", "completed", "cancelled"].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setStatusFilter(s)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                      statusFilter === s
-                        ? "bg-gold text-background"
-                        : "bg-surface border border-surface-light text-muted hover:text-gold"
-                    }`}
-                  >
-                    {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
-                  </button>
-                ))}
-              </div>
+            {tab === "orders" && (
               <select
                 value={deliveryFilter}
                 onChange={(e) => setDeliveryFilter(e.target.value)}
-                className="h-9 rounded-full bg-surface border border-surface-light px-4 text-xs focus:border-gold focus:outline-none"
+                aria-label="Filter by delivery method"
+                className="h-9 shrink-0 rounded-full bg-surface border border-surface-light px-4 text-xs focus:border-gold focus:outline-none"
               >
                 <option value="all">All Methods</option>
                 <option value="delivery">Delivery</option>
                 <option value="pickup">Pickup</option>
               </select>
+            )}
+          </div>
+        </div>
+
+        {tab === "orders" && (
+          <div>
+            {/* Status filters: one horizontally scrollable row (never wraps). */}
+            <div className="flex gap-2 overflow-x-auto no-scrollbar mb-5">
+              {["all", "pending", "processing", "completed", "cancelled"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    statusFilter === s
+                      ? "bg-gold text-background"
+                      : "bg-surface border border-surface-light text-muted hover:text-gold"
+                  }`}
+                >
+                  {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
+                </button>
+              ))}
             </div>
 
             {filteredOrders.length === 0 ? (

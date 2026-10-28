@@ -59,6 +59,17 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+/* Horizontally scrollable filter/nav rows: hide the scrollbar while the row
+   stays scrollable by touch, trackpad or shift+wheel. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .gold-border-gradient {
   border: 1px solid transparent;
   background:

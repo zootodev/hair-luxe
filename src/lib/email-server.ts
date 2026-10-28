@@ -1,6 +1,6 @@
 import { BUSINESS, PUBLIC_KEY } from "@/lib/config";
 import { formatPrice } from "@/lib/data/products";
-import { studioLocation } from "@/lib/format";
+import { formatIntlPhone, studioLocation } from "@/lib/format";
 import { statusLabel } from "@/lib/order-status";
 import type { Booking, Order } from "@/lib/types";
 
@@ -138,7 +138,7 @@ function orderSummaryLines(order: Order): string[] {
   return [
     line("Order", order.id),
     line("Customer", customerFullName(order)),
-    line("Phone", order.customer.phone),
+    line("Phone", formatIntlPhone(order.customer.phone)),
     line("Email", order.customer.email),
     itemsBlock(order.items),
     line("Subtotal", formatPrice(order.subtotal)),
@@ -238,7 +238,7 @@ export function buildNewBookingOwnerEmail(booking: Booking): EmailDraft {
         line("Date", bookingDate(booking.date)),
         line("Time", booking.time),
         line("Name", booking.name),
-        line("Phone", booking.phone),
+        line("Phone", formatIntlPhone(booking.phone)),
         line("Email", booking.email),
         line("Notes", booking.notes)
       ),
@@ -266,7 +266,7 @@ export function buildNewBookingCustomerEmail(booking: Booking): EmailDraft {
         line("Date", bookingDate(booking.date)),
         line("Time", booking.time),
         line("Name", booking.name),
-        line("Phone", booking.phone),
+        line("Phone", formatIntlPhone(booking.phone)),
         line("Email", booking.email),
         line("Notes", booking.notes),
         line("Studio phone", BUSINESS.phone)

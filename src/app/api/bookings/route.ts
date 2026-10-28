@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { addBooking, nextBookingId } from "@/lib/store";
 import { sendBookingEmail } from "@/lib/email-server";
+import { formatNigerianPhone } from "@/lib/format";
 import type { Booking } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -54,10 +55,15 @@ export async function POST(request: NextRequest) {
 
   const name = body.name?.trim() ?? "";
   const email = body.email?.trim() ?? "";
-  const phone = body.phone?.trim() ?? "";
+  // Always a string; normalised to +234XXXXXXXXXX (never Number()/parseInt,
+  // which would swallow the leading zero).
+  const phone = formatNigerianPhone(body.phone ?? "");
 
-  if (!name || !/^[\d\s()+-]{7,}$/.test(phone)) {
-    return NextResponse.json({ error: "Please provide your name and a valid phone number." }, { status: 400 });
+  if (!name || !phone) {
+    return NextResponse.json(
+      { error: "Please provide your name and a valid Nigerian phone number, e.g. 08123456789." },
+      { status: 400 }
+    );
   }
   if (!EMAIL_PATTERN.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email." }, { status: 400 });

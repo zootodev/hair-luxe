@@ -76,15 +76,15 @@ export default function ServicesPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <Link
                     href={`/services/${service.id}`}
-                    className="flex-1 h-11 rounded-full border border-gold/40 text-gold text-xs font-semibold flex items-center justify-center hover:bg-gold/10 transition-colors"
+                    className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full border border-gold/40 px-2 text-[11px] font-semibold text-gold hover:bg-gold/10 transition-colors min-[380px]:px-3 min-[380px]:text-xs"
                   >
                     View Details
                   </Link>
                   <Link href={`/services/${service.id}?book=1`}
-                    className="flex-1 h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+                    className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark px-2 text-[11px] font-semibold text-background hover:opacity-90 transition-opacity cursor-pointer min-[380px]:px-3 min-[380px]:text-xs"
                   >
                     Book This Service
                   </Link>

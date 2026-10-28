@@ -4,6 +4,7 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { generateBookingId, saveBooking } from "@/lib/orders";
 import { BUSINESS } from "@/lib/config";
+import { formatIntlPhone, formatNigerianPhone } from "@/lib/format";
 import type { Booking, Service } from "@/lib/types";
 
 const TIME_SLOTS = [
@@ -38,16 +39,26 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<Booking | null>(null);
   const [error, setError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const close = () => {
     onClose();
     setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "", website: "" });
     setSuccess(null);
     setError("");
+    setPhoneError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Always stored as a normalised string (+234XXXXXXXXXX).
+    const phone = formatNigerianPhone(form.phone);
+    if (!phone) {
+      setPhoneError("Enter a valid Nigerian phone number, e.g. 08123456789");
+      return;
+    }
+    setPhoneError("");
 
     const minDate = new Date();
     minDate.setDate(minDate.getDate() + 1);
@@ -63,7 +74,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
     const payload = {
       name: form.name,
       email: form.email,
-      phone: form.phone,
+      phone,
       service: service.name,
       date: form.date,
       time: form.time,
@@ -107,7 +118,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
       id: generateBookingId(),
       name: form.name,
       email: form.email,
-      phone: form.phone,
+      phone,
       service: service.name,
       date: form.date,
       time: form.time,
@@ -173,7 +184,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             </p>
             <p>
               <span className="text-muted">Phone:</span>{" "}
-              <span className="font-semibold">{success.phone}</span>
+              <span className="font-semibold">{formatIntlPhone(success.phone)}</span>
             </p>
             <p>
               <span className="text-muted">Email:</span>{" "}
@@ -181,7 +192,8 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             </p>
           </div>
           <p className="text-xs text-muted mb-2">
-            We&apos;ll contact you on <span className="text-gold">{success.phone}</span> or{" "}
+            We&apos;ll contact you on{" "}
+            <span className="text-gold">{formatIntlPhone(success.phone)}</span> or{" "}
             <span className="text-gold break-all">{success.email}</span> to confirm your
             appointment. See you soon!
           </p>
@@ -237,10 +249,19 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 type="tel"
                 required
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+                onChange={(e) => {
+                  setPhoneError("");
+                  setForm({ ...form, phone: e.target.value });
+                }}
+                aria-invalid={!!phoneError}
+                className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
+                  phoneError ? "border-red-500" : "border-surface-light focus:border-gold"
+                }`}
                 placeholder="+234 812 345 6789"
               />
+              {phoneError && (
+                <p className="text-xs text-red-400 mt-1">{phoneError}</p>
+              )}
             </label>
           </div>
           <label className="block">

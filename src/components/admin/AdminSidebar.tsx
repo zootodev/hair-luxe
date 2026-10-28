@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 
 export type AdminView = "dashboard" | "products" | "services" | "settings";
@@ -67,14 +68,50 @@ const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
 ];
 
 export default function AdminSidebar({ active, onChange, onLogout }: AdminSidebarProps) {
+  const pillRefs = useRef<Partial<Record<AdminView, HTMLButtonElement | null>>>({});
+
+  // The mobile nav is a single horizontally scrollable row: keep the active
+  // pill in view when the section changes.
+  useEffect(() => {
+    pillRefs.current[active]?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [active]);
+
   return (
     <aside className="w-full lg:w-56 shrink-0 lg:sticky lg:top-28 h-fit">
-      <nav className="flex flex-wrap lg:flex-nowrap lg:flex-col gap-1.5 pb-2 lg:pb-0">
+      {/* Compact top bar (mobile only): brand + log out icon. */}
+      <div className="flex items-center justify-between gap-3 mb-3 lg:hidden">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif text-xl font-bold shadow-lg shadow-gold/20 shrink-0">
+            HL
+          </span>
+          <span className="font-serif text-xl font-semibold truncate">Admin</span>
+        </div>
+        <button
+          onClick={onLogout}
+          title="Log out"
+          aria-label="Log out"
+          className="flex items-center justify-center w-9 h-9 rounded-full text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors shrink-0 cursor-pointer"
+        >
+          <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+            />
+          </svg>
+        </button>
+      </div>
+      {/* Section pills: one horizontally scrollable row on mobile, a normal
+          column on desktop (hidden scrollbar via .no-scrollbar). */}
+      <nav className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 lg:pb-0 lg:flex-col lg:overflow-visible">
         {NAV.map((item) => (
           <button
             key={item.key}
+            ref={(el) => {
+              pillRefs.current[item.key] = el;
+            }}
             onClick={() => onChange(item.key)}
-            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-full lg:rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+            className={`flex shrink-0 items-center gap-2.5 px-4 py-2.5 rounded-full lg:rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
               active === item.key
                 ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background shadow-lg shadow-gold/20"
                 : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
@@ -86,7 +123,7 @@ export default function AdminSidebar({ active, onChange, onLogout }: AdminSideba
         ))}
         <button
           onClick={onLogout}
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full lg:rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors whitespace-nowrap ml-auto lg:ml-0 lg:mt-2 cursor-pointer"
+          className="hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors whitespace-nowrap lg:mt-2 cursor-pointer"
         >
           <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
             <path

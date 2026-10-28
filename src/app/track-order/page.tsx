@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { getOrders } from "@/lib/orders";
 import { formatPrice } from "@/lib/data/products";
-import { studioLocation } from "@/lib/format";
+import { phonesMatch, studioLocation } from "@/lib/format";
 import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
 import { useCart } from "@/lib/context/CartContext";
 import type { Order } from "@/lib/types";
@@ -18,10 +18,10 @@ export default function TrackOrderPage() {
 
   const checkoutLocal = (id: string, ph: string) => {
     const orders = getOrders();
+    // phonesMatch normalises both sides, so 08123456789 finds an order
+    // stored as +2348123456789 (and vice versa).
     const match = orders.find(
-      (o) =>
-        o.id.toUpperCase() === id &&
-        o.customer.phone.replace(/\D/g, "") === ph
+      (o) => o.id.toUpperCase() === id && phonesMatch(o.customer.phone, ph)
     );
     if (match) {
       setFound(match);
@@ -32,8 +32,8 @@ export default function TrackOrderPage() {
 
   const lookup = async () => {
     const id = orderId.trim().toUpperCase();
-    const ph = phone.trim().replace(/\D/g, "");
-    if (!id || !ph) {
+    const ph = phone.trim();
+    if (!id || !ph.replace(/\D/g, "")) {
       setError("Please enter both Order ID and phone number.");
       setFound(null);
       return;
@@ -42,6 +42,7 @@ export default function TrackOrderPage() {
     setError("");
 
     try {
+      // Send the raw input; the server normalises both formats before matching.
       const res = await fetch(`/api/order/${encodeURIComponent(id)}?phone=${encodeURIComponent(ph)}`);
       if (res.status === 429) {
         setError("Too many lookups. Please wait a moment and try again.");

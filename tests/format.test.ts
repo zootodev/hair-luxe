@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatIntlPhone, intlPhone, swatchColor, telHref } from "@/lib/format";
+import {
+  formatIntlPhone,
+  formatNigerianPhone,
+  intlPhone,
+  phonesMatch,
+  swatchColor,
+  telHref,
+} from "@/lib/format";
 
 describe("intlPhone", () => {
   it("converts Nigerian local numbers to international format", () => {
@@ -31,6 +38,59 @@ describe("telHref", () => {
 describe("formatIntlPhone", () => {
   it("pretty-prints a 13-digit Nigerian number", () => {
     expect(formatIntlPhone("08123456789")).toBe("+234 812 345 6789");
+  });
+});
+
+describe("formatNigerianPhone", () => {
+  it("normalises an 11-digit local number (leading 0 kept out of the international form)", () => {
+    expect(formatNigerianPhone("08123456789")).toBe("+2348123456789");
+  });
+
+  it("accepts 234-prefixed and +234 numbers", () => {
+    expect(formatNigerianPhone("2348123456789")).toBe("+2348123456789");
+    expect(formatNigerianPhone("+2348123456789")).toBe("+2348123456789");
+  });
+
+  it("ignores spaces, dashes and brackets", () => {
+    expect(formatNigerianPhone("0812 345 6789")).toBe("+2348123456789");
+    expect(formatNigerianPhone("+234 (812) 345-6789")).toBe("+2348123456789");
+  });
+
+  it("rejects wrong lengths - including the 12-digit typo that loses its leading zero", () => {
+    expect(formatNigerianPhone("081234567")).toBeNull(); // too short
+    expect(formatNigerianPhone("081234567890")).toBeNull(); // 12 digits
+    // The stored-data bug: 070123456789 coerced to a number became
+    // "70123456789" - unparseable input must never be silently accepted.
+    expect(formatNigerianPhone("70123456789")).toBeNull();
+  });
+
+  it("rejects non-Nigerian numbers, letters and empty input", () => {
+    expect(formatNigerianPhone("+44 7911 123456")).toBeNull();
+    expect(formatNigerianPhone("call me")).toBeNull();
+    expect(formatNigerianPhone("")).toBeNull();
+  });
+
+  it("displays as +234 XXX XXX XXXX via formatIntlPhone", () => {
+    expect(formatIntlPhone(formatNigerianPhone("08123456789") ?? "")).toBe(
+      "+234 812 345 6789"
+    );
+  });
+});
+
+describe("phonesMatch", () => {
+  it("matches across accepted formats of the same number", () => {
+    expect(phonesMatch("08123456789", "+2348123456789")).toBe(true);
+    expect(phonesMatch("2348123456789", "0812 345 6789")).toBe(true);
+    expect(phonesMatch("+234 812 345 6789", "08123456789")).toBe(true);
+  });
+
+  it("does not match different numbers", () => {
+    expect(phonesMatch("08123456789", "08031112222")).toBe(false);
+  });
+
+  it("falls back to digits for legacy stored numbers that cannot be normalised", () => {
+    expect(phonesMatch("+234 701 234 56789", "23470123456789")).toBe(true);
+    expect(phonesMatch("70123456789", "070123456789")).toBe(false);
   });
 });
 

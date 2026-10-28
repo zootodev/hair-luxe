@@ -6,6 +6,7 @@ import {
   nextOrderId,
 } from "@/lib/store";
 import { sendOrderEmail } from "@/lib/email-server";
+import { formatNigerianPhone } from "@/lib/format";
 import type { CartItem, DeliveryMethod, Order } from "@/lib/types";
 
 export interface CreateOrderInput {
@@ -54,7 +55,9 @@ export async function createOrderServer(
   const firstName = customer.firstName?.trim() ?? "";
   const lastName = customer.lastName?.trim() ?? "";
   const email = customer.email?.trim() ?? "";
-  const phone = customer.phone?.trim() ?? "";
+  // Always a string; normalised to +234XXXXXXXXXX. Never Number()/parseInt
+  // it - that is what used to swallow the leading zero.
+  const phone = formatNigerianPhone(customer.phone ?? "");
   const city = customer.city?.trim() ?? "";
   const address = customer.address?.trim() ?? "";
 
@@ -64,8 +67,11 @@ export async function createOrderServer(
   if (!EMAIL_PATTERN.test(email)) {
     return { ok: false, error: "Please enter a valid email." };
   }
-  if (!/^[\d\s()+-]{7,}$/.test(phone)) {
-    return { ok: false, error: "Please enter a valid phone number." };
+  if (!phone) {
+    return {
+      ok: false,
+      error: "Please enter a valid Nigerian phone number, e.g. 08123456789.",
+    };
   }
   if (!city) {
     return { ok: false, error: "City is required." };

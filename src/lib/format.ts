@@ -21,6 +21,37 @@ export function intlPhone(raw: string): string {
   return trimmed;
 }
 
+/**
+ * Normalise a customer-entered Nigerian phone number to the stored
+ * international form "+234XXXXXXXXXX". Accepts an 11-digit local number
+ * starting with 0 (0XXXXXXXXXX), a bare country-code number (234XXXXXXXXXX)
+ * or an already-international one (+234XXXXXXXXXX); spaces, dashes and
+ * brackets are allowed anywhere. Returns null for anything else (wrong
+ * length, other countries, letters, empty) so callers can show an inline
+ * validation error. Phones are handled as strings end to end - never with
+ * Number()/parseInt, which would swallow the leading zero.
+ */
+export function formatNigerianPhone(raw: string): string | null {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed) return null;
+  const digits = trimmed.replace(/[\s()-]/g, "").replace(/^\+/, "");
+  if (/^0\d{10}$/.test(digits)) return `+234${digits.slice(1)}`;
+  if (/^234\d{10}$/.test(digits)) return `+${digits}`;
+  return null;
+}
+
+/**
+ * True when two phone strings refer to the same number across formats:
+ * both normalise to the same +234 number, or (legacy fallback for stored
+ * numbers that predate normalisation) their digit-only forms match.
+ */
+export function phonesMatch(a: string, b: string): boolean {
+  const normalisedA = formatNigerianPhone(a);
+  const normalisedB = formatNigerianPhone(b);
+  if (normalisedA && normalisedB) return normalisedA === normalisedB;
+  return a.replace(/\D/g, "") === b.replace(/\D/g, "");
+}
+
 /** Digits-only form suitable for a tel: href (keeps a leading +). */
 export function telHref(raw: string): string {
   const intl = intlPhone(raw);
