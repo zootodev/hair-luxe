@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { getOrders } from "@/lib/orders";
-import { formatPrice } from "@/lib/data/products";
+import { formatPriceShort } from "@/lib/format";
 import { studioLocation } from "@/lib/format";
 import { statusLabel } from "@/lib/order-status";
 import { useCart } from "@/lib/context/CartContext";
@@ -39,7 +39,7 @@ export default function OrderConfirmationPage() {
   return (
     <div className="pt-24 md:pt-28 pb-16 min-h-[70vh]">
       <div className="max-w-2xl mx-auto px-4 text-center">
-        <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-full bg-emerald-500/15 text-emerald-400 mb-6 animate-fade-in-up">
+        <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-md bg-success-soft text-success mb-6">
           <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -48,16 +48,16 @@ export default function OrderConfirmationPage() {
             />
           </svg>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-3">
-          Thank You, {order.customer.firstName}!
+        <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3">
+          Thank you, {order.customer.firstName}
         </h1>
-        <p className="text-muted mb-6">Your order has been placed successfully.</p>
+        <p className="text-muted mb-6">Your order is with us. We will confirm it after checking your payment.</p>
 
-        <div className="rounded-2xl bg-surface border border-gold/20 p-6 mb-6 text-left animate-fade-in-up">
-          <div className="flex items-center justify-between mb-4 pb-4 border-b border-gold/10">
+        <div className="rounded-md bg-surface border border-brand/20 p-6 mb-6 text-left">
+          <div className="flex items-center justify-between mb-4 pb-4 border-b border-brand/10">
             <div>
-              <p className="text-xs text-muted uppercase tracking-wide">Order Reference</p>
-              <p className="font-serif text-xl font-bold text-gold">{order.id}</p>
+              <p className="text-xs text-muted">Order reference</p>
+              <p className="text-lg font-semibold text-brand tabular">{order.id}</p>
             </div>
             <p className="text-xs text-muted">Status: {statusLabel(order.status)}</p>
           </div>
@@ -78,40 +78,40 @@ export default function OrderConfirmationPage() {
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/shop/${productSlug}`}
-                    className="text-sm font-medium truncate block hover:text-gold transition-colors"
+                    className="text-sm font-medium truncate block hover:text-brand transition-colors"
                   >
                     {item.name}
                     <span className="text-muted font-normal"> x{item.quantity}</span>
                   </Link>
                 </div>
-                <span className="text-sm font-semibold">
-                  {formatPrice(item.price * item.quantity)}
+                <span className="text-sm font-semibold price tabular">
+                  {formatPriceShort(item.price * item.quantity)}
                 </span>
               </div>
             );
           })}
 
-          <div className="space-y-2 text-sm border-t border-gold/10 pt-4">
+          <div className="space-y-2 text-sm border-t border-brand/10 pt-4">
             <div className="flex justify-between">
               <span className="text-muted">Subtotal</span>
-              <span>{formatPrice(order.subtotal)}</span>
+              <span className="price tabular">{formatPriceShort(order.subtotal)}</span>
             </div>
             {order.deliveryFee > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted">Delivery Fee</span>
-                <span>{formatPrice(order.deliveryFee)}</span>
+                <span className="text-muted">Delivery fee</span>
+                <span className="price tabular">{formatPriceShort(order.deliveryFee)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-base pt-2">
               <span>Total</span>
-              <span className="text-gold">{formatPrice(order.total)}</span>
+              <span className="text-brand price tabular">{formatPriceShort(order.total)}</span>
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl bg-gold/5 border border-gold/30 p-5 mb-8 text-left">
+        <div className="rounded-md bg-brand/5 border border-brand/30 p-5 mb-8 text-left">
           <div className="flex items-center gap-3 mb-3">
-            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gold text-background shrink-0">
+            <span className="flex items-center justify-center w-9 h-9 rounded-md bg-brand text-background shrink-0">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21 4h-2.153a1 1 0 00-.986.836l-.74 4.435a1 1 0 01.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V21a1 1 0 01-1 1h-2C7.82 22 2 16.18 2 5V3a1 1 0 011-1zM8 5v2.5a5.5 5.5 0 005.5 5.5H16v-0.5a1 1 0 00-1-1h-1.5a4 4 0 01-4-4V5a1 1 0 00-1-1H9a1 1 0 00-1 1z" />
               </svg>
@@ -126,16 +126,16 @@ export default function OrderConfirmationPage() {
               <span className="font-medium">{business.bankDetails.bankName}</span>
             </p>
             <p className="flex justify-between">
-              <span className="text-muted">Account Name:</span>
+              <span className="text-muted">Account name:</span>
               <span className="font-medium">{business.bankDetails.accountName}</span>
             </p>
             <p className="flex justify-between">
-              <span className="text-muted">Account Number:</span>
+              <span className="text-muted">Account number:</span>
               <span className="font-medium">{business.bankDetails.accountNumber}</span>
             </p>
             <p className="flex justify-between">
               <span className="text-muted">Amount:</span>
-              <span className="font-medium text-gold">{formatPrice(order.total)}</span>
+              <span className="font-medium text-brand tabular">{formatPriceShort(order.total)}</span>
             </p>
             <p className="flex justify-between">
               <span className="text-muted">Reference:</span>
@@ -160,15 +160,15 @@ export default function OrderConfirmationPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/shop"
-            className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-brand text-background font-semibold text-sm hover:opacity-90 transition-opacity"
           >
-            Continue Shopping
+            Continue shopping
           </Link>
           <Link
             href="/track-order"
-            className="inline-flex items-center justify-center h-12 px-8 rounded-full border border-gold/40 text-gold font-semibold text-sm hover:bg-gold/10 transition-colors"
+            className="inline-flex items-center justify-center h-12 px-8 rounded-md border border-brand/40 text-brand font-semibold text-sm hover:bg-brand/10 transition-colors"
           >
-            Track My Order
+            Track order
           </Link>
         </div>
       </div>

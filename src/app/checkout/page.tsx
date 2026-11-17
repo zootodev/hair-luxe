@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
-import { formatPrice } from "@/lib/data/products";
+import { formatPriceShort } from "@/lib/format";
 import { formatNigerianPhone, studioLocation } from "@/lib/format";
 import { statusLabel } from "@/lib/order-status";
 import { generateOrderId, saveOrder } from "@/lib/orders";
@@ -13,8 +13,8 @@ import { recordSold } from "@/lib/stock";
 import type { DeliveryZoneSettings, Order } from "@/lib/types";
 
 const STATUS_STEPS = [
-  { label: "Order Details", step: 1 },
-  { label: "Bank Transfer", step: 2 },
+  { label: "Your details", step: 1 },
+  { label: "Bank transfer", step: 2 },
   { label: "Confirmation", step: 3 },
 ];
 
@@ -25,7 +25,7 @@ export default function CheckoutPage() {
 
   const zoneInfo =
     deliveryZones.find((z) => z.name === deliveryZone) ??
-    ({ name: deliveryZone, zones: [], fee: 0, days: "2-3 business days" } satisfies DeliveryZoneSettings);
+    ({ name: deliveryZone, zones: [], fee: 0, days: "2 to 3 days" } satisfies DeliveryZoneSettings);
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
@@ -112,7 +112,7 @@ const [submitting, setSubmitting] = useState(false);
     if (!form.lastName.trim()) newErrors.lastName = "Required";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) newErrors.email = "Enter a valid email";
     if (!formatNigerianPhone(form.phone)) {
-      newErrors.phone = "Enter a valid Nigerian phone number, e.g. 08123456789";
+      newErrors.phone = "Enter a valid Nigerian phone number, for example 08123456789";
     }
     if (!form.city.trim()) newErrors.city = "Required";
     if (deliveryMethod === "delivery" && !form.address.trim()) newErrors.address = "Required";
@@ -195,7 +195,7 @@ const handlePlaceOrder = async () => {
     return (
       <div className="pt-24 md:pt-28 pb-16 min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-full bg-gold/10 text-gold mb-6">
+          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-md bg-brand/10 text-brand mb-6">
             <svg className="w-9 h-9" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -204,13 +204,13 @@ const handlePlaceOrder = async () => {
               />
             </svg>
           </div>
-          <h1 className="font-serif text-3xl font-bold mb-3">No Items to Checkout</h1>
-          <p className="text-muted mb-8">Your cart is empty. Add some luxury products first.</p>
+          <h1 className="font-display text-3xl font-bold mb-3">Nothing to check out</h1>
+          <p className="text-muted mb-8">Your cart is empty. Add a product to your cart first.</p>
 <Link
             href="/shop"
-            className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-brand text-background font-semibold text-sm hover:opacity-90 transition-opacity"
           >
-            Shop Products
+            Shop products
           </Link>
         </div>
       </div>
@@ -221,7 +221,7 @@ const handlePlaceOrder = async () => {
     return (
       <div className="pt-24 md:pt-28 pb-16 min-h-[70vh] flex items-center justify-center">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-full bg-emerald-500/15 text-emerald-400 mb-6 animate-fade-in-up">
+          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-md bg-success-soft text-success mb-6">
             <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -230,16 +230,16 @@ const handlePlaceOrder = async () => {
               />
             </svg>
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-3">
-            Thank You, {placedOrder.customer.firstName}!
+          <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3">
+            Thank you, {placedOrder.customer.firstName}
           </h1>
-          <p className="text-muted mb-6">Your order has been placed successfully.</p>
+          <p className="text-muted mb-6">Your order is with us. We will confirm it after checking your payment.</p>
 
-          <div className="rounded-2xl bg-surface border border-gold/20 p-6 mb-6 text-left animate-fade-in-up">
-            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gold/10">
+          <div className="rounded-md bg-surface border border-brand/20 p-6 mb-6 text-left">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-brand/10">
               <div>
-                <p className="text-xs text-muted uppercase tracking-wide">Order Reference</p>
-                <p className="font-serif text-xl font-bold text-gold">{placedOrder.id}</p>
+                <p className="text-xs text-muted">Order reference</p>
+                <p className="text-lg font-semibold text-brand tabular">{placedOrder.id}</p>
               </div>
               <p className="text-xs text-muted">Status: {statusLabel(placedOrder.status)}</p>
             </div>
@@ -251,33 +251,33 @@ const handlePlaceOrder = async () => {
                     {item.name} <span className="text-muted">x{item.quantity}</span>
                   </span>
                   <span className="font-semibold">
-                    {formatPrice(item.price * item.quantity)}
+                    {formatPriceShort(item.price * item.quantity)}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="space-y-2 text-sm border-t border-gold/10 pt-4">
+            <div className="space-y-2 text-sm border-t border-brand/10 pt-4">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
-                <span>{formatPrice(placedOrder.subtotal)}</span>
+                <span className="price tabular">{formatPriceShort(placedOrder.subtotal)}</span>
               </div>
               {placedOrder.deliveryFee > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-muted">Delivery Fee</span>
-                  <span>{formatPrice(placedOrder.deliveryFee)}</span>
+                  <span className="text-muted">Delivery fee</span>
+                  <span className="price tabular">{formatPriceShort(placedOrder.deliveryFee)}</span>
                 </div>
               )}
               <div className="flex justify-between font-bold text-base pt-2">
                 <span>Total</span>
-                <span className="text-gold">{formatPrice(placedOrder.total)}</span>
+                <span className="text-brand price tabular">{formatPriceShort(placedOrder.total)}</span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-gold/5 border border-gold/30 p-5 mb-8 text-left">
+          <div className="rounded-md bg-brand/5 border border-brand/30 p-5 mb-8 text-left">
             <div className="flex items-center gap-3 mb-3">
-              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gold text-background shrink-0">
+              <span className="flex items-center justify-center w-9 h-9 rounded-md bg-brand text-background shrink-0">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M21 4h-2.153a1 1 0 00-.986.836l-.74 4.435a1 1 0 01.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V21a1 1 0 01-1 1h-2C7.82 22 2 16.18 2 5V3a1 1 0 011-1zM8 5v2.5a5.5 5.5 0 005.5 5.5H16v-0.5a1 1 0 00-1-1h-1.5a4 4 0 01-4-4V5a1 1 0 00-1-1H9a1 1 0 00-1 1z" />
                 </svg>
@@ -292,16 +292,16 @@ const handlePlaceOrder = async () => {
                 <span className="font-medium">{business.bankDetails.bankName}</span>
               </p>
               <p className="flex justify-between">
-                <span className="text-muted">Account Name:</span>
+                <span className="text-muted">Account name:</span>
                 <span className="font-medium">{business.bankDetails.accountName}</span>
               </p>
               <p className="flex justify-between">
-                <span className="text-muted">Account Number:</span>
+                <span className="text-muted">Account number:</span>
                 <span className="font-medium">{business.bankDetails.accountNumber}</span>
               </p>
               <p className="flex justify-between">
                 <span className="text-muted">Amount:</span>
-                <span className="font-medium text-gold">{formatPrice(placedOrder.total)}</span>
+                <span className="font-medium text-brand price tabular">{formatPriceShort(placedOrder.total)}</span>
               </p>
               <p className="flex justify-between">
                 <span className="text-muted">Reference:</span>
@@ -324,7 +324,7 @@ const handlePlaceOrder = async () => {
           </p>
 
 {placedOrder.paymentProofName && (
-            <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-3 mb-5 text-sm text-emerald-400 flex items-center gap-2 justify-center">
+            <div className="rounded-md bg-success-soft border border-success/30 p-3 mb-5 text-sm text-success flex items-center gap-2 justify-center">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -335,21 +335,21 @@ const handlePlaceOrder = async () => {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/"
-              className="inline-flex items-center justify-center h-12 px-8 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity"
+              className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-brand text-background font-semibold text-sm hover:opacity-90 transition-opacity"
             >
-              Continue Shopping
+              Continue shopping
             </Link>
             <Link
               href="/track-order"
-              className="inline-flex items-center justify-center h-12 px-8 rounded-full border border-gold/40 text-gold font-semibold text-sm hover:bg-gold/10 transition-colors"
+              className="inline-flex items-center justify-center h-12 px-8 rounded-md border border-brand/40 text-brand font-semibold text-sm hover:bg-brand/10 transition-colors"
             >
-              Track My Order
+              Track order
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center h-12 px-8 rounded-full border border-gold/40 text-gold font-semibold text-sm hover:bg-gold/10 transition-colors"
+              className="inline-flex items-center justify-center h-12 px-8 rounded-md border border-brand/40 text-brand font-semibold text-sm hover:bg-brand/10 transition-colors"
             >
-              Contact Us
+              Contact us
             </Link>
           </div>
         </div>
@@ -360,17 +360,17 @@ const handlePlaceOrder = async () => {
   return (
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-8 text-center">Checkout</h1>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold mb-8 text-center">Checkout</h1>
 
-        <div className="rounded-2xl bg-gold/5 border border-gold/20 p-6 mb-8 text-left">
+        <div className="rounded-md bg-brand/5 border border-brand/20 p-6 mb-8 text-left">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
             </div>
             <div>
-              <p className="font-semibold text-sm mb-1">Demo Store</p>
+              <p className="font-semibold text-sm mb-1">Demo store</p>
               <p className="text-xs text-muted">This is a demo store. No real orders or payments will be processed. Bank details (GTBank 0123456789) are placeholder only.</p>
             </div>
           </div>
@@ -381,9 +381,9 @@ const handlePlaceOrder = async () => {
             <div key={s.step} className="flex items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
                 <span
-                  className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold ${
+                  className={`flex items-center justify-center w-8 h-8 rounded-md text-xs font-bold ${
                     step >= s.step
-                      ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background"
+                      ? "bg-brand text-background"
                       : "bg-surface border border-surface-light text-muted"
                   }`}
                 >
@@ -391,7 +391,7 @@ const handlePlaceOrder = async () => {
                 </span>
                 <span
                   className={`hidden sm:block text-xs font-medium ${
-                    step >= s.step ? "text-gold" : "text-muted"
+                    step >= s.step ? "text-brand" : "text-muted"
                   }`}
                 >
                   {s.label}
@@ -400,7 +400,7 @@ const handlePlaceOrder = async () => {
               {i < STATUS_STEPS.length - 1 && (
                 <span
                   className={`w-8 sm:w-16 h-px ${
-                    step > s.step ? "bg-gold" : "bg-surface-light"
+                    step > s.step ? "bg-brand" : "bg-surface-light"
                   }`}
                 />
               )}
@@ -411,49 +411,49 @@ const handlePlaceOrder = async () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-3">
             {step === 1 && (
-              <div className="rounded-2xl bg-surface border border-surface-light p-6">
-                <h2 className="font-serif text-xl font-bold mb-6">Contact &amp; Delivery Info</h2>
+              <div className="rounded-md bg-surface border border-surface-light p-6">
+                <h2 className="font-display text-xl font-bold mb-6">Contact and delivery details</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <label className="block">
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                      First Name *
+                    <span className="text-xs text-muted mb-1.5 block">
+                      First name *
                     </span>
                     <input
                       type="text"
                       value={form.firstName}
                       onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                        errors.firstName ? "border-red-500" : "border-surface-light focus:border-gold"
+                        errors.firstName ? "border-danger" : "border-surface-light focus:border-brand"
                       }`}
                       placeholder="Jane"
                     />
                     {errors.firstName && (
-                      <p className="text-xs text-red-400 mt-1">{errors.firstName}</p>
+                      <p className="text-xs text-danger mt-1">{errors.firstName}</p>
                     )}
                   </label>
                   <label className="block">
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                      Last Name *
+                    <span className="text-xs text-muted mb-1.5 block">
+                      Last name *
                     </span>
                     <input
                       type="text"
                       value={form.lastName}
                       onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                        errors.lastName ? "border-red-500" : "border-surface-light focus:border-gold"
+                        errors.lastName ? "border-danger" : "border-surface-light focus:border-brand"
                       }`}
                       placeholder="Smith"
                     />
                     {errors.lastName && (
-                      <p className="text-xs text-red-400 mt-1">{errors.lastName}</p>
+                      <p className="text-xs text-danger mt-1">{errors.lastName}</p>
                     )}
                   </label>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <label className="block">
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+                    <span className="text-xs text-muted mb-1.5 block">
                       Email *
                     </span>
                     <input
@@ -461,29 +461,29 @@ const handlePlaceOrder = async () => {
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                        errors.email ? "border-red-500" : "border-surface-light focus:border-gold"
+                        errors.email ? "border-danger" : "border-surface-light focus:border-brand"
                       }`}
                       placeholder="jane@email.com"
                     />
                     {errors.email && (
-                      <p className="text-xs text-red-400 mt-1">{errors.email}</p>
+                      <p className="text-xs text-danger mt-1">{errors.email}</p>
                     )}
                   </label>
                   <label className="block">
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                      Phone Number *
+                    <span className="text-xs text-muted mb-1.5 block">
+                      Phone number *
                     </span>
                     <input
                       type="tel"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                        errors.phone ? "border-red-500" : "border-surface-light focus:border-gold"
+                        errors.phone ? "border-danger" : "border-surface-light focus:border-brand"
                       }`}
                       placeholder="+234 800 000 0000"
                     />
                     {errors.phone && (
-                      <p className="text-xs text-red-400 mt-1">{errors.phone}</p>
+                      <p className="text-xs text-danger mt-1">{errors.phone}</p>
                     )}
                   </label>
                 </div>
@@ -492,7 +492,7 @@ const handlePlaceOrder = async () => {
                   <label
                     className={`block ${deliveryMethod === "delivery" ? "" : "sm:col-span-2"}`}
                   >
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+                    <span className="text-xs text-muted mb-1.5 block">
                       City *
                     </span>
                     <input
@@ -500,35 +500,35 @@ const handlePlaceOrder = async () => {
                       value={form.city}
                       onChange={(e) => setForm({ ...form, city: e.target.value })}
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                        errors.city ? "border-red-500" : "border-surface-light focus:border-gold"
+                        errors.city ? "border-danger" : "border-surface-light focus:border-brand"
                       }`}
                       placeholder="Lagos"
                     />
-                    {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city}</p>}
+                    {errors.city && <p className="text-xs text-danger mt-1">{errors.city}</p>}
                   </label>
                   {deliveryMethod === "delivery" && (
                     <label className="block">
-                      <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                        Delivery Zone
+                      <span className="text-xs text-muted mb-1.5 block">
+                        Delivery zone
                       </span>
                       <select
                         value={deliveryZone}
                         onChange={(e) => setDeliveryZone(e.target.value)}
                         className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
                           errors.deliveryZone
-                            ? "border-red-500"
-                            : "border-surface-light focus:border-gold"
+                            ? "border-danger"
+                            : "border-surface-light focus:border-brand"
                         }`}
                       >
                         <option value="">Select delivery zone</option>
                         {deliveryZones.map((z) => (
                           <option key={z.name} value={z.name}>
-                            {z.name} — {formatPrice(z.fee)} ({z.days})
+                            {z.name} — {formatPriceShort(z.fee)} ({z.days})
                           </option>
                         ))}
                       </select>
                       {errors.deliveryZone && (
-                        <p className="text-xs text-red-400 mt-1">{errors.deliveryZone}</p>
+                        <p className="text-xs text-danger mt-1">{errors.deliveryZone}</p>
                       )}
                     </label>
                   )}
@@ -536,40 +536,40 @@ const handlePlaceOrder = async () => {
 
                 {deliveryMethod === "delivery" && (
                   <label className="block mb-4">
-                    <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                      Street Address *
+                    <span className="text-xs text-muted mb-1.5 block">
+                      Street address *
                     </span>
                     <input
                       type="text"
                       value={form.address}
                       onChange={(e) => setForm({ ...form, address: e.target.value })}
                       className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                        errors.address ? "border-red-500" : "border-surface-light focus:border-gold"
+                        errors.address ? "border-danger" : "border-surface-light focus:border-brand"
                       }`}
-                      placeholder="123 Maple Street, Apt 4"
+                      placeholder="14 Allen Avenue, Ikeja"
                     />
                     {errors.address && (
-                      <p className="text-xs text-red-400 mt-1">{errors.address}</p>
+                      <p className="text-xs text-danger mt-1">{errors.address}</p>
                     )}
                   </label>
                 )}
 
                 <label className="block mb-6">
-                  <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                    Order Notes (optional)
+                  <span className="text-xs text-muted mb-1.5 block">
+                    Delivery notes (optional)
                   </span>
                   <textarea
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                    className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-gold focus:outline-none min-h-[90px] resize-none"
+                    className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-brand focus:outline-none min-h-[90px] resize-none"
                     placeholder="Delivery instructions, gift note, etc."
                   />
                 </label>
 
                 {deliveryMethod === "delivery" ? (
-                  <div className="rounded-xl bg-gold/5 border border-gold/20 p-4 mb-6 text-sm flex items-start gap-3">
+                  <div className="rounded-md bg-brand/5 border border-brand/20 p-4 mb-6 text-sm flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-gold shrink-0 mt-0.5"
+                      className="w-5 h-5 text-brand shrink-0 mt-0.5"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -580,15 +580,15 @@ const handlePlaceOrder = async () => {
                       />
                     </svg>
                     <p className="text-muted">
-                      Delivery is {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)} to{" "}
+                      Delivery is {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)} to{" "}
                       {deliveryZone || "your zone"} and takes {zoneInfo.days}. We&apos;ll call you
                       on your phone number before delivery.
                     </p>
                   </div>
                 ) : (
-                  <div className="rounded-xl bg-gold/5 border border-gold/20 p-4 mb-6 text-sm flex items-start gap-3">
+                  <div className="rounded-md bg-brand/5 border border-brand/20 p-4 mb-6 text-sm flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-gold shrink-0 mt-0.5"
+                      className="w-5 h-5 text-brand shrink-0 mt-0.5"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -608,19 +608,19 @@ const handlePlaceOrder = async () => {
 
                 <button
                   onClick={handleNext}
-                  className="w-full h-12 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
+                  className="w-full h-12 rounded-md bg-brand text-background font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
                 >
-                  Continue to Payment
+                  Continue to payment
                 </button>
               </div>
             )}
 
             {step === 2 && (
               <div className="space-y-6">
-                <div className="rounded-2xl bg-surface border border-surface-light p-6">
+                <div className="rounded-md bg-surface border border-surface-light p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-serif text-xl font-bold">Bank Transfer</h2>
-                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-semibold">
+                    <h2 className="font-display text-xl font-bold">Bank transfer</h2>
+                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-brand/10 text-brand text-xs font-semibold">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path
                           fillRule="evenodd"
@@ -628,35 +628,35 @@ const handlePlaceOrder = async () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Secure &amp; Encrypted
+                      Bank details
                     </span>
                   </div>
 
                   <div className="space-y-4 mb-6">
                     {[
                       {
-                        title: "Step 1: Open your banking app",
+                        title: "Step 1: open your banking app",
                         desc: "Log into your bank's app or website and start a new transfer.",
                       },
                       {
-                        title: `Step 2: Transfer to ${business.bankDetails.bankName}`,
+                        title: `Step 2: transfer to ${business.bankDetails.bankName}`,
                         desc: `Send to account number ${business.bankDetails.accountNumber} (${business.bankDetails.accountName}). Confirm the account name matches before sending.`,
                       },
                       {
-                        title: `Step 3: Send exactly ${formatPrice(total)}`,
-                        desc: `Transfer the exact amount of ${formatPrice(total)}. Double-check to avoid errors.`,
+                        title: `Step 3: send exactly ${formatPriceShort(total)}`,
+                        desc: `Transfer the exact amount of ${formatPriceShort(total)}. Double-check to avoid errors.`,
                       },
                       {
-                        title: `Step 4: Use "Order ${previewId}" as reference`,
+                        title: `Step 4: use "Order ${previewId}" as reference`,
                         desc: "Add your order number as the transfer reference or narration so we can match your payment quickly.",
                       },
                       {
-                        title: "Step 5: Confirm below",
+                        title: "Step 5: confirm below",
                         desc: "Once you've sent the transfer, tick the checkbox below and place your order. We'll verify the payment and begin processing.",
                       },
                     ].map((s, i) => (
                       <div key={i} className="flex items-start gap-4">
-                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gold/10 text-gold text-sm font-bold shrink-0">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-md bg-brand/10 text-brand text-sm font-bold shrink-0">
                           {i + 1}
                         </span>
                         <div>
@@ -667,27 +667,27 @@ const handlePlaceOrder = async () => {
                     ))}
                   </div>
 
-                  <div className="rounded-xl bg-overlay p-5 mb-6 border border-gold/20" style={{ backgroundColor: "rgba(212,175,55,0.05)" }}>
-                    <p className="text-xs text-muted uppercase tracking-wide mb-3">
-                      Payment Summary
+                  <div className="rounded-md bg-brand/5 p-5 mb-6 border border-brand/20">
+                    <p className="text-xs text-muted mb-3">
+                      Payment summary
                     </p>
                     <div className="space-y-2 text-sm">
                       <p className="flex justify-between">
                         <span className="text-muted">Bank</span>
-                        <span className="font-medium text-gold">{business.bankDetails.bankName}</span>
+                        <span className="font-medium text-brand">{business.bankDetails.bankName}</span>
                       </p>
                       <p className="flex justify-between">
-                        <span className="text-muted">Account Name</span>
+                        <span className="text-muted">Account name</span>
                         <span className="font-medium">{business.bankDetails.accountName}</span>
                       </p>
                       <p className="flex justify-between">
-                        <span className="text-muted">Account Number</span>
+                        <span className="text-muted">Account number</span>
                         <span className="font-medium">{business.bankDetails.accountNumber}</span>
                       </p>
                       <p className="flex justify-between">
                         <span className="text-muted">Amount</span>
-                        <span className="font-bold text-gold text-base">
-                          {formatPrice(total)}
+                        <span className="font-bold tabular text-brand text-base">
+                          {formatPriceShort(total)}
                         </span>
                       </p>
                       <p className="flex justify-between">
@@ -697,22 +697,22 @@ const handlePlaceOrder = async () => {
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-surface-light border border-surface-light p-4 mb-6">
+                  <div className="rounded-md bg-surface-light border border-surface-light p-4 mb-6">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-muted uppercase tracking-wide font-semibold">
-                        Payment Proof <span className="text-foreground/50 normal-case">(optional)</span>
+                      <p className="text-xs text-muted font-semibold">
+                        Payment proof <span className="text-foreground/50 normal-case">(optional)</span>
                       </p>
                       {proofFile && (
                         <button
                           onClick={() => { setProofFile(null); setProofError(""); }}
-                          className="text-xs text-red-400 hover:text-red-300 cursor-pointer"
+                          className="text-xs text-danger hover:text-danger cursor-pointer"
                         >
                           Remove
                         </button>
                       )}
                     </div>
                     {!proofFile ? (
-                      <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-surface-light rounded-lg cursor-pointer hover:border-gold/40 transition-colors">
+                      <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-surface-light rounded-lg cursor-pointer hover:border-brand/40 transition-colors">
                         <input
                           ref={proofInputRef}
                           type="file"
@@ -727,7 +727,7 @@ const handlePlaceOrder = async () => {
                             <svg className="w-6 h-6 text-muted mb-1" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                             </svg>
-                            <span className="text-xs text-muted">Attach screenshot of e-Transfer</span>
+                            <span className="text-xs text-muted">Attach a transfer screenshot</span>
                           </>
                         )}
                       </label>
@@ -743,10 +743,10 @@ const handlePlaceOrder = async () => {
                       </div>
                     )}
                     {proofError && (
-                      <p className="text-xs text-red-400 mt-2">{proofError}</p>
+                      <p className="text-xs text-danger mt-2">{proofError}</p>
                     )}
                     <p className="text-xs text-muted/60 mt-2">
-                      Upload a screenshot of your e-Transfer confirmation to help us verify your payment faster.
+                      Upload a screenshot of your transfer confirmation so we can check your payment.
                     </p>
                   </div>
 
@@ -755,13 +755,13 @@ const handlePlaceOrder = async () => {
                       type="checkbox"
                       checked={agreed}
                       onChange={(e) => setAgreed(e.target.checked)}
-                      className="mt-0.5 w-5 h-5 rounded border border-surface-light accent-[#d4af37] cursor-pointer"
+                      className="mt-0.5 w-5 h-5 rounded border border-surface-light accent-brand cursor-pointer"
                     />
                     <span className="text-sm text-foreground/85 leading-relaxed">
                       I confirm I have sent a bank transfer of{" "}
-                      <strong className="text-gold">{formatPrice(total)}</strong> to{" "}
+                      <strong className="text-brand">{formatPriceShort(total)}</strong> to{" "}
                       <strong>
-                        {business.bankDetails.bankName} - {business.bankDetails.accountNumber}
+                        {business.bankDetails.bankName}, account {business.bankDetails.accountNumber}
                       </strong>{" "}
                       with reference <strong>Order {previewId}</strong>.
                     </span>
@@ -776,16 +776,16 @@ const handlePlaceOrder = async () => {
                   <div className="flex gap-3">
                     <button
                       onClick={handleBack}
-                      className="h-12 px-6 rounded-full border border-gold/40 text-gold font-semibold text-sm hover:bg-gold/10 transition-colors cursor-pointer"
+                      className="h-12 px-6 rounded-md border border-brand/40 text-brand font-semibold text-sm hover:bg-brand/10 transition-colors cursor-pointer"
                     >
                       Back
                     </button>
                     <button
                       onClick={handlePlaceOrder}
                       disabled={!agreed || submitting}
-                      className="flex-1 h-12 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="flex-1 h-12 rounded-md bg-brand text-background font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                     >
-                      {submitting ? "Placing Order..." : "Place Order & Confirm"}
+                      {submitting ? "Placing order..." : "Place order"}
                     </button>
                   </div>
                 </div>
@@ -794,8 +794,8 @@ const handlePlaceOrder = async () => {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="rounded-2xl bg-surface border border-surface-light p-6 sticky top-24">
-              <h2 className="font-serif text-xl font-bold mb-5">Order Summary</h2>
+            <div className="rounded-md bg-surface border border-surface-light p-6 sticky top-24">
+              <h2 className="font-display text-xl font-bold mb-5">Order summary</h2>
               <div className="space-y-4 mb-5 max-h-64 overflow-y-auto pr-1">
                 {items.map((item) => (
                   <div key={item.productId} className="flex items-center gap-3">
@@ -811,11 +811,11 @@ const handlePlaceOrder = async () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.name}</p>
                       <p className="text-xs text-muted">
-                        {formatPrice(item.price)} x {item.quantity}
+                        {formatPriceShort(item.price)} x {item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-semibold">
-                      {formatPrice(item.price * item.quantity)}
+                    <p className="text-sm font-semibold tabular">
+                      {formatPriceShort(item.price * item.quantity)}
                     </p>
                   </div>
                 ))}
@@ -824,7 +824,7 @@ const handlePlaceOrder = async () => {
               <div className="space-y-2.5 text-sm border-t border-surface-light pt-4">
                 <div className="flex justify-between text-muted">
                   <span>Subtotal</span>
-                  <span className="text-foreground">{formatPrice(subtotal)}</span>
+                  <span className="text-foreground price tabular">{formatPriceShort(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted">
                   <span>
@@ -832,18 +832,18 @@ const handlePlaceOrder = async () => {
                       ? `Delivery${deliveryZone ? ` (${deliveryZone})` : ""}`
                       : "Pickup"}
                   </span>
-                  <span className="text-foreground">
-                    {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)}
+                  <span className="text-foreground tabular">
+                    {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-base border-t border-surface-light pt-3">
                   <span>Total</span>
-                  <span className="text-gold">{formatPrice(total)}</span>
+                  <span className="text-brand price tabular">{formatPriceShort(total)}</span>
                 </div>
               </div>
 
-              <div className="mt-5 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-sm">
-                <p className="flex items-center gap-2 text-emerald-400 font-semibold mb-2">
+              <div className="mt-5 p-4 rounded-md bg-success-soft border border-success/30 text-sm">
+                <p className="flex items-center gap-2 text-success font-semibold mb-2">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
@@ -851,11 +851,11 @@ const handlePlaceOrder = async () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  Why Bank Transfer?
+                  Why bank transfer?
                 </p>
                 <p className="text-muted leading-relaxed">
-                  Bank transfer is fast, secure and available with any Nigerian bank. No card
-                  fees, no delays - we confirm payments manually and ship within 24 hours.
+                  You can pay from any Nigerian bank account. We check transfers manually
+                  and email you when your payment is confirmed.
                 </p>
               </div>
             </div>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/context/CartContext";
-import { formatPrice } from "@/lib/data/products";
+import { formatPriceShort } from "@/lib/format";
 import Button from "@/components/ui/Button";
 
 export default function CartPage() {
@@ -27,8 +27,8 @@ export default function CartPage() {
     return (
       <div className="pt-24 md:pt-28 pb-16 min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-full bg-gold/10 text-gold mb-6">
-            <svg className="w-9 h-9" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <div className="flex items-center justify-center w-16 h-16 mx-auto rounded-md bg-brand/10 text-brand mb-6">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -36,12 +36,12 @@ export default function CartPage() {
               />
             </svg>
           </div>
-          <h1 className="font-serif text-3xl font-bold mb-3">Your Cart is Empty</h1>
+          <h1 className="font-display text-3xl font-semibold mb-3">Your cart is empty</h1>
           <p className="text-muted mb-8">
-            Explore our premium wigs, hair bundles and beauty essentials.
+            Browse wigs, bundles, lashes and hair care, with prices in naira.
           </p>
           <Button href="/shop" size="lg">
-            Start Shopping
+            Shop products
           </Button>
         </div>
       </div>
@@ -51,42 +51,38 @@ export default function CartPage() {
   return (
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-8 text-center">
-          Shopping Cart
-        </h1>
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold mb-8">Your cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <div
                 key={item.productId}
-                className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl bg-surface border border-surface-light"
+                className="flex flex-col sm:flex-row gap-4 p-4 rounded-md bg-surface border border-surface-light"
               >
                 <Link
                   href={`/shop/${item.productId}`}
-                  className="relative w-full sm:w-24 h-32 sm:h-24 rounded-lg overflow-hidden bg-surface-light shrink-0"
+                  className="relative w-full sm:w-24 h-32 sm:h-24 rounded-md overflow-hidden bg-surface-light shrink-0"
                 >
                   <Image src={item.image} alt={item.name} fill className="object-cover" sizes="96px" />
                 </Link>
                 <div className="flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs text-gold uppercase tracking-wider mb-1">
-                        {item.category}
-                      </p>
-<Link
+                      <p className="text-xs text-brand mb-1">{item.category}</p>
+                      <Link
                         href={`/shop/${item.productId}`}
-                        className="font-serif font-semibold hover:text-gold transition-colors"
+                        className="font-semibold hover:text-brand transition-colors"
                       >
                         {item.name}
                       </Link>
                     </div>
                     <button
                       onClick={() => removeItem(item.productId)}
-                      className="text-muted hover:text-red-400 transition-colors cursor-pointer"
-                      aria-label="Remove item"
+                      className="text-muted hover:text-danger transition-colors cursor-pointer"
+                      aria-label={`Remove ${item.name} from cart`}
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -96,25 +92,25 @@ export default function CartPage() {
                     </button>
                   </div>
                   <div className="mt-auto pt-3 flex items-center justify-between">
-                    <div className="flex items-center rounded-full border border-surface-light bg-surface-light">
+                    <div className="flex items-center rounded-md border border-surface-light bg-surface-light">
                       <button
                         onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                        className="flex items-center justify-center w-9 h-9 text-lg text-muted hover:text-gold transition-colors cursor-pointer"
-                        aria-label="Decrease"
+                        className="flex items-center justify-center w-9 h-9 text-lg text-muted hover:text-brand transition-colors cursor-pointer"
+                        aria-label={`Decrease quantity of ${item.name}`}
                       >
                         -
                       </button>
-                      <span className="w-6 text-center text-sm font-semibold">{item.quantity}</span>
+                      <span className="w-6 text-center text-sm font-semibold tabular">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                        className="flex items-center justify-center w-9 h-9 text-lg text-muted hover:text-gold transition-colors cursor-pointer"
-                        aria-label="Increase"
+                        className="flex items-center justify-center w-9 h-9 text-lg text-muted hover:text-brand transition-colors cursor-pointer"
+                        aria-label={`Increase quantity of ${item.name}`}
                       >
                         +
                       </button>
                     </div>
-                    <p className="font-bold text-gold text-lg">
-                      {formatPrice(item.price * item.quantity)}
+                    <p className="font-semibold text-brand text-lg price tabular">
+                      {formatPriceShort(item.price * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -123,40 +119,38 @@ export default function CartPage() {
 
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 text-sm text-gold hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-brand hover:underline"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
               </svg>
-              Continue Shopping
+              Continue shopping
             </Link>
           </div>
 
           <div className="lg:col-span-1">
-            <div className="rounded-2xl bg-surface border border-surface-light p-6 sticky top-24">
-              <h2 className="font-serif text-xl font-bold mb-6">Order Summary</h2>
+            <div className="rounded-md bg-surface border border-surface-light p-6 sticky top-24">
+              <h2 className="text-lg font-semibold mb-6">Order summary</h2>
 
               <div className="mb-6">
-                <p className="text-xs text-muted uppercase tracking-wide mb-3">
-                  Fulfillment Method
-                </p>
+                <p className="text-xs text-muted mb-3">Fulfilment method</p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setDeliveryMethod("delivery")}
-                    className={`h-10 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    className={`h-10 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
                       deliveryMethod === "delivery"
-                        ? "bg-gold text-background"
-                        : "bg-surface-light text-muted hover:text-gold"
+                        ? "bg-brand text-background"
+                        : "bg-surface-light text-muted hover:text-brand"
                     }`}
                   >
                     Delivery
                   </button>
                   <button
                     onClick={() => setDeliveryMethod("pickup")}
-                    className={`h-10 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    className={`h-10 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
                       deliveryMethod === "pickup"
-                        ? "bg-gold text-background"
-                        : "bg-surface-light text-muted hover:text-gold"
+                        ? "bg-brand text-background"
+                        : "bg-surface-light text-muted hover:text-brand"
                     }`}
                   >
                     Pickup
@@ -166,19 +160,17 @@ export default function CartPage() {
 
               {deliveryMethod === "delivery" && (
                 <div className="mb-6">
-                  <p className="text-xs text-muted uppercase tracking-wide mb-3">
-                    Delivery Zone
-                  </p>
+                  <p className="text-xs text-muted mb-3">Delivery zone</p>
                   <select
                     value={deliveryZone}
                     onChange={(e) => setDeliveryZone(e.target.value)}
                     aria-label="Delivery zone"
-                    className="w-full h-10 rounded-lg bg-surface-light border border-surface-light px-3 text-sm focus:border-gold focus:outline-none"
+                    className="w-full h-10 rounded-md bg-surface-light border border-surface-light px-3 text-sm focus:border-brand focus:outline-none"
                   >
                     <option value="">Select delivery zone</option>
                     {deliveryZones.map((z) => (
                       <option key={z.name} value={z.name}>
-                        {z.name} - {formatPrice(z.fee)} ({z.days})
+                        {z.name} — {formatPriceShort(z.fee)} ({z.days})
                       </option>
                     ))}
                   </select>
@@ -190,37 +182,35 @@ export default function CartPage() {
                   <span>
                     Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
                   </span>
-                  <span className="text-foreground">{formatPrice(subtotal)}</span>
+                  <span className="text-foreground price tabular">{formatPriceShort(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted">
-                  <span>
-                    {deliveryMethod === "delivery" ? "Delivery Fee" : "Pickup"}
-                  </span>
-                  <span className="text-foreground">
-                    {deliveryFee === 0 ? "FREE" : formatPrice(deliveryFee)}
+                  <span>{deliveryMethod === "delivery" ? "Delivery fee" : "Pickup"}</span>
+                  <span className="text-foreground price tabular">
+                    {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)}
                   </span>
                 </div>
                 {deliveryMethod === "delivery" && freeDeliveryOver > 0 && (
                   <div
-                    className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${
+                    className={`rounded-md border px-3 py-2.5 text-xs font-semibold ${
                       subtotal >= freeDeliveryOver
-                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                        : "bg-gold/10 border-gold/30 text-gold"
+                        ? "bg-success-soft border-success/25 text-success"
+                        : "bg-brand/10 border-brand/30 text-brand"
                     }`}
                   >
                     {subtotal >= freeDeliveryOver
-                      ? "You've unlocked free delivery"
-                      : `Add ${formatPrice(freeDeliveryOver - subtotal)} more for free delivery`}
+                      ? "Free delivery included"
+                      : `Add ${formatPriceShort(freeDeliveryOver - subtotal)} more for free delivery`}
                   </div>
                 )}
-                <div className="flex justify-between font-bold text-base border-t border-surface-light pt-3">
+                <div className="flex justify-between font-semibold text-base border-t border-surface-light pt-3">
                   <span>Total</span>
-                  <span className="text-gold">{formatPrice(total)}</span>
+                  <span className="text-brand price tabular">{formatPriceShort(total)}</span>
                 </div>
               </div>
 
               <Button href="/checkout" size="lg" fullWidth className="mt-6">
-                Proceed to Checkout
+                Go to checkout
               </Button>
             </div>
           </div>

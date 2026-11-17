@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: `Shopping Cart | ${BUSINESS.name}`,
+  title: `Shopping cart | ${BUSINESS.name}`,
   description: `Review your shopping cart and proceed to checkout. ${BUSINESS.name} offers local delivery across Lagos and in-store pickup.`,
   alternates: { canonical: "/cart" },
 };

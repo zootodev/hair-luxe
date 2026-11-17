@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getOrders } from "@/lib/orders";
-import { formatPrice } from "@/lib/data/products";
+import { formatPriceShort } from "@/lib/format";
 import { phonesMatch, studioLocation } from "@/lib/format";
 import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
 import { useCart } from "@/lib/context/CartContext";
@@ -34,7 +34,7 @@ export default function TrackOrderPage() {
     const id = orderId.trim().toUpperCase();
     const ph = phone.trim();
     if (!id || !ph.replace(/\D/g, "")) {
-      setError("Please enter both Order ID and phone number.");
+      setError("Please enter both order number and phone number.");
       setFound(null);
       return;
     }
@@ -60,7 +60,7 @@ export default function TrackOrderPage() {
       }
       if (res.status === 400 || res.status === 404) {
         if (checkoutLocal(id, ph)) return;
-        setError("No order found. Please check your Order ID and phone number.");
+        setError("No order found. Please check your order number and phone number.");
         return;
       }
       setError("Unexpected error. Please try again.");
@@ -76,43 +76,43 @@ export default function TrackOrderPage() {
     <div className="pt-24 md:pt-28 pb-16 min-h-[70vh]">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-3">
-            Order Status
+          <p className="text-brand text-xs font-medium mb-3">
+            Order tracking
           </p>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-3">Track Your Order</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3">Track your order</h1>
           <p className="text-muted text-sm">
-            Enter your Order ID and the phone number you used at checkout.
+            Enter your order number and the phone number you used at checkout.
           </p>
         </div>
 
-        <div className="rounded-2xl bg-surface border border-surface-light p-6 sm:p-8">
+        <div className="rounded-md bg-surface border border-surface-light p-6 sm:p-8">
           <label className="block mb-4">
-            <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-              Order ID
+            <span className="text-xs text-muted mb-1.5 block">
+              Order number
             </span>
             <input
               type="text"
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               placeholder="HL-2026-0123"
-              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
             />
           </label>
           <label className="block mb-6">
-            <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-              Phone Number
+            <span className="text-xs text-muted mb-1.5 block">
+              Phone number
             </span>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+234 812 345 6789"
-              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
             />
           </label>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-5">
+            <p className="text-sm text-danger bg-danger-soft border border-danger/30 rounded-lg px-4 py-3 mb-5">
               {error}
             </p>
           )}
@@ -120,21 +120,21 @@ export default function TrackOrderPage() {
           <button
             onClick={lookup}
             disabled={searching}
-            className="w-full h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+            className="w-full h-11 rounded-md bg-brand text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
           >
-            {searching ? "Looking Up..." : "Look Up Order"}
+            {searching ? "Looking up..." : "Look up order"}
           </button>
         </div>
 
         {found && (
-          <div className="rounded-2xl bg-surface border border-gold/20 p-6 mt-6 animate-fade-in-up">
-            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gold/10">
+          <div className="rounded-md bg-surface border border-brand/20 p-6 mt-6">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-brand/10">
               <div>
-                <p className="text-xs text-muted uppercase tracking-wide">Order</p>
-                <p className="font-serif text-xl font-bold text-gold">{found.id}</p>
+                <p className="text-xs text-muted">Order</p>
+                <p className="text-lg font-semibold text-brand tabular">{found.id}</p>
               </div>
               <span
-                className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                className={`inline-block px-3 py-1 rounded-md text-xs font-bold ${
                   STATUS_BADGE_CLASSES[found.status]
                 }`}
               >
@@ -148,33 +148,33 @@ export default function TrackOrderPage() {
                   <span>
                     {item.name} <span className="text-muted">x{item.quantity}</span>
                   </span>
-                  <span className="font-semibold">{formatPrice(item.price * item.quantity)}</span>
+                  <span className="font-semibold price tabular">{formatPriceShort(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
 
-            <div className="space-y-2 text-sm border-t border-gold/10 pt-4">
+            <div className="space-y-2 text-sm border-t border-brand/10 pt-4">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
-                <span>{formatPrice(found.subtotal)}</span>
+                <span className="price tabular">{formatPriceShort(found.subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Delivery</span>
-                <span>{found.deliveryFee === 0 ? "FREE" : formatPrice(found.deliveryFee)}</span>
+                <span className="price tabular">{found.deliveryFee === 0 ? "Free" : formatPriceShort(found.deliveryFee)}</span>
               </div>
-              <div className="flex justify-between font-bold border-t border-gold/10 pt-3">
+              <div className="flex justify-between font-bold border-t border-brand/10 pt-3">
                 <span>Total</span>
-                <span className="text-gold">{formatPrice(found.total)}</span>
+                <span className="text-brand price tabular">{formatPriceShort(found.total)}</span>
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-gold/10 text-sm space-y-2 text-muted">
+            <div className="mt-5 pt-4 border-t border-brand/10 text-sm space-y-2 text-muted">
               <p>
                 <span className="font-medium">Method: </span>
                 {found.customer.deliveryMethod === "delivery" ? (
                   <>
-                    Delivery to {found.customer.address}, {found.customer.city} ·
-                    {found.customer.deliveryZone && found.customer.deliveryZone}
+                    Delivery to {found.customer.address}, {found.customer.city}
+                    {found.customer.deliveryZone ? ` (${found.customer.deliveryZone})` : ""}
                   </>
                 ) : (
                   <>Pickup at {studioLocation(business.address, business.city)}</>
@@ -182,7 +182,7 @@ export default function TrackOrderPage() {
               </p>
               {found.paymentProofName && (
                 <p>
-                  <span className="font-medium text-gold">Payment proof uploaded: </span>
+                  <span className="font-medium text-brand">Payment proof uploaded: </span>
                   {found.paymentProofName}
                 </p>
               )}
@@ -196,7 +196,7 @@ export default function TrackOrderPage() {
             </div>
 
             {found.status === "pending" && (
-              <div className="mt-4 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-400 flex items-start gap-2">
+              <div className="mt-4 p-3 rounded-md bg-warning-soft border border-warning/30 text-xs text-warning flex items-start gap-2">
                 <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
@@ -204,7 +204,7 @@ export default function TrackOrderPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Your bank transfer is being verified. Please allow 1-2 business hours.
+                Your bank transfer is being checked. Please allow 1 to 2 hours.
               </div>
             )}
           </div>
@@ -212,8 +212,8 @@ export default function TrackOrderPage() {
 
         {!found && (
           <p className="text-center text-xs text-muted mt-6">
-            Your Order ID is shown on the checkout confirmation screen (e.g.{" "}
-            <span className="text-gold">HL-2026-0123</span>). Please check your email
+            Your order number is shown on the checkout confirmation screen (for example{" "}
+            <span className="text-brand">HL-2026-0123</span>). Please check your email
             for a copy.
           </p>
         )}
