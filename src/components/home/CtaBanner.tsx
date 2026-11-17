@@ -7,39 +7,27 @@ export default function CtaBanner() {
   const { business } = useCart();
 
   return (
-    <section className="py-16">
+    <section className="py-14 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1600&auto=format&fit=crop')",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40" />
-          <div className="relative z-10 px-8 py-16 sm:px-14 md:px-20 max-w-2xl">
-            <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-3">
-              Ready For a Transformation?
-            </p>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">
-              Book Your Appointment Today
+        <div className="rounded-md bg-brand-soft border border-brand/15 p-8 sm:p-12 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-brand-strong">
+              Book your next appointment
             </h2>
-            <p className="text-foreground/80 mb-8 leading-relaxed">
-              Reserve your spot for wigs, makeup, lashes, microblading and more. Call us at{" "}
-              <a href={`tel:${business.phoneFormatted}`} className="text-gold hover:underline">
+            <p className="text-sm text-foreground/80 mt-3 max-w-xl leading-relaxed">
+              Pick a service and a time that works for you. You can also call or
+              message us at{" "}
+              <a href={`tel:${business.phoneFormatted}`} className="font-medium text-brand hover:underline">
                 {business.phone}
-              </a>{" "}
-              or book instantly online.
+              </a>
+              .
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button href="/services" size="lg">
-                Book a Service
-              </Button>
-              <Button href="/contact" size="lg" variant="outline">
-                Contact Us
-              </Button>
-            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+            <Button href="/services">Book a service</Button>
+            <Button href="/contact" variant="outline">
+              Contact us
+            </Button>
           </div>
         </div>
       </div>

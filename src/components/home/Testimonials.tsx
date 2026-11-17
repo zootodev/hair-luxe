@@ -1,86 +1,30 @@
-const testimonials = [
+const samples = [
   {
-    name: "Adebisi O.",
-    location: "Lagos",
-    text: "My custom wig from Hair Luxe is absolutely stunning! The install was seamless and I get compliments everywhere I go. Truly luxury from start to finish.",
-    service: "Wig Making",
+    text: "The wig was ready on the date I needed it, and the fitting was quick.",
+    service: "Wig making",
   },
   {
-    name: "Chinedu K.",
-    location: "Abuja",
-    text: "The hair revamping service completely transformed my relaxed hair. After just one session, my curls are defined, bouncy, and healthy. Finally, a salon that understands textured hair!",
-    service: "Hair Revamping",
+    text: "My hair felt softer after the revamping session and the style held well.",
+    service: "Hair revamping",
   },
   {
-    name: "Funmi A.",
-    location: "Kano",
-    text: "I drove down from the north just for the microblading, and it was worth every kilometer. My brows look natural and perfect. The team was professional and the environment was so relaxing.",
-    service: "Microblading",
-  },
-  {
-    name: "Bolanle S.",
-    location: "Ibadan",
-    text: "The lace front wig I purchased exceeded my expectations. The quality is premium and the pricing is fair. My friends can't stop asking where I got it from.",
-    service: "Wig Making",
-  },
-  {
-    name: "Emem E.",
-    location: "Port Harcourt",
-    text: "Lash extensions from Hair Luxe have become my daily confidence booster. They look so natural and last longer than any other salon I've tried. Excellent service!",
-    service: "Lash Extensions",
-  },
-  {
-    name: "Oluwafemi O.",
-    location: "Benin City",
-    text: "The skin tag removal procedure was quick, painless, and professional. I didn't even feel anything. My skin is now clear and I feel more confident than ever.",
-    service: "Skin Tag Removal",
+    text: "Booking took a few minutes and the price I saw online was the price I paid.",
+    service: "Makeup",
   },
 ];
 
 export default function Testimonials() {
   return (
-    <section className="py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-3">
-            Client Love
-          </p>
-          <h2 className="font-serif text-3xl sm:text-5xl font-bold mb-4">
-            What Our Clients Say
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="flex flex-col rounded-2xl bg-surface border border-surface-light p-7 shadow-lg shadow-black/20 hover:border-gold/40 transition-colors"
-            >
-              <div className="flex gap-1 text-gold mb-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-foreground/85 leading-relaxed text-sm flex-1">
-                &ldquo;{t.text}&rdquo;
-              </p>
-              <div className="mt-5 pt-4 border-t border-gold/10 flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold">
-                  {t.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">{t.name}</p>
-                  <p className="text-xs text-muted">
-                    {t.location} &middot; <span className="text-gold">{t.service}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="mt-12 pt-10 border-t border-surface-light">
+      <p className="text-xs font-medium text-brand mb-5">Sample reviews</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {samples.map((sample) => (
+          <figure key={sample.service} className="rounded-md bg-background border border-surface-light p-5">
+            <blockquote className="text-sm leading-relaxed">&ldquo;{sample.text}&rdquo;</blockquote>
+            <figcaption className="text-xs text-muted mt-3">{sample.service}</figcaption>
+          </figure>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

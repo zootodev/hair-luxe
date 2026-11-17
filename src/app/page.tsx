@@ -1,8 +1,7 @@
 import Hero from "@/components/home/Hero";
 import FeaturedServices from "@/components/home/FeaturedServices";
-import WhyChooseUs from "@/components/home/WhyChooseUs";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
-import Testimonials from "@/components/home/Testimonials";
+import WhyChooseUs from "@/components/home/WhyChooseUs";
 import CtaBanner from "@/components/home/CtaBanner";
 import { getVisibleProducts, getVisibleServices } from "@/lib/catalog";
 
@@ -15,9 +14,8 @@ export default async function HomePage() {
     <>
       <Hero />
       <FeaturedServices services={services} />
-      <WhyChooseUs />
       <FeaturedProducts products={products} />
-      <Testimonials />
+      <WhyChooseUs />
       <CtaBanner />
     </>
   );
