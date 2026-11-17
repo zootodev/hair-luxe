@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "shots:auth": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/save-auth.ts",
-    "shots:mobile": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/mobile-shots.ts"
+    "shots:mobile": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/mobile-shots.ts",
+    "shots:design": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/design-shots.ts"
   },
   "dependencies": {
     "next": "16.3.8",

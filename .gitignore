@@ -43,9 +43,10 @@ next-env.d.ts
 # local log files
 *.log
 
-# dev-only screenshot tooling (scripts/save-auth.ts, scripts/mobile-shots.ts)
+# dev-only screenshot tooling (scripts/save-auth.ts, scripts/mobile-shots.ts, scripts/design-shots.ts)
 /.auth/
 /mobile-shots/
+/design-shots/
 
 .vercel
 .env*
