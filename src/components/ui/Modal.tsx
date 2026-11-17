@@ -78,7 +78,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-scrim"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -87,17 +87,17 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
-        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-surface border border-gold/20 shadow-2xl shadow-black/60 gold-border-gradient"
+        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-md bg-surface border border-brand/20"
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gold/10">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-brand/10">
           {title && (
-            <h3 id={titleId} className="font-serif text-xl text-gold">
+            <h3 id={titleId} className="font-display text-xl text-brand">
               {title}
             </h3>
           )}
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-full text-muted hover:text-gold hover:bg-gold/10 transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-md text-muted hover:text-brand hover:bg-brand/10 transition-colors"
             aria-label="Close"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

@@ -30,10 +30,10 @@ export default function Toast({
     <div
       role="status"
       aria-live="polite"
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-5 py-3 rounded-full border text-sm font-semibold shadow-2xl shadow-black/50 backdrop-blur-sm ${
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-5 py-3 rounded-md border text-sm font-semibold ${
         variant === "error"
-          ? "bg-red-500/15 border-red-500/40 text-red-300"
-          : "bg-surface border-gold/40 text-gold"
+          ? "bg-danger-soft border-danger/30 text-danger"
+          : "bg-surface border-brand/40 text-brand"
       }`}
     >
       {variant === "success" ? (

@@ -1,53 +1,53 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import SiteShell from "@/components/layout/SiteShell";
 import { CartProvider } from "@/lib/context/CartContext";
 import { BUSINESS, SITE_URL } from "@/lib/config";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Self-hosted OFL fonts. No Google request at build time or in the browser.
+const dmSans = localFont({
+  src: "./fonts/DMSans.ttf",
+  variable: "--font-dm-sans",
+  weight: "100 1000",
+  display: "swap",
+  fallback: ["system-ui", "sans-serif"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const fraunces = localFont({
+  src: "./fonts/Fraunces.ttf",
+  variable: "--font-fraunces",
+  weight: "100 900",
+  display: "swap",
+  fallback: ["Georgia", "serif"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
-  description: "Premium hair services and luxury wigs. Hair revamping, wig making, makeup, lash extensions, microblading and skin tag removal. Book online with easy payment.",
+  title: `${BUSINESS.name} | Wigs and hair services in Lagos`,
+  description:
+    "Wigs, hair revamping, makeup and lashes in Lagos. See prices and appointment lengths, then book online or pay by bank transfer.",
   keywords: [
-    "hair luxury",
-    "hair revamping",
-    "wig making",
-    "makeup artist",
-    "lash extensions",
-    "microblading",
-    "skin tag removal",
-    "human hair wigs",
-    "hair bundles",
+    "wigs Lagos",
+    "hair revamping Lagos",
+    "wig making Lagos",
+    "makeup artist Lagos",
+    "lash extensions Lagos",
+    "microblading Lagos",
+    "human hair wigs Nigeria",
     BUSINESS.city,
   ],
   openGraph: {
     url: "/",
-    title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
+    title: `${BUSINESS.name} | Wigs and hair services in Lagos`,
     description: BUSINESS.description,
     type: "website",
-    locale: "en_CA",
+    locale: "en_NG",
     siteName: BUSINESS.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${BUSINESS.name} | Premium Hair Services & Luxury Wigs`,
+    title: `${BUSINESS.name} | Wigs and hair services in Lagos`,
     description: BUSINESS.description,
   },
   alternates: { canonical: "/" },
@@ -56,9 +56,7 @@ export const metadata: Metadata = {
 // Favicon, apple-touch and OG images are supplied by the file-based
 // metadata conventions: icon.svg, favicon.ico, apple-icon.png,
 // opengraph-image.png and manifest.ts in this directory.
-export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
-};
+export const viewport: Viewport = {};
 
 export default function RootLayout({
   children,
@@ -67,14 +65,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      lang="en-NG"
+      className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://plus.unsplash.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
-        <link rel="dns-prefetch" href="https://plus.unsplash.com" />
       </head>
       <body className="min-h-full flex flex-col">
         <CartProvider>

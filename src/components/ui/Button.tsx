@@ -3,7 +3,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import Link from "next/link";
 
-type Variant = "primary" | "outline" | "ghost" | "gold";
+type Variant = "primary" | "outline" | "ghost" | "brand";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -16,13 +16,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold hover:opacity-90 shadow-lg shadow-gold/20",
-  gold:
-    "bg-gold text-background font-semibold hover:bg-gold-dark transition-colors",
+    "bg-brand text-background font-semibold hover:opacity-90",
+  brand:
+    "bg-brand text-background font-semibold hover:bg-brand-strong transition-colors",
   outline:
-    "border border-gold/40 text-gold hover:bg-gold/10 transition-colors",
+    "border border-brand/40 text-brand hover:bg-brand/10 transition-colors",
   ghost:
-    "text-foreground/80 hover:text-gold hover:bg-gold/5 transition-colors",
+    "text-foreground/80 hover:text-brand hover:bg-brand/5 transition-colors",
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -40,7 +40,7 @@ export default function Button({
   className = "",
   ...props
 }: ButtonProps) {
-  const classes = `inline-flex items-center justify-center gap-2 rounded-full transition-all duration-200 cursor-pointer ${
+  const classes = `inline-flex items-center justify-center gap-2 rounded-md transition-all duration-200 cursor-pointer ${
     variantClasses[variant]
   } ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${className}`;
 

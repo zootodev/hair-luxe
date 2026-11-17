@@ -16,10 +16,10 @@ import sharp from "sharp";
 const root = new URL("../", import.meta.url);
 const iconSvg = readFileSync(new URL("src/app/icon.svg", root));
 
-const BACKGROUND = "#0a0a0a"; // --color-background
-const GOLD = "#d4af37"; // --color-gold
-const CREAM = "#f5f1e8"; // --color-foreground
-const MUTED = "#9ca3af"; // --color-muted
+const BACKGROUND = "#f7f3ec"; // --color-background
+const BRAND = "#5b233e"; // --color-brand
+const FOREGROUND = "#2b1f25"; // --color-foreground
+const MUTED = "#6d5f63"; // --color-muted
 
 /** Rasterize the 64px viewBox icon.svg at an exact pixel size. */
 async function renderIcon(size, { opaque = true } = {}) {
@@ -64,18 +64,11 @@ async function buildOgImage() {
     .replace(/^[\s\S]*?<svg[^>]*>/, "")
     .replace(/<\/svg>\s*$/, "");
   const card = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#f5e6cc"/>
-      <stop offset="0.5" stop-color="${GOLD}"/>
-      <stop offset="1" stop-color="#a8862b"/>
-    </linearGradient>
-  </defs>
   <rect width="1200" height="630" fill="${BACKGROUND}"/>
   <svg x="120" y="225" width="180" height="180" viewBox="0 0 64 64">${inner}</svg>
-  <text x="350" y="300" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="96" fill="${CREAM}">Hair Luxe</text>
-  <rect x="352" y="330" width="180" height="5" rx="2.5" fill="url(#gold)"/>
-  <text x="352" y="384" font-family="Arial, Helvetica, sans-serif" font-size="28" letter-spacing="1" fill="${MUTED}">Premium wigs, hair revamping, makeup &amp; lash artistry.</text>
+  <text x="350" y="310" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="96" fill="${FOREGROUND}">Hair Luxe</text>
+  <rect x="352" y="336" width="180" height="5" fill="${BRAND}"/>
+  <text x="352" y="390" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="${MUTED}">Wigs, hair revamping, makeup and lashes in Lagos.</text>
 </svg>`;
   return sharp(Buffer.from(card)).png().toBuffer();
 }
