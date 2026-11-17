@@ -4,7 +4,7 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { generateBookingId, saveBooking } from "@/lib/orders";
 import { BUSINESS } from "@/lib/config";
-import { formatIntlPhone, formatNigerianPhone } from "@/lib/format";
+import { formatIntlPhone, formatNigerianPhone, plainRange } from "@/lib/format";
 import type { Booking, Service } from "@/lib/types";
 
 const TIME_SLOTS = [
@@ -145,11 +145,11 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
     <Modal
       isOpen={isOpen}
       onClose={close}
-      title={success ? "Booking Confirmed" : `Book ${service.name}`}
+      title={success ? "Booking confirmed" : `Book ${service.name}`}
     >
       {success ? (
         <div className="text-center">
-          <div className="flex items-center justify-center w-16 h-16 mx-auto rounded-full bg-gold/15 text-gold mb-4">
+          <div className="flex items-center justify-center w-16 h-16 mx-auto rounded-md bg-brand/15 text-brand mb-4">
             <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -158,11 +158,11 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
               />
             </svg>
           </div>
-          <h3 className="font-serif text-2xl font-bold mb-2">Booking Received!</h3>
+          <h3 className="text-xl font-semibold mb-2">We&apos;ve received your booking</h3>
           <p className="text-muted text-sm mb-4">
-            Reference: <span className="text-gold font-semibold">{success.id}</span>
+            Reference: <span className="text-brand font-semibold">{success.id}</span>
           </p>
-          <div className="rounded-xl bg-surface-light/50 p-4 text-left text-sm space-y-2 mb-5">
+          <div className="rounded-md bg-surface-light/50 p-4 text-left text-sm space-y-2 mb-5">
             <p>
               <span className="text-muted">Service:</span>{" "}
               <span className="font-semibold">{success.service}</span>
@@ -170,7 +170,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             <p>
               <span className="text-muted">Date:</span>{" "}
               <span className="font-semibold">
-                {new Date(success.date + "T00:00:00").toLocaleDateString("en-CA", {
+                {new Date(success.date + "T00:00:00").toLocaleDateString("en-NG", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",
@@ -193,16 +193,16 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
           </div>
           <p className="text-xs text-muted mb-2">
             We&apos;ll contact you on{" "}
-            <span className="text-gold">{formatIntlPhone(success.phone)}</span> or{" "}
-            <span className="text-gold break-all">{success.email}</span> to confirm your
-            appointment. See you soon!
+            <span className="text-brand">{formatIntlPhone(success.phone)}</span> or{" "}
+            <span className="text-brand break-all">{success.email}</span> to confirm your
+            appointment.
           </p>
           <p className="text-xs text-muted mb-6">
-            Questions? Call us on <span className="text-gold">{BUSINESS.phone}</span>.
+            Questions? Call us on <span className="text-brand">{BUSINESS.phone}</span>.
           </p>
           <button
             onClick={close}
-            className="w-full h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold cursor-pointer"
+            className="w-full h-11 rounded-md bg-brand text-background text-sm font-semibold cursor-pointer"
           >
             Done
           </button>
@@ -222,28 +222,28 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             </label>
           </div>
           <div>
-            <p className="text-xl font-serif mb-1">{service.name}</p>
-            <p className="text-sm text-gold">
-              {service.priceRange} &middot; {service.duration}
+            <p className="text-base font-semibold mb-1">{service.name}</p>
+            <p className="text-sm text-brand price tabular">
+              {plainRange(service.priceRange)} &middot; {plainRange(service.duration)}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block">
-              <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                Full Name *
+              <span className="text-xs text-muted mb-1.5 block">
+                Full name *
               </span>
               <input
                 type="text"
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
                 placeholder="Jane Smith"
               />
             </label>
             <label className="block">
-              <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                Phone Number *
+              <span className="text-xs text-muted mb-1.5 block">
+                Phone number *
               </span>
               <input
                 type="tel"
@@ -255,17 +255,17 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 }}
                 aria-invalid={!!phoneError}
                 className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                  phoneError ? "border-red-500" : "border-surface-light focus:border-gold"
+                  phoneError ? "border-danger" : "border-surface-light focus:border-brand"
                 }`}
                 placeholder="+234 812 345 6789"
               />
               {phoneError && (
-                <p className="text-xs text-red-400 mt-1">{phoneError}</p>
+                <p className="text-xs text-danger mt-1">{phoneError}</p>
               )}
             </label>
           </div>
           <label className="block">
-            <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+            <span className="text-xs text-muted mb-1.5 block">
               Email *
             </span>
             <input
@@ -273,14 +273,14 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
               required
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
               placeholder="jane@email.com"
             />
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block">
-              <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                Preferred Date *
+              <span className="text-xs text-muted mb-1.5 block">
+                Preferred date *
               </span>
               <input
                 type="date"
@@ -288,18 +288,18 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 min={minDate.toISOString().split("T")[0]}
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none [color-scheme:dark]"
+                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none [color-scheme:dark]"
               />
             </label>
             <label className="block">
-              <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                Preferred Time *
+              <span className="text-xs text-muted mb-1.5 block">
+                Preferred time *
               </span>
               <select
                 required
                 value={form.time}
                 onChange={(e) => setForm({ ...form, time: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none appearance-none"
+                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none appearance-none"
               >
                 <option value="" disabled>
                   Select time
@@ -313,27 +313,27 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             </label>
           </div>
           <label className="block">
-            <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+            <span className="text-xs text-muted mb-1.5 block">
               Notes (optional)
             </span>
             <textarea
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-gold focus:outline-none min-h-[80px] resize-none"
+              className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-brand focus:outline-none min-h-[80px] resize-none"
               placeholder="Anything we should know?"
             />
           </label>
           {error && (
-            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+            <p className="text-sm text-danger bg-danger-soft border border-danger/30 rounded-lg px-4 py-3">
               {error}
             </p>
           )}
           <button
             type="submit"
             disabled={submitting}
-            className="w-full h-12 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+            className="w-full h-12 rounded-md bg-brand text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
           >
-            {submitting ? "Booking..." : "Confirm Booking"}
+            {submitting ? "Booking..." : "Confirm booking"}
           </button>
         </form>
       )}

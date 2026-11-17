@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { services } from "@/lib/data/services";
 import { getVisibleServiceById, getVisibleServices } from "@/lib/catalog";
 import { BUSINESS, SITE_URL } from "@/lib/config";
+import { plainRange } from "@/lib/format";
 import ServiceDetailClient from "@/components/services/ServiceDetailClient";
 
 interface Props {
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const service = await getVisibleServiceById(slug);
   if (!service) {
-    return { title: `Service Not Found | ${BUSINESS.name}` };
+    return { title: `Service not found | ${BUSINESS.name}` };
   }
   return {
     title: `${service.name} | ${BUSINESS.name}`,
@@ -55,22 +56,22 @@ export default async function ServiceDetailPage({ params }: Props) {
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 text-sm text-muted flex items-center gap-2">
-          <Link href="/" className="hover:text-gold transition-colors">
+          <Link href="/" className="hover:text-brand transition-colors">
             Home
           </Link>
           <span>/</span>
-          <Link href="/services" className="hover:text-gold transition-colors">
+          <Link href="/services" className="hover:text-brand transition-colors">
             Services
           </Link>
           <span>/</span>
-          <span className="text-gold">{service.name}</span>
+          <span className="text-brand">{service.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 mb-16">
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-surface border border-surface-light">
+          <div className="relative aspect-[4/3] rounded-md overflow-hidden bg-surface border border-surface-light">
             <Image
               src={service.image}
-              alt={service.name}
+              alt={`${service.name} at Hair Luxe`}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -84,17 +85,17 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
 
         <div>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-8 text-center">
-            Explore Other Services
+          <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-8">
+            Other services
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {related.map((s) => (
               <Link
                 key={s.id}
                 href={`/services/${s.id}`}
-                className="group flex items-center gap-4 rounded-2xl bg-surface border border-surface-light p-4 hover:border-gold/40 transition-all duration-300 hover:-translate-y-0.5"
+                className="group flex items-center gap-4 rounded-md bg-surface border border-surface-light p-4 hover:border-brand/40 transition-colors"
               >
-                <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-surface-light shrink-0">
+                <div className="relative w-16 h-16 rounded-md overflow-hidden bg-surface-light shrink-0">
                   <Image
                     src={s.image}
                     alt={s.name}
@@ -104,11 +105,11 @@ export default async function ServiceDetailPage({ params }: Props) {
                   />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-serif font-semibold truncate group-hover:text-gold transition-colors">
+                  <p className="font-semibold truncate group-hover:text-brand transition-colors">
                     {s.name}
                   </p>
-                  <p className="text-xs text-muted mt-0.5">
-                    {s.priceRange} &middot; {s.duration}
+                  <p className="text-xs text-muted mt-0.5 tabular">
+                    {plainRange(s.priceRange)} &middot; {plainRange(s.duration)}
                   </p>
                 </div>
               </Link>

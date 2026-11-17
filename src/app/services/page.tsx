@@ -3,24 +3,23 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { services } from "@/lib/data/services";
 import { BUSINESS } from "@/lib/config";
+import { plainRange } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: `Services | ${BUSINESS.name}`,
-  description: "Expert hair services including hair revamping, wig making, makeup, lash extensions, microblading, and skin tag removal. Book a consultation online.",
+  description:
+    "Hair revamping, wig making, makeup, lashes, microblading and skin tag removal in Lagos. See prices and appointment lengths, then book online.",
 };
 
 export default function ServicesPage() {
   return (
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-3">
-            Our Expertise
-          </p>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold mb-4">Our Services</h1>
-          <p className="text-muted max-w-2xl mx-auto">
-            Premium beauty services delivered by certified professionals. Select a service to
-            book your appointment.
+        <div className="mb-12">
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold mb-3">Services and prices</h1>
+          <p className="text-muted max-w-2xl">
+            Prices depend on hair length and the work needed. Each service shows
+            the time to set aside before you book.
           </p>
         </div>
 
@@ -28,65 +27,45 @@ export default function ServicesPage() {
           {services.map((service) => (
             <div
               key={service.id}
-              className="group flex flex-col rounded-2xl bg-surface border border-surface-light hover:border-gold/40 overflow-hidden transition-all duration-300 shadow-lg shadow-black/20 hover:-translate-y-1"
+              className="flex flex-col rounded-md bg-surface border border-surface-light overflow-hidden"
             >
-              <Link href={`/services/${service.id}`} className="relative h-56 overflow-hidden block">
+              <Link href={`/services/${service.id}`} className="relative aspect-[16/10] overflow-hidden block bg-surface-light">
                 <Image
                   src={service.image}
-                  alt={service.name}
+                  alt={`${service.name} at Hair Luxe`}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-gold text-background text-xs font-bold">
-                    {service.priceRange}
-                  </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm text-foreground/90 text-xs">
-                    {service.duration}
-                  </span>
-                </div>
               </Link>
 
-              <div className="flex flex-col flex-1 p-6">
-                <Link href={`/services/${service.id}`}>
-                  <h2 className="font-serif text-xl font-bold mb-2 group-hover:text-gold transition-colors">
+              <div className="flex flex-col flex-1 p-5">
+                <h2 className="text-lg font-semibold mb-1">
+                  <Link href={`/services/${service.id}`} className="hover:text-brand transition-colors">
                     {service.name}
-                  </h2>
-                </Link>
-                <p className="text-sm text-muted leading-relaxed mb-4 flex-1">
+                  </Link>
+                </h2>
+                <p className="text-sm font-semibold text-brand price tabular">
+                  {plainRange(service.priceRange)}
+                </p>
+                <p className="text-xs text-muted tabular mt-0.5">
+                  {plainRange(service.duration)}
+                </p>
+                <p className="text-sm text-muted leading-relaxed mt-3 mb-4 flex-1">
                   {service.description}
                 </p>
-                <ul className="space-y-1.5 mb-6">
-                  {service.includes.slice(0, 3).map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-foreground/80">
-                      <svg
-                        className="w-4 h-4 text-gold mt-0.5 shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
                 <div className="grid grid-cols-2 gap-3">
                   <Link
                     href={`/services/${service.id}`}
-                    className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full border border-gold/40 px-2 text-[11px] font-semibold text-gold hover:bg-gold/10 transition-colors min-[380px]:px-3 min-[380px]:text-xs"
+                    className="inline-flex h-11 items-center justify-center rounded-md border border-brand/40 px-3 text-xs font-semibold text-brand hover:bg-brand/10 transition-colors"
                   >
-                    View Details
+                    View service
                   </Link>
-                  <Link href={`/services/${service.id}?book=1`}
-                    className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark px-2 text-[11px] font-semibold text-background hover:opacity-90 transition-opacity cursor-pointer min-[380px]:px-3 min-[380px]:text-xs"
+                  <Link
+                    href={`/services/${service.id}?book=1`}
+                    className="inline-flex h-11 items-center justify-center rounded-md bg-brand px-3 text-xs font-semibold text-background hover:opacity-90 transition-opacity"
                   >
-                    Book This Service
+                    Book service
                   </Link>
                 </div>
               </div>
