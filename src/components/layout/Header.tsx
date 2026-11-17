@@ -83,22 +83,19 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled || mobileOpen
-          ? "bg-background/95 backdrop-blur-md border-b border-gold/20 shadow-lg shadow-black/40"
-          : "bg-gradient-to-b from-black/80 to-transparent"
+          ? "bg-background/95 border-b border-brand/20"
+          : ""
       }`}
     >
       {announcement.enabled && announcement.text && (
-        <div className="bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-center text-xs font-semibold py-2 px-4">
+        <div className="bg-brand text-background text-center text-xs font-semibold py-2 px-4">
           {announcement.text}
         </div>
       )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif text-xl font-bold shadow-lg shadow-gold/20">
-              HL
-            </span>
-            <span className="font-serif text-2xl md:text-3xl tracking-wide text-gradient-gold font-semibold">
+          <Link href="/" className="flex items-center group" aria-label={`${BUSINESS.name} home`}>
+            <span className="text-xl md:text-2xl text-brand font-semibold tracking-tight">
               {BUSINESS.name.split(" ")[0]}
               <span className="text-foreground"> {BUSINESS.name.split(" ")[1]}</span>
             </span>
@@ -111,9 +108,9 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative text-sm font-medium tracking-wide transition-colors hover:text-gold ${
+                  className={`relative text-sm font-medium  transition-colors hover:text-brand ${
                     active
-                      ? "text-gold after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-px after:bg-gold"
+                      ? "text-brand after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-px after:bg-brand"
                       : "text-foreground/80"
                   }`}
                 >
@@ -126,7 +123,7 @@ export default function Header() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSearchOpen((v) => !v)}
-              className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
+              className="hidden sm:flex items-center justify-center w-10 h-10 rounded-md border border-brand/30 text-brand hover:bg-brand/10 transition-colors"
               aria-label="Search"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -136,7 +133,7 @@ export default function Header() {
 
             <Link
               href="/cart"
-              className="relative flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
+              className="relative flex items-center justify-center w-10 h-10 rounded-md border border-brand/30 text-brand hover:bg-brand/10 transition-colors"
               aria-label="Shopping cart"
             >
               <svg
@@ -153,7 +150,7 @@ export default function Header() {
                 />
               </svg>
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-gold text-background text-[10px] font-bold">
+                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-md bg-brand text-background text-[10px] font-bold">
                   {itemCount}
                 </span>
               )}
@@ -161,15 +158,15 @@ export default function Header() {
 
             <Link
               href="/services"
-              className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-gold/20"
+              className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-md bg-brand text-background text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              Book Now
+              Book now
             </Link>
 
             <button
               ref={toggleRef}
               onClick={() => setMobileNav((v) => ({ open: !v.open, path: pathname }))}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-gold/30 text-gold"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-md border border-brand/30 text-brand"
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
@@ -204,7 +201,7 @@ export default function Header() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search wigs, bundles, lashes..."
               aria-label="Search products"
-              className="w-full h-11 rounded-full bg-surface border border-gold/30 pl-11 pr-4 text-sm focus:border-gold focus:outline-none"
+              className="w-full h-11 rounded-md bg-surface border border-brand/30 pl-11 pr-4 text-sm focus:border-brand focus:outline-none"
             />
           </div>
         </form>
@@ -214,7 +211,7 @@ export default function Header() {
         <nav
           id="mobile-menu"
           ref={menuRef}
-          className="md:hidden bg-background/98 backdrop-blur-md border-t border-gold/20 px-4 pb-6 pt-2"
+          className="md:hidden bg-background/98 border-t border-brand/20 px-4 pb-6 pt-2"
         >
           <form onSubmit={submitSearch} className="relative mb-3">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
@@ -228,7 +225,7 @@ export default function Header() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products..."
               aria-label="Search products"
-              className="w-full h-11 rounded-full bg-surface-light border border-surface-light pl-10 pr-4 text-sm focus:border-gold focus:outline-none"
+              className="w-full h-11 rounded-md bg-surface-light border border-surface-light pl-10 pr-4 text-sm focus:border-brand focus:outline-none"
             />
           </form>
           <div className="flex flex-col gap-1">
@@ -238,10 +235,10 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium tracking-wide transition-colors ${
+                  className={`px-4 py-3 rounded-lg text-sm font-medium  transition-colors ${
                     active
-                      ? "bg-gold/10 text-gold"
-                      : "text-foreground/80 hover:bg-gold/5 hover:text-gold"
+                      ? "bg-brand/10 text-brand"
+                      : "text-foreground/80 hover:bg-brand/5 hover:text-brand"
                   }`}
                 >
                   {link.label}
@@ -250,15 +247,15 @@ export default function Header() {
             })}
             <Link
               href="/track-order"
-              className="px-4 py-3 rounded-lg text-sm font-medium tracking-wide text-foreground/80 hover:bg-gold/5 hover:text-gold transition-colors"
+              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground/80 hover:bg-brand/5 hover:text-brand transition-colors"
             >
               Track Order
             </Link>
             <Link
               href="/services"
-              className="mt-3 inline-flex items-center justify-center h-11 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background text-sm font-semibold"
+              className="mt-3 inline-flex items-center justify-center h-11 rounded-md bg-brand text-background text-sm font-semibold"
             >
-              Book Now
+              Book now
             </Link>
           </div>
         </nav>

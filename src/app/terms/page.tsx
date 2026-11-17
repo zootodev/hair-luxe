@@ -3,31 +3,31 @@ import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: `Terms & Conditions | ${BUSINESS.name}`,
+  title: `Terms and conditions | ${BUSINESS.name}`,
   description: `Terms and conditions for placing orders, paying by bank transfer, and booking services with ${BUSINESS.name} in Lagos, Nigeria.`,
   alternates: { canonical: "/terms" },
 };
 
 const SECTIONS = [
   {
-    title: "Orders & Payment",
+    title: "Orders and payment",
     body: [
       "Orders are placed through our website and paid by bank transfer. An order is confirmed once a completed bank transfer is received; we verify payment before preparing your items.",
       "We reserve the right to cancel or adjust any order that appears fraudulent or was placed with incorrect pricing.",
     ],
   },
   {
-    title: "Delivery & Pickup",
+    title: "Delivery and pickup",
     body: [
       "Delivery is available within our listed zones. Delivery fees and estimated times depend on your zone, and delivery is free on orders over the amount shown at checkout. Pickup orders can be collected from our location during business hours.",
-      "While we make every effort to meet estimated delivery times, they are estimates and not guaranteed. We are not liable for delays outside our control (e.g., courier or weather).",
+      "While we make every effort to meet estimated delivery times, they are estimates and not guaranteed. We are not liable for delays outside our control (for example, courier or weather).",
     ],
   },
   {
-    title: "Cancellations & Refunds",
+    title: "Cancellations and refunds",
     body: [
-      "Orders that have not shipped may be cancelled or refunded. Custom-made and hygiene-sensitive items (including wigs, hair, and lash products) are final sale once opened or prepared, in line with industry practice.",
-      "If an item arrives damaged or incorrect, contact us within 7 days and we will make it right.",
+      "Orders that have not shipped may be cancelled or refunded. Custom-made and hygiene-sensitive items (including wigs, hair, and lash products) cannot be returned once opened or prepared.",
+      "If an item arrives damaged or incorrect, contact us within 7 days and we will arrange a replacement or refund.",
     ],
   },
   {
@@ -38,14 +38,14 @@ const SECTIONS = [
     ],
   },
   {
-    title: "Product Information",
+    title: "Product information",
     body: [
       "We do our best to display product colours and imagery accurately; however, screens vary and small colour differences are normal for human hair products.",
       "Availability updates when stock is sold. We are not liable for outcomes of use contrary to care instructions provided with your product.",
     ],
   },
   {
-    title: "Intellectual Property",
+    title: "Intellectual property",
     body: [
       `All content on this website - text, design, logos, and imagery belonging to ${BUSINESS.name} - is protected by copyright and may not be reused without written permission.`,
     ],
@@ -57,7 +57,7 @@ const SECTIONS = [
     ],
   },
   {
-    title: "Governing Law",
+    title: "Governing law",
     body: [
       "These terms are governed by the laws of Lagos State, Nigeria, and any disputes will be resolved in the Nigerian courts.",
     ],
@@ -74,10 +74,10 @@ export default function TermsPage() {
   return (
     <div className="pt-24 md:pt-28 pb-16 min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-2">
+        <p className="text-brand text-xs font-medium mb-2">
           Legal
         </p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-2">Terms &amp; Conditions</h1>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">Terms and conditions</h1>
         <p className="text-sm text-muted mb-10">
           Effective date: {new Date().toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" })}
         </p>
@@ -85,7 +85,7 @@ export default function TermsPage() {
         <div className="space-y-8">
           {SECTIONS.map((s) => (
             <div key={s.title}>
-              <h2 className="font-serif text-xl font-bold text-gold mb-3">{s.title}</h2>
+              <h2 className="font-display text-xl font-bold text-brand mb-3">{s.title}</h2>
               {s.body.map((p, i) => (
                 <p key={i} className="text-sm text-foreground/80 leading-relaxed mb-3">
                   {p}
@@ -95,11 +95,11 @@ export default function TermsPage() {
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl bg-surface border border-gold/20 p-5 text-sm">
+        <div className="mt-12 rounded-md bg-surface border border-brand/20 p-5 text-sm">
           <p className="text-muted mb-1">
             For more detail, also see our{" "}
-            <Link href="/privacy" className="text-gold hover:underline">
-              Privacy Policy
+            <Link href="/privacy" className="text-brand hover:underline">
+              Privacy policy
             </Link>
             .
           </p>

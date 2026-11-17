@@ -12,7 +12,7 @@ export function getDeliveryZoneInfo(name: string): DeliveryZoneInfo {
     DELIVERY_ZONES.find((z) => z.name === name) ?? {
       name,
       fee: BUSINESS.deliveryFee,
-      days: "2-3 business days",
+      days: "2 to 3 days",
     }
   );
 }

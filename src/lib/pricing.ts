@@ -8,7 +8,7 @@ export interface PriceRange {
 }
 
 /**
- * Parse a human price range such as "₦120,000 - ₦250,000" into numbers.
+ * Parse a human price range such as "₦120,000 to ₦250,000" into numbers.
  * Returns null when no range can be extracted.
  */
 export function parsePriceRange(range: string): PriceRange | null {

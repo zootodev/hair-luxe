@@ -1,9 +1,9 @@
 export const BUSINESS = {
   name: "Hair Luxe",
-  tagline: "Where Luxury Meets Hair",
-  secondaryTagline: "More Than Hair. It's a Lifestyle.",
+  tagline: "Wigs and hair services in Lagos",
+  secondaryTagline: "Pickup at the studio or delivery across the South-West.",
   description:
-    "Premium hair services and products. Wigs, hair revamping, makeup, lashes, microblading and more - crafted with elegance.",
+    "Wigs, hair revamping, makeup, lashes, microblading and skin tag removal in Lagos and Ibadan. Prices and appointment lengths are listed online.",
   email: process.env.NEXT_PUBLIC_BUSINESS_EMAIL || "ifeoluwaniolufunmilayo@gmail.com",
   phone: "+234 812 345 6789",
   phoneFormatted: "+2348123456789",
@@ -14,7 +14,7 @@ export const BUSINESS = {
   },
   address: "Lagos, Nigeria",
   city: "Lagos",
-  hours: "Mon - Sat: 9:00 AM - 7:00 PM",
+  hours: "Mon to Sat, 9am to 7pm",
   deliveryFee: 5000,
   freeDeliveryOver: 250000,
 };
@@ -33,7 +33,7 @@ export const DELIVERY_ZONES = [
     name: "Lagos Mainland",
     zones: ["Lagos Mainland"],
     fee: 3000,
-    days: "same day–1 day",
+    days: "same day to 1 day",
   },
   {
     name: "Lagos Island & Lekki",
@@ -45,13 +45,13 @@ export const DELIVERY_ZONES = [
     name: "Ibadan/Abeokuta",
     zones: ["Ibadan", "Abeokuta"],
     fee: 7000,
-    days: "2–3 days",
+    days: "2 to 3 days",
   },
   {
     name: "Other South-West",
     zones: ["Other South-West"],
     fee: 10000,
-    days: "3–5 days",
+    days: "3 to 5 days",
   },
 ];
 

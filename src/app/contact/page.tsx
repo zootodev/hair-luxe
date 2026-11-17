@@ -57,10 +57,10 @@ export default function ContactPage() {
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-3">
-            We&apos;re Here to Help
+          <p className="text-brand text-xs font-medium mb-3">
+            Questions or bookings?
           </p>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold mb-4">Contact Us</h1>
+          <h1 className="font-display text-4xl sm:text-5xl font-bold mb-4">Contact us</h1>
           <p className="text-muted max-w-2xl mx-auto">
             Questions about a service, an order or an appointment? Reach out - we respond
             within 24 hours.
@@ -71,7 +71,7 @@ export default function ContactPage() {
           <div className="lg:col-span-2 space-y-4">
             {[
               {
-                title: "Visit Our Studio",
+                title: "Visit the studio",
                 value: business.address,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -84,7 +84,7 @@ export default function ContactPage() {
                 ),
               },
               {
-                title: "Call Us",
+                title: "Call us",
                 value: business.phone,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -93,7 +93,7 @@ export default function ContactPage() {
                 ),
               },
               {
-                title: "Email Us",
+                title: "Email us",
                 value: business.email,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -103,8 +103,8 @@ export default function ContactPage() {
                 ),
               },
               {
-                title: "Order Payments",
-                value: `Bank transfer to ${business.bankDetails.bankName} - ${business.bankDetails.accountNumber}`,
+                title: "Order payments",
+                value: `Bank transfer to ${business.bankDetails.bankName}, account ${business.bankDetails.accountNumber}`,
                 icon: (
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -118,9 +118,9 @@ export default function ContactPage() {
             ].map((c) => (
               <div
                 key={c.title}
-                className="flex items-start gap-4 rounded-2xl bg-surface border border-surface-light p-5 hover:border-gold/40 transition-colors"
+                className="flex items-start gap-4 rounded-md bg-surface border border-surface-light p-5 hover:border-brand/40 transition-colors"
               >
-                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-gold/10 text-gold shrink-0">
+                <span className="flex items-center justify-center w-10 h-10 rounded-md bg-brand/10 text-brand shrink-0">
                   {c.icon}
                 </span>
                 <div>
@@ -130,21 +130,21 @@ export default function ContactPage() {
               </div>
             ))}
 
-            <div className="rounded-2xl bg-surface border border-surface-light p-5">
-              <p className="font-semibold text-sm mb-2">Opening Hours</p>
+            <div className="rounded-md bg-surface border border-surface-light p-5">
+              <p className="font-semibold text-sm mb-2">Opening hours</p>
               <p className="text-sm text-muted">{business.hours}</p>
-              <p className="text-sm text-muted mt-1">Sunday: Closed</p>
+              <p className="text-sm text-muted mt-1">Sunday: closed</p>
             </div>
           </div>
 
           <div className="lg:col-span-3">
             <form
               onSubmit={handleSubmit}
-              className="rounded-2xl bg-surface border border-surface-light p-6 sm:p-8"
+              className="rounded-md bg-surface border border-surface-light p-6 sm:p-8"
             >
-              <h2 className="font-serif text-xl font-bold mb-1">Send Us a Message</h2>
+              <h2 className="font-display text-xl font-bold mb-1">Send us a message</h2>
               <p className="text-xs text-muted mb-6">
-                <span className="text-gold" aria-hidden="true">
+                <span className="text-brand" aria-hidden="true">
                   *
                 </span>{" "}
                 required
@@ -163,8 +163,8 @@ export default function ContactPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <label className="block">
-                  <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                    Your Name *
+                  <span className="text-xs text-muted mb-1.5 block">
+                    Name *
                   </span>
                   <input
                     type="text"
@@ -172,25 +172,25 @@ export default function ContactPage() {
                     aria-required="true"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+                    className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
                     placeholder="Jane Smith"
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
-                    Phone Number
+                  <span className="text-xs text-muted mb-1.5 block">
+                    Phone number
                   </span>
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+                    className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
                     placeholder="+234 800 000 0000"
                   />
                 </label>
               </div>
               <label className="block mb-4">
-                <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+                <span className="text-xs text-muted mb-1.5 block">
                   Email *
                 </span>
                 <input
@@ -199,12 +199,12 @@ export default function ContactPage() {
                   aria-required="true"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none"
+                  className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
                   placeholder="jane@email.com"
                 />
               </label>
               <label className="block mb-4">
-                <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+                <span className="text-xs text-muted mb-1.5 block">
                   Subject *
                 </span>
                 <select
@@ -212,21 +212,21 @@ export default function ContactPage() {
                   aria-required="true"
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-gold focus:outline-none appearance-none"
+                  className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none appearance-none"
                 >
                   <option value="" disabled>
                     Select a topic
                   </option>
-                  <option>Order Inquiry</option>
-                  <option>Booking Appointment</option>
-                  <option>Product Question</option>
+                  <option>Order enquiry</option>
+                  <option>Booking appointment</option>
+                  <option>Product question</option>
                   <option>Payment / Bank transfer</option>
                   <option>Delivery / Pickup</option>
                   <option>Other</option>
                 </select>
               </label>
               <label className="block mb-6">
-                <span className="text-xs text-muted uppercase tracking-wide mb-1.5 block">
+                <span className="text-xs text-muted mb-1.5 block">
                   Message *
                 </span>
                 <textarea
@@ -234,18 +234,18 @@ export default function ContactPage() {
                   aria-required="true"
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-gold focus:outline-none min-h-[140px] resize-none"
+                  className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-brand focus:outline-none min-h-[140px] resize-none"
                   placeholder="How can we help?"
                 />
               </label>
 
               {sent && (
-                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-400 mb-4">
+                <div className="rounded-md bg-success-soft border border-success/30 px-4 py-3 text-sm text-success mb-4">
                   Message sent! We&apos;ll get back to you within 24 hours.
                 </div>
               )}
               {sendError && (
-                <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400 mb-4">
+                <div className="rounded-md bg-danger-soft border border-danger/30 px-4 py-3 text-sm text-danger mb-4">
                   {sendError}
                 </div>
               )}
@@ -253,9 +253,9 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full h-12 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full h-12 rounded-md bg-brand text-background font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {sending ? "Sending..." : "Send Message"}
+                {sending ? "Sending..." : "Send message"}
               </button>
             </form>
           </div>
