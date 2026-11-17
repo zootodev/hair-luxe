@@ -15,10 +15,9 @@ const CATEGORIES: ("All" | ProductCategory)[] = [
 ];
 
 const SORT_OPTIONS = [
-  { value: "featured", label: "Featured" },
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
-  { value: "rating", label: "Top Rated" },
+  { value: "featured", label: "Default" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
 ];
 
 type SortValue = (typeof SORT_OPTIONS)[number]["value"];
@@ -68,9 +67,6 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
       case "price-desc":
         result = [...result].sort((a, b) => b.price - a.price);
         break;
-      case "rating":
-        result = [...result].sort((a, b) => b.rating - a.rating);
-        break;
       default:
         result = [...result].sort((a, b) => Number(b.featured ?? false) - Number(a.featured ?? false));
     }
@@ -80,9 +76,9 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
   return (
     <>
       {search.trim().length > 0 && (
-        <div className="text-center text-gold text-xs uppercase tracking-wider mb-6">
+        <div className="text-center text-brand text-xs mb-6">
           Results for{" "}
-          <span className="font-semibold text-gold">&quot;{search.trim()}&quot;</span>
+          <span className="font-semibold text-brand">&quot;{search.trim()}&quot;</span>
           {filtered.length > 0 ? ` (${filtered.length})` : ""}
         </div>
       )}
@@ -92,10 +88,10 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
             <button
               key={c}
               onClick={() => setCategory(c)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                 category === c
-                  ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background shadow-lg shadow-gold/20"
-                  : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
+                  ? "bg-brand text-background"
+                  : "bg-surface border border-surface-light text-muted hover:text-brand hover:border-brand/40"
               }`}
             >
               {c}
@@ -120,14 +116,14 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
               aria-label="Search products"
-              className="w-full h-11 rounded-full bg-surface border border-surface-light pl-9 pr-10 text-sm focus:border-gold focus:outline-none"
+              className="w-full h-11 rounded-md bg-surface border border-surface-light pl-9 pr-10 text-sm focus:border-brand focus:outline-none"
             />
             {search.length > 0 && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
                 aria-label="Clear search"
-                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-full text-muted hover:text-gold hover:bg-gold/10 transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-md text-muted hover:text-brand hover:bg-brand/10 transition-colors cursor-pointer"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -138,7 +134,7 @@ export default function ShopGrid({ products, initialSearch = "" }: ShopGridProps
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortValue)}
-            className="h-11 rounded-full bg-surface border border-surface-light px-4 text-sm focus:border-gold focus:outline-none appearance-none"
+            className="h-11 rounded-md bg-surface border border-surface-light px-4 text-sm focus:border-brand focus:outline-none appearance-none"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>

@@ -7,9 +7,9 @@ import { BUSINESS } from "@/lib/config";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: `Shop Products | ${BUSINESS.name}`,
+  title: `Shop products | ${BUSINESS.name}`,
   description:
-    "Luxury wigs, virgin hair bundles, lashes and hair care essentials. Shop the premium collection online.",
+    "Wigs, hair bundles, lashes and hair care, with prices in naira. Delivery in Lagos and Ibadan or pickup at the studio.",
   alternates: {
     canonical: "/shop",
   },
@@ -26,13 +26,11 @@ export default async function ShopPage({ searchParams }: Props) {
   return (
     <div className="pt-24 md:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-3">
-            Premium Collection
-          </p>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold mb-4">Shop Products</h1>
-          <p className="text-muted max-w-2xl mx-auto">
-            Luxury wigs, virgin hair bundles, lashes and hair care essentials.
+        <div className="mb-10">
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold mb-3">Shop wigs and hair products</h1>
+          <p className="text-muted max-w-2xl">
+            Prices are in naira. Each listing shows the length, texture or lace
+            before you buy. Delivery in Lagos and Ibadan, or pickup at the studio.
           </p>
         </div>
 

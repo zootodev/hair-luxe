@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatIntlPhone,
   formatNigerianPhone,
+  formatPriceShort,
   intlPhone,
   phonesMatch,
   swatchColor,
@@ -91,6 +92,17 @@ describe("phonesMatch", () => {
   it("falls back to digits for legacy stored numbers that cannot be normalised", () => {
     expect(phonesMatch("+234 701 234 56789", "23470123456789")).toBe(true);
     expect(phonesMatch("70123456789", "070123456789")).toBe(false);
+  });
+});
+
+describe("formatPriceShort", () => {
+  it("shows whole naira without a decimal part", () => {
+    expect(formatPriceShort(205000)).toBe("₦205,000");
+    expect(formatPriceShort(5000)).toBe("₦5,000");
+  });
+
+  it("falls back to zero for missing values", () => {
+    expect(formatPriceShort(0)).toBe("₦0");
   });
 });
 

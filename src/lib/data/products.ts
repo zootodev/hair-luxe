@@ -3,10 +3,10 @@ import type { Product } from "@/lib/types";
 export const products: Product[] = [
   {
     id: "fr-wig-royal",
-    name: "Royal Glam Lace Front Wig",
+    name: "Lace front wig, straight",
     category: "Wigs",
     description:
-      "Premium 100% virgin human hair lace front wig with 5x5 closure. Pre-plucked hairline for a natural, undetectable finish.",
+      "100% virgin human hair lace front wig with a 5x5 closure. The hairline is pre-plucked, so it is ready to wear.",
     price: 250000,
     compareAtPrice: 320000,
     image:
@@ -31,10 +31,10 @@ export const products: Product[] = [
   },
   {
     id: "fl-wig-silk",
-    name: "Silken Diva Full Lace Wig",
+    name: "Full lace wig, body wave",
     category: "Wigs",
     description:
-      "360-degree full lace human hair wig offering natural parting from every angle. Lightweight construction with maximum comfort.",
+      "Full lace human hair wig that can be parted in any direction. The cap is light and has adjustable straps.",
     price: 350000,
     compareAtPrice: 420000,
     image:
@@ -58,10 +58,10 @@ export const products: Product[] = [
   },
   {
     id: "closure-wig-goddess",
-    name: "Goddess Braid Wig",
+    name: "Braid wig",
     category: "Wigs",
     description:
-      "Luxurious goddess braids wig with natural-looking roots. Pre-styled and ready to wear - zero install time.",
+      "Pre-styled braided wig with a natural-looking hairline. Ready to wear, with no install appointment needed.",
     price: 180000,
     image:
       "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
@@ -74,7 +74,7 @@ export const products: Product[] = [
     colors: ["Natural Black", "Dark Brown", "Honey Blonde"],
     lengths: ["16 inches", "20 inches", "24 inches"],
     details: [
-      "Handmade Goddess crochet braids",
+      "Handmade braided wig",
       "Natural-looking with a realistic hairline",
       "Ready to wear - no combing needed",
       "Lightweight and breathable cap",
@@ -86,7 +86,7 @@ export const products: Product[] = [
     name: "Ocean Body Wave Bundles (3x8oz)",
     category: "Hair Bundles",
     description:
-      "Lush body wave bundles in a 3-piece set. Thick, full and bouncy with minimal shedding. Perfect for sew-ins or crochet styles.",
+      "Three body wave bundles for sew-ins and crochet styles. The hair is full, holds a curl and sheds very little.",
     price: 200000,
     compareAtPrice: 260000,
     image:
@@ -112,7 +112,7 @@ export const products: Product[] = [
     name: "Silk Straight Bundles (4x4)",
     category: "Hair Bundles",
     description:
-      "Buttery silk straight bundles for ice-cold sleek looks. 4-piece set with double weft for extra fullness.",
+      "Four straight bundles with a double weft for a fuller sew-in. The hair is soft and holds a smooth finish.",
     price: 280000,
     compareAtPrice: 350000,
     image:
@@ -136,7 +136,7 @@ export const products: Product[] = [
     name: "Ginger Blonde Highlight Bundles",
     category: "Hair Bundles",
     description:
-      "Trending ginger blonde bundles with premium color. Dimension and vibrancy for eye-catching looks.",
+      "Ginger blonde bundles in three lengths. The colour adds dimension to a sew-in or wig.",
     price: 230000,
     image:
       "https://images.unsplash.com/photo-1607093699882-27ca1cb89a3b?q=80&w=1200&auto=format&fit=crop",
@@ -149,11 +149,11 @@ export const products: Product[] = [
     colors: ["Ginger Blonde"],
     lengths: ["16 inches", "18 inches", "20 inches"],
     details: [
-      "Premium blond-highlighted virgin hair",
+      "Blond-highlighted virgin hair",
       "3 bundles set (16, 18, 20 inches)",
       "Long-lasting color treatment",
-      "Minimal shedding guaranteed",
-      "Perfect for festive looks",
+      "Low shedding",
+      "Suits event styling",
     ],
   },
   {
@@ -161,7 +161,7 @@ export const products: Product[] = [
     name: "Mink Volume Lash Kit",
     category: "Lashes",
     description:
-      "Professional mink volume lash kit with 10 different lengths. Reusable and cruelty-free for stunning statement eyes.",
+      "Faux mink lash kit with ten lengths so you can build a natural or fuller lash line. Reusable and cruelty-free.",
     price: 45000,
     image:
       "https://images.unsplash.com/photo-1639629509821-c54cdd984227?q=80&w=1200&auto=format&fit=crop",
@@ -173,7 +173,7 @@ export const products: Product[] = [
     reviewCount: 38,
     featured: true,
     details: [
-      "Premium faux mink lashes",
+      "Faux mink lashes",
       "10 individual diameters & lengths",
       "Reusable up to 20 times",
       "Cruelty-free and hypoallergenic",
@@ -182,10 +182,10 @@ export const products: Product[] = [
   },
   {
     id: "lash-strip-glam",
-    name: "Glamour Strip Lashes (5 Pack)",
+    name: "Strip lashes (5 pairs)",
     category: "Lashes",
     description:
-      "Wispy glamour strip lashes perfect for events and photoshoots. 5 pairs with band flexibility for polished everyday wear.",
+      "Five pairs of wispy strip lashes with a flexible band, for events or everyday wear.",
     price: 25000,
     compareAtPrice: 35000,
     image:
@@ -197,19 +197,19 @@ export const products: Product[] = [
     rating: 4.5,
     reviewCount: 51,
     details: [
-      "Whispy glamour style",
+      "Wispy style",
       "Comfortable flexible band",
       "Reusable multiple times",
       "Lightweight and natural",
-      "Perfect for professional use",
+      "Suitable for salon use",
     ],
   },
   {
     id: "care-edge-control",
-    name: "Royal Edge Control Gel",
+    name: "Edge control gel",
     category: "Hair Care",
     description:
-      "Strong-hold edge control finished with a luxurious shine. Lays edges flat and smooth without flaking.",
+      "Strong-hold edge gel that smooths edges without flaking or leaving a white residue.",
     price: 18000,
     compareAtPrice: 24000,
     image:
@@ -225,15 +225,15 @@ export const products: Product[] = [
       "No flaking or white residue",
       "Moisturizing formula with argan oil",
       "Smooths edges quickly",
-      "100ml premium jar",
+      "100ml jar",
     ],
   },
   {
-    id: "care-gold-oil",
-    name: "Luxe Growth Serum Oil",
+    id: "care-brand-oil",
+    name: "Growth serum oil",
     category: "Hair Care",
     description:
-      "Nourishing hair growth serum with biotin, castor oil and rosemary. Promotes healthy, thicker-looking hair.",
+      "Scalp oil with biotin, castor oil and rosemary, for hair that looks fuller and feels conditioned.",
     price: 32000,
     image:
       "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=1200&auto=format&fit=crop",
@@ -245,11 +245,11 @@ export const products: Product[] = [
     reviewCount: 44,
     featured: true,
     details: [
-      "Clinically proven ingredients",
-      "Stimulates hair follicles",
+      "Biotin, castor oil and rosemary",
+      "Massaged into the scalp",
       "Strengthens roots & reduces breakage",
       "Adds natural shine",
-      "60ml premium bottle",
+      "60ml bottle",
     ],
   },
   {
@@ -272,7 +272,7 @@ export const products: Product[] = [
       "Deeply hydrating formula",
       "Safe for keratin treatments",
       "Restores natural shine",
-      "350ml premium bottle",
+      "350ml bottle",
     ],
   },
   {

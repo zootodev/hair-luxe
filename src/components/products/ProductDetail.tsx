@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { formatPrice } from "@/lib/data/products";
-import { swatchColor } from "@/lib/format";
+import { formatPriceShort, productSpec, swatchColor } from "@/lib/format";
 import { useCart } from "@/lib/context/CartContext";
 import Toast from "@/components/ui/Toast";
 import type { Product } from "@/lib/types";
@@ -18,6 +17,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const [toast, setToast] = useState<string | null>(null);
   const available = Math.max(0, product.stockCount - (product.sold ?? 0));
   const outOfStock = available <= 0;
+  const lowStock = available > 0 && available <= 5;
 
   const handleAdd = () => {
     if (outOfStock || adding) return;
@@ -37,34 +37,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     }, 350);
   };
 
-  const discount = product.compareAtPrice
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
-    : 0;
-
-  const stockLabel =
-    outOfStock
-      ? "Out of Stock"
-      : available <= 10
-        ? `Only ${available} left - Order soon!`
-        : `In Stock (${available})`;
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
       <div>
-        <div className="relative aspect-square rounded-2xl overflow-hidden bg-surface border border-surface-light">
+        <div className="relative aspect-square rounded-md overflow-hidden bg-surface-light border border-surface-light">
           <Image
             src={product.images[activeImage] || product.image}
-            alt={product.name}
+            alt={`${product.name} — ${productSpec(product)}`}
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
-          {discount > 0 && (
-            <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gold text-background text-xs font-bold uppercase">
-              Save {discount}%
-            </span>
-          )}
         </div>
         {product.images.length > 1 && (
           <div className="flex gap-3 mt-4">
@@ -72,9 +56,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               <button
                 key={i}
                 onClick={() => setActiveImage(i)}
-                className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                  activeImage === i ? "border-gold" : "border-surface-light"
+                className={`relative w-20 h-20 rounded-md overflow-hidden border-2 transition-colors ${
+                  activeImage === i ? "border-brand" : "border-surface-light"
                 }`}
+                aria-label={`View image ${i + 1} of ${product.name}`}
               >
                 <Image src={img} alt="" fill className="object-cover" sizes="80px" />
               </button>
@@ -84,63 +69,23 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       </div>
 
       <div>
-        <p className="text-gold uppercase tracking-wider text-xs font-semibold mb-2">
-          {product.category}
+        <p className="text-brand text-xs font-semibold mb-2">{product.category}</p>
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold mb-3">{product.name}</h1>
+        <p className="text-sm text-muted mb-4">{productSpec(product)}</p>
+
+        <p className="text-3xl font-semibold text-brand price tabular mb-6">
+          {formatPriceShort(product.price)}
         </p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-3">{product.name}</h1>
-
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex text-gold">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <svg
-                key={i}
-                className={`w-4 h-4 ${
-                  i < Math.round(product.rating) ? "" : "opacity-25"
-                }`}
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-          <span className="text-sm text-muted">
-            {product.rating} ({product.reviewCount} reviews)
-          </span>
-        </div>
-
-        <div className="flex items-baseline gap-3 mb-6">
-          <span className="font-serif text-4xl font-bold text-gold">
-            {formatPrice(product.price)}
-          </span>
-          {product.compareAtPrice && (
-            <span className="text-xl text-muted line-through">
-              {formatPrice(product.compareAtPrice)}
-            </span>
-          )}
-        </div>
 
         <p className="text-muted leading-relaxed mb-6">{product.description}</p>
 
-        <div className="mb-6">
-          <p
-            className={`inline-flex items-center gap-1.5 text-sm font-medium ${
-              outOfStock ? "text-red-400" : "text-emerald-400"
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                outOfStock ? "bg-red-400" : "bg-emerald-400 animate-pulse"
-              }`}
-            />
-            {stockLabel}
-          </p>
-        </div>
+        {outOfStock && <p className="text-sm text-danger mb-5">Out of stock</p>}
+        {lowStock && <p className="text-sm text-warning mb-5">Only {available} left</p>}
 
         {product.colors && product.colors.length > 0 && (
           <div className="mb-5">
-            <p className="text-xs text-muted uppercase tracking-wide mb-2">
-              Color: <span className="text-foreground font-semibold normal-case">{color}</span>
+            <p className="text-xs text-muted mb-2">
+              Colour: <span className="text-foreground font-semibold">{color}</span>
             </p>
             <div className="flex flex-wrap items-center gap-3">
               {product.colors.map((c) => {
@@ -150,17 +95,17 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
-                    aria-label={`Color: ${c}`}
+                    aria-label={`Colour: ${c}`}
                     aria-pressed={selected}
                     title={c}
-                    className={`relative w-9 h-9 rounded-full border-2 transition-all cursor-pointer hover:scale-110 ${
-                      selected ? "border-gold ring-2 ring-gold/40 scale-110" : "border-surface-light"
+                    className={`relative w-9 h-9 rounded-md border-2 transition-colors cursor-pointer ${
+                      selected ? "border-brand" : "border-surface-light"
                     }`}
                     style={{ backgroundColor: swatchColor(c) }}
                   >
                     {selected && (
                       <svg
-                        className="w-4 h-4 absolute inset-0 m-auto text-white drop-shadow"
+                        className="w-4 h-4 absolute inset-0 m-auto text-background"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                         aria-hidden="true"
@@ -188,8 +133,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </p>
             ) : (
               <>
-                <p className="text-xs text-muted uppercase tracking-wide mb-2">
-                  Length: <span className="text-foreground font-semibold normal-case">{length}</span>
+                <p className="text-xs text-muted mb-2">
+                  Length: <span className="text-foreground font-semibold">{length}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.lengths.map((l) => (
@@ -199,10 +144,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                       onClick={() => setLength(l)}
                       aria-pressed={length === l}
                       title={l}
-                      className={`px-3 h-9 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                      className={`px-3 h-9 rounded-md text-xs font-semibold border transition-colors cursor-pointer ${
                         length === l
-                          ? "bg-gold text-background border-gold"
-                          : "bg-surface text-muted border-surface-light hover:border-gold/40 hover:text-gold"
+                          ? "bg-brand text-background border-brand"
+                          : "bg-surface text-muted border-surface-light hover:border-brand/40 hover:text-brand"
                       }`}
                     >
                       {l}
@@ -215,18 +160,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         )}
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex items-center rounded-full border border-surface-light bg-surface">
+          <div className="flex items-center rounded-md border border-surface-light bg-surface">
             <button
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="flex items-center justify-center w-11 h-11 text-xl text-muted hover:text-gold transition-colors cursor-pointer"
+              className="flex items-center justify-center w-11 h-11 text-xl text-muted hover:text-brand transition-colors cursor-pointer"
               aria-label="Decrease quantity"
             >
               -
             </button>
-            <span className="w-8 text-center font-semibold">{quantity}</span>
+            <span className="w-8 text-center font-semibold tabular">{quantity}</span>
             <button
               onClick={() => setQuantity((q) => Math.min(available || 1, q + 1))}
-              className="flex items-center justify-center w-11 h-11 text-xl text-muted hover:text-gold transition-colors cursor-pointer"
+              className="flex items-center justify-center w-11 h-11 text-xl text-muted hover:text-brand transition-colors cursor-pointer"
               aria-label="Increase quantity"
             >
               +
@@ -236,19 +181,19 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           <button
             onClick={handleAdd}
             disabled={outOfStock || adding}
-            className={`flex-1 h-12 rounded-full font-semibold text-sm transition-all ${
+            className={`flex-1 h-12 rounded-md font-semibold text-sm transition-opacity ${
               adding
-                ? "bg-gold/60 text-background"
-                : "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90"
+                ? "bg-brand/60 text-background"
+                : "bg-brand text-background hover:opacity-90"
             } disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer`}
           >
-            {outOfStock ? "Sold Out" : adding ? "Adding..." : "Add to Cart"}
+            {outOfStock ? "Out of stock" : adding ? "Adding..." : "Add to cart"}
           </button>
         </div>
 
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-surface border border-surface-light mb-6">
-          <span className="text-gold">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <div className="flex items-center gap-3 p-4 rounded-md bg-surface border border-surface-light mb-6">
+          <span className="text-brand">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -257,17 +202,17 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             </svg>
           </span>
           <div className="text-sm">
-            <p className="font-semibold">Delivery or Pickup</p>
-            <p className="text-muted">Local delivery across Lagos or in-store pickup</p>
+            <p className="font-semibold">Delivery or pickup</p>
+            <p className="text-muted">Delivery across Lagos and Ibadan, or pickup at the studio</p>
           </div>
         </div>
 
         <div>
-          <h3 className="font-serif text-lg font-semibold mb-3">Product Details</h3>
+          <h3 className="text-base font-semibold mb-3">Product details</h3>
           <ul className="space-y-2">
             {product.details.map((d) => (
               <li key={d} className="flex items-start gap-2 text-sm text-foreground/80">
-                <svg className="w-4 h-4 text-gold mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 text-brand mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

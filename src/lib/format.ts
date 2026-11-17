@@ -2,6 +2,8 @@
  * Display helpers shared by the storefront and the admin.
  */
 
+import type { Product } from "@/lib/types";
+
 /**
  * Normalise any customer-entered phone number to international format for
  * display and tel: links. Nigerian local numbers (0XXXXXXXXXX) are converted
@@ -72,6 +74,51 @@ const SWATCH_COLORS: Record<string, string> = {
 /** Map a colour name to a swatch hex (neutral fallback for unknown names). */
 export function swatchColor(name: string): string {
   return SWATCH_COLORS[(name ?? "").trim().toLowerCase()] ?? "#8a7350";
+}
+
+/**
+ * UI-only naira price: kobo is always zero in this catalogue, so show a whole
+ * naira figure. The email templates keep their own two-decimal formatter.
+ */
+const wholeNaira = new Intl.NumberFormat("en-NG", {
+  style: "currency",
+  currency: "NGN",
+  maximumFractionDigits: 0,
+});
+
+export function formatPriceShort(value: number): string {
+  return wholeNaira.format(value || 0);
+}
+
+/** Replace legacy hyphen ranges with plain "to" ranges in UI copy. */
+export function plainRange(value: string): string {
+  return (value ?? "").replace(/\s+[-–]\s+/g, " to ");
+}
+
+/**
+ * Short, factual line for product cards: length, lace or texture. Seeded
+ * products have a known spec; anything added later falls back to its first
+ * listed length and category.
+ */
+const PRODUCT_SPECS: Record<string, string> = {
+  "fr-wig-royal": "22 inches · lace front · straight",
+  "fl-wig-silk": "24 inches · full lace · straight",
+  "closure-wig-goddess": "16 to 24 inches · braided · ready to wear",
+  "bundle-seamless-wave": "24 inches · body wave · 3 bundles",
+  "bundle-straight-silk": "24 inches · straight · 4 bundles",
+  "bundle-highlight-ginger": "16 to 20 inches · ginger blonde · 3 bundles",
+  "lash-volume-mink": "10 lengths · faux mink",
+  "lash-strip-glam": "5 pairs · wispy",
+  "care-edge-control": "100ml · strong hold",
+  "care-brand-oil": "60ml · biotin and castor oil",
+  "care-revive-shampoo": "350ml · sulfate-free",
+  "care-silk-scarf": "Mulberry silk · bonnet and scrunchie",
+};
+
+export function productSpec(product: Product): string {
+  if (PRODUCT_SPECS[product.id]) return PRODUCT_SPECS[product.id];
+  const length = product.lengths?.[0];
+  return [length, product.category].filter(Boolean).join(" · ");
 }
 
 /** Pretty-print an international Nigerian number: +234 812 345 6789. */
