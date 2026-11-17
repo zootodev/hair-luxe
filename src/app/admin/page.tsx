@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatPrice } from "@/lib/data/products";
+import { formatPriceShort } from "@/lib/format";
 import { formatIntlPhone, telHref } from "@/lib/format";
 import type { Order, Booking } from "@/lib/types";
 import AdminSidebar, { type AdminView } from "@/components/admin/AdminSidebar";
@@ -375,10 +375,10 @@ export default function AdminPage() {
           <div className="flex-1 min-w-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
-              Private Dashboard
+            <p className="text-brand text-xs font-medium mb-1">
+              Admin area
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold">Order Management</h1>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold">Orders and bookings</h1>
           </div>
           <div className="flex items-center gap-3">
 <p className="text-xs text-muted">
@@ -390,27 +390,27 @@ export default function AdminPage() {
         </div>
 
         {!storeConfigured && (
-          <div className="rounded-2xl bg-yellow-500/10 border border-yellow-500/30 p-4 mb-8 text-sm flex items-start gap-3">
-            <svg className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="rounded-md bg-warning-soft border border-warning/30 p-4 mb-8 text-sm flex items-start gap-3">
+            <svg className="w-5 h-5 text-warning shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
-            <p className="text-yellow-300 leading-relaxed">
+            <p className="text-warning leading-relaxed">
               <strong>Persistent storage is not configured yet.</strong> Orders placed now
               are kept only in server memory and may be lost on redeploys. To persist
               orders/bookings across browsers permanently, add one of:{" "}
-              <code className="text-yellow-200">DATABASE_URL</code> (Supabase Postgres),{" "}
-              <code className="text-yellow-200">KV_REST_API_URL</code> +{" "}
-              <code className="text-yellow-200">KV_REST_API_TOKEN</code> (Vercel KV /
+              <code className="text-warning">DATABASE_URL</code> (Supabase Postgres),{" "}
+              <code className="text-warning">KV_REST_API_URL</code> +{" "}
+              <code className="text-warning">KV_REST_API_TOKEN</code> (Vercel KV /
               Upstash), or{" "}
-              <code className="text-yellow-200">UPSTASH_REDIS_REST_URL</code> +{" "}
-              <code className="text-yellow-200">UPSTASH_REDIS_REST_TOKEN</code> through
-              <span className="text-yellow-200">vercel env add</span>.
+              <code className="text-warning">UPSTASH_REDIS_REST_URL</code> +{" "}
+              <code className="text-warning">UPSTASH_REDIS_REST_TOKEN</code> through
+              <span className="text-warning">vercel env add</span>.
             </p>
           </div>
         )}
 
         {apiError && (
-          <div className="rounded-2xl bg-red-500/10 border border-red-500/30 p-4 mb-8 text-sm text-red-400">
+          <div className="rounded-md bg-danger-soft border border-danger/30 p-4 mb-8 text-sm text-danger">
             {apiError}
           </div>
         )}
@@ -426,33 +426,33 @@ export default function AdminPage() {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           {[
             {
-              label: "Total Orders",
+              label: "Total orders",
               value: stats.total,
-              color: "text-gold",
+              color: "text-brand",
               title: "All orders placed on the site, regardless of status.",
             },
             {
-              label: "Pending Payment",
+              label: "Pending payment",
               value: stats.pending,
-              color: "text-yellow-400",
+              color: "text-warning",
               title: "Orders still awaiting payment confirmation.",
             },
             {
-              label: "Upcoming Bookings",
+              label: "Upcoming bookings",
               value: stats.upcomingBookings,
-              color: "text-gold",
+              color: "text-brand",
               title: "Bookings dated today or later.",
             },
             {
-              label: "Active Deliveries",
+              label: "Active deliveries",
               value: stats.activeDeliveries,
-              color: "text-blue-400",
-              title: "Delivery orders that are not completed or cancelled — same orders shown in the Deliveries tab.",
+              color: "text-brand",
+              title: "Delivery orders that are not completed or cancelled — same orders shown in the deliveries tab.",
             },
             {
               label: "Estimated revenue",
-              value: formatPrice(stats.totalRevenue),
-              color: "text-emerald-400",
+              value: formatPriceShort(stats.totalRevenue),
+              color: "text-success",
               title: "Sum of order totals, excluding cancelled orders. Estimates only — based on reported bank transfers.",
               full: true,
             },
@@ -460,12 +460,12 @@ export default function AdminPage() {
             <div
               key={s.label}
               title={s.title}
-              className={`rounded-2xl bg-surface border border-surface-light p-5 cursor-help ${
+              className={`rounded-md bg-surface border border-surface-light p-5 cursor-help ${
                 "full" in s && s.full ? "col-span-2 lg:col-span-1" : ""
               }`}
             >
-              <p className={`font-serif text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-muted mt-1 uppercase tracking-wide">{s.label}</p>
+              <p className={`text-2xl font-semibold tabular ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-muted mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -493,20 +493,20 @@ export default function AdminPage() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                className={`shrink-0 px-5 py-2.5 rounded-md text-sm font-semibold transition-all ${
                   tab === t.key
-                    ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background"
-                    : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
+                    ? "bg-brand text-background"
+                    : "bg-surface border border-surface-light text-muted hover:text-brand hover:border-brand/40"
                 }`}
               >
                 {t.label}
                 {t.count > 0 && <span className="ml-1.5 opacity-70">({t.count})</span>}
                 {t.newCount > 0 && (
                   <span
-                    className={`ml-1.5 inline-block px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none ${
+                    className={`ml-1.5 inline-block px-1.5 py-0.5 rounded-md text-[10px] font-bold leading-none ${
                       tab === t.key
-                        ? "bg-background/85 text-gold"
-                        : "bg-gold/15 text-gold border border-gold/40"
+                        ? "bg-background/85 text-brand"
+                        : "bg-brand/15 text-brand border border-brand/40"
                     }`}
                   >
                     • {t.newCount} new
@@ -525,9 +525,9 @@ export default function AdminPage() {
                   ? "No orders to export yet."
                   : "Download all orders as a CSV file."
               }
-              className="shrink-0 px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="shrink-0 px-4 py-2.5 rounded-md text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-brand hover:border-brand/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              Export Orders
+              Export orders
             </button>
             <button
               onClick={exportBookings}
@@ -537,18 +537,18 @@ export default function AdminPage() {
                   ? "No bookings to export yet — bookings appear here once clients book a service."
                   : "Download all bookings as a CSV file."
               }
-              className="shrink-0 px-4 py-2.5 rounded-full text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="shrink-0 px-4 py-2.5 rounded-md text-xs font-semibold bg-surface border border-surface-light text-muted hover:text-brand hover:border-brand/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              Export Bookings
+              Export bookings
             </button>
             {tab === "orders" && (
               <select
                 value={deliveryFilter}
                 onChange={(e) => setDeliveryFilter(e.target.value)}
                 aria-label="Filter by delivery method"
-                className="h-9 shrink-0 rounded-full bg-surface border border-surface-light px-4 text-xs focus:border-gold focus:outline-none"
+                className="h-9 shrink-0 rounded-md bg-surface border border-surface-light px-4 text-xs focus:border-brand focus:outline-none"
               >
-                <option value="all">All Methods</option>
+                <option value="all">All methods</option>
                 <option value="delivery">Delivery</option>
                 <option value="pickup">Pickup</option>
               </select>
@@ -564,10 +564,10 @@ export default function AdminPage() {
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     statusFilter === s
-                      ? "bg-gold text-background"
-                      : "bg-surface border border-surface-light text-muted hover:text-gold"
+                      ? "bg-brand text-background"
+                      : "bg-surface border border-surface-light text-muted hover:text-brand"
                   }`}
                 >
                   {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -576,7 +576,7 @@ export default function AdminPage() {
             </div>
 
             {filteredOrders.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl bg-surface border border-surface-light">
+              <div className="text-center py-16 rounded-md bg-surface border border-surface-light">
                 {orders.length === 0 ? (
                   <>
                     <p className="text-muted">No orders yet.</p>
@@ -595,7 +595,7 @@ export default function AdminPage() {
                         setStatusFilter("all");
                         setDeliveryFilter("all");
                       }}
-                      className="mt-4 px-4 py-2 rounded-full text-xs font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                      className="mt-4 px-4 py-2 rounded-md text-xs font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
                     >
                       Clear filters
                     </button>
@@ -607,7 +607,7 @@ export default function AdminPage() {
                 {filteredOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="rounded-2xl bg-surface border border-surface-light overflow-hidden"
+                    className="rounded-md bg-surface border border-surface-light overflow-hidden"
                   >
                     <button
                       onClick={() =>
@@ -616,7 +616,7 @@ export default function AdminPage() {
                       className="w-full flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 hover:bg-surface-light/40 transition-colors text-left"
                     >
                       <div className="flex items-center gap-3 flex-1">
-                        <div className="flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold text-sm shrink-0">
+                        <div className="flex items-center justify-center w-11 h-11 rounded-md bg-brand text-background font-sans font-bold text-sm shrink-0">
                           {order.customer.firstName.charAt(0)}
                           {order.customer.lastName.charAt(0)}
                         </div>
@@ -624,7 +624,7 @@ export default function AdminPage() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold text-sm">{order.id}</p>
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${STATUS_BADGE_CLASSES[order.status]}`}
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border ${STATUS_BADGE_CLASSES[order.status]}`}
                             >
                               {statusLabel(order.status)}
                             </span>
@@ -639,22 +639,22 @@ export default function AdminPage() {
                         <span className="hidden sm:flex items-center gap-1.5">
                           {order.customer.deliveryMethod === "delivery" ? (
                             <>
-                              <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                              <svg className="w-3.5 h-3.5 text-brand" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                               </svg>
                               Delivery
                             </>
                           ) : (
                             <>
-                              <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                              <svg className="w-3.5 h-3.5 text-brand" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .414.336.75.75.75z" />
                               </svg>
                               Pickup
                             </>
                           )}
                         </span>
-                        <span className="font-bold text-gold">
-                          {formatPrice(order.total)}
+                        <span className="font-bold tabular text-brand">
+                          {formatPriceShort(order.total)}
                         </span>
                         <svg
                           className={`w-4 h-4 transition-transform ${expandedOrder === order.id ? "rotate-180" : ""}`}
@@ -672,10 +672,10 @@ export default function AdminPage() {
                       <div className="px-5 pb-5 border-t border-surface-light pt-5">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           <div>
-                            <h4 className="text-xs text-muted uppercase tracking-wide mb-3">
-                              Customer Information
+                            <h4 className="text-xs text-muted mb-3">
+                              Customer details
                             </h4>
-                            <div className="rounded-xl bg-surface-light/50 p-4 space-y-2 text-sm">
+                            <div className="rounded-md bg-surface-light/50 p-4 space-y-2 text-sm">
                               <p className="flex justify-between">
                                 <span className="text-muted">Name</span>
                                 <span className="font-medium">
@@ -690,7 +690,7 @@ export default function AdminPage() {
                                 <span className="text-muted">Phone</span>
                                 <a
                                   href={`tel:${telHref(order.customer.phone)}`}
-                                  className="font-medium text-gold hover:underline"
+                                  className="font-medium text-brand hover:underline"
                                 >
                                   {formatIntlPhone(order.customer.phone)}
                                 </a>
@@ -707,10 +707,10 @@ export default function AdminPage() {
                               )}
                               <p className="flex justify-between">
                                 <span className="text-muted">Method</span>
-                                <span className="font-medium capitalize">
+                                <span className="font-medium">
                                   {order.customer.deliveryMethod}
                                   {order.customer.deliveryZone
-                                    ? ` - ${order.customer.deliveryZone}`
+                                    ? ` (${order.customer.deliveryZone})`
                                     : ""}
                                 </span>
                               </p>
@@ -724,34 +724,34 @@ export default function AdminPage() {
                           </div>
 
                           <div>
-                            <h4 className="text-xs text-muted uppercase tracking-wide mb-3">
+                            <h4 className="text-xs text-muted mb-3">
                               Items ({order.items.length})
                             </h4>
-                            <div className="rounded-xl bg-surface-light/50 p-4 space-y-2 text-sm">
+                            <div className="rounded-md bg-surface-light/50 p-4 space-y-2 text-sm">
                               {order.items.map((item) => (
                                 <p key={item.productId} className="flex justify-between gap-3">
                                   <span>
                                     {item.name} <span className="text-muted">x{item.quantity}</span>
                                   </span>
-                                  <span className="font-medium">
-                                    {formatPrice(item.price * item.quantity)}
+                                  <span className="font-medium tabular">
+                                    {formatPriceShort(item.price * item.quantity)}
                                   </span>
                                 </p>
                               ))}
                               <div className="border-t border-surface-light pt-2 space-y-1">
                                 <p className="flex justify-between text-muted">
                                   <span>Subtotal</span>
-                                  <span>{formatPrice(order.subtotal)}</span>
+                                  <span className="tabular">{formatPriceShort(order.subtotal)}</span>
                                 </p>
                                 <p className="flex justify-between text-muted">
                                   <span>Delivery</span>
                                   <span>
-                                    {order.deliveryFee === 0 ? "FREE" : formatPrice(order.deliveryFee)}
+                                    <span className="tabular">{order.deliveryFee === 0 ? "Free" : formatPriceShort(order.deliveryFee)}</span>
                                   </span>
                                 </p>
-                                <p className="flex justify-between font-bold text-gold">
+                                <p className="flex justify-between font-bold text-brand">
                                   <span>Total</span>
-                                  <span>{formatPrice(order.total)}</span>
+                                  <span className="tabular">{formatPriceShort(order.total)}</span>
                                 </p>
                               </div>
                             </div>
@@ -760,10 +760,10 @@ export default function AdminPage() {
 
                         {order.paymentProof && (
                           <div className="mt-5">
-                            <h4 className="text-xs text-muted uppercase tracking-wide mb-3">
-                              Payment Proof {order.paymentProofName ? `- ${order.paymentProofName}` : ""}
+                            <h4 className="text-xs text-muted mb-3">
+                              Payment proof {order.paymentProofName ? `- ${order.paymentProofName}` : ""}
                             </h4>
-                            <div className="rounded-xl bg-surface-light/50 p-3 border border-emerald-500/20">
+                            <div className="rounded-md bg-surface-light/50 p-3 border border-success/30">
                               <a
                                 href={order.paymentProof}
                                 target="_blank"
@@ -775,9 +775,9 @@ export default function AdminPage() {
                                 <img
                                   src={order.paymentProof}
                                   alt="Payment proof"
-                                  className="w-full max-h-64 object-contain rounded-lg group-hover:opacity-90 transition-opacity bg-black/40"
+                                  className="w-full max-h-64 object-contain rounded-lg group-hover:opacity-90 transition-opacity bg-surface-light"
                                 />
-                                <span className="flex items-center justify-center gap-1.5 text-xs mt-2 text-emerald-400">
+                                <span className="flex items-center justify-center gap-1.5 text-xs mt-2 text-success">
                                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clipRule="evenodd" />
                                     <path fillRule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clipRule="evenodd" />
@@ -790,7 +790,7 @@ export default function AdminPage() {
                         )}
 
                         <div className="flex flex-wrap items-center gap-2 mt-5 pt-4 border-t border-surface-light">
-                          <span className="text-xs text-muted mr-2">Update Status:</span>
+                          <span className="text-xs text-muted mr-2">Update status</span>
                           {(["pending", "processing", "completed", "cancelled"] as const).map(
                             (status) => (
                               <button
@@ -809,10 +809,10 @@ export default function AdminPage() {
                                     ? "Current status"
                                     : `Change status from ${statusLabel(order.status)} to ${statusLabel(status)}`
                                 }
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                                   order.status === status
-                                    ? "bg-gold text-background"
-                                    : "bg-surface-light text-muted hover:text-gold"
+                                    ? "bg-brand text-background"
+                                    : "bg-surface-light text-muted hover:text-brand"
                                 }`}
                               >
                                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -832,7 +832,7 @@ export default function AdminPage() {
                                 email: order.customer.email,
                               });
                             }}
-                            className="px-3 py-1.5 rounded-full text-xs font-medium text-gold hover:bg-gold/10 border border-gold/30 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-md text-xs font-medium text-brand hover:bg-brand/10 border border-brand/30 transition-colors cursor-pointer"
                           >
                             Email customer
                           </button>
@@ -844,7 +844,7 @@ export default function AdminPage() {
                                 from: order.status,
                               })
                             }
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold text-white bg-red-500/90 hover:bg-red-500 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-md text-xs font-semibold text-background bg-danger hover:bg-danger transition-colors cursor-pointer"
                           >
                             Delete order
                           </button>
@@ -861,7 +861,7 @@ export default function AdminPage() {
         {tab === "bookings" && (
           <div>
             {bookings.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl bg-surface border border-surface-light">
+              <div className="text-center py-16 rounded-md bg-surface border border-surface-light">
                 <p className="text-muted">No service bookings yet.</p>
                 <p className="text-xs text-muted mt-2">
                   When clients book services, they will appear here.
@@ -872,10 +872,10 @@ export default function AdminPage() {
                 {bookings.map((booking) => (
                   <div
                     key={booking.id}
-                    className="rounded-2xl bg-surface border border-surface-light p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+                    className="rounded-md bg-surface border border-surface-light p-5 flex flex-col sm:flex-row sm:items-center gap-4"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gold/10 text-gold shrink-0">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-md bg-brand/10 text-brand shrink-0">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
@@ -890,7 +890,7 @@ export default function AdminPage() {
                           {booking.name} &middot;{" "}
                           <a
                             href={`tel:${telHref(booking.phone)}`}
-                            className="text-gold hover:underline"
+                            className="text-brand hover:underline"
                           >
                             {formatIntlPhone(booking.phone)}
                           </a>
@@ -905,7 +905,7 @@ export default function AdminPage() {
                       at {booking.time}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 rounded-full bg-gold/10 text-gold text-xs font-semibold">
+                      <span className="px-2.5 py-1 rounded-md bg-brand/10 text-brand text-xs font-semibold">
                         {booking.email}
                       </span>
                       <button
@@ -920,7 +920,7 @@ export default function AdminPage() {
                             email: booking.email,
                           });
                         }}
-                        className="text-gold hover:bg-gold/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        className="text-brand hover:bg-brand/10 p-1.5 rounded-lg transition-colors cursor-pointer"
                         aria-label={`Email ${booking.name}`}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
@@ -929,7 +929,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         onClick={() => setPendingDeleteBooking(booking)}
-                        className="text-red-400 hover:bg-red-500/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        className="text-danger hover:bg-danger-soft p-1.5 rounded-lg transition-colors cursor-pointer"
                         aria-label="Delete booking"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
@@ -950,12 +950,12 @@ export default function AdminPage() {
 
         {tab === "deliveries" && (
           <div>
-            <div className="rounded-2xl bg-surface border border-surface-light p-5 mb-4 flex items-center gap-3">
-              <svg className="w-5 h-5 text-gold shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+            <div className="rounded-md bg-surface border border-surface-light p-5 mb-4 flex items-center gap-3">
+              <svg className="w-5 h-5 text-brand shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
               </svg>
               <div>
-                <p className="font-semibold text-sm">Delivery Queue</p>
+                <p className="font-semibold text-sm">Delivery queue</p>
                 <p className="text-xs text-muted">
                   {allDeliveries.length === 1
                     ? "1 active delivery order to fulfill."
@@ -965,7 +965,7 @@ export default function AdminPage() {
             </div>
 
             {allDeliveries.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl bg-surface border border-surface-light">
+              <div className="text-center py-16 rounded-md bg-surface border border-surface-light">
                 <p className="text-muted">No deliveries to show.</p>
               </div>
             ) : (
@@ -973,10 +973,10 @@ export default function AdminPage() {
                 {allDeliveries.map((order) => (
                   <div
                     key={order.id}
-                    className="rounded-2xl bg-surface border border-surface-light p-4 flex items-center gap-4"
+                    className="rounded-md bg-surface border border-surface-light p-4 flex items-center gap-4"
                   >
                     <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${STATUS_BADGE_CLASSES[order.status]}`}
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-semibold border ${STATUS_BADGE_CLASSES[order.status]}`}
                     >
                       {statusLabel(order.status)}
                     </span>
@@ -989,7 +989,7 @@ export default function AdminPage() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-bold text-gold">{formatPrice(order.total)}</p>
+                      <p className="text-sm font-bold tabular text-brand">{formatPriceShort(order.total)}</p>
                       <p className="text-xs text-muted">
                         {new Date(order.date).toLocaleDateString("en-CA", {
                           month: "short",
@@ -1007,10 +1007,10 @@ export default function AdminPage() {
         )}
 
         {emailTarget && (
-          <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4">
-            <div className="w-full max-w-lg rounded-2xl bg-surface border border-surface-light p-6">
+          <div className="fixed inset-0 z-[60] bg-scrim flex items-center justify-center p-4">
+            <div className="w-full max-w-lg rounded-md bg-surface border border-surface-light p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-serif text-xl font-bold">
+                <h3 className="font-display text-xl font-bold">
                   Email {emailTarget.customerName}
                   <span className="block text-xs text-muted font-normal mt-0.5">
                     {emailTarget.kind === "order" ? `Order ${emailTarget.id}` : `Booking ${emailTarget.id}`}
@@ -1018,7 +1018,7 @@ export default function AdminPage() {
                 </h3>
                 <button
                   onClick={() => setEmailTarget(null)}
-                  className="text-muted hover:text-gold p-1 cursor-pointer"
+                  className="text-muted hover:text-brand p-1 cursor-pointer"
                   aria-label="Close"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -1027,7 +1027,7 @@ export default function AdminPage() {
                 </button>
               </div>
               {emailError && (
-                <div className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 mb-4 text-sm text-red-400">
+                <div className="rounded-md bg-danger-soft border border-danger/30 p-3 mb-4 text-sm text-danger">
                   {emailError}
                 </div>
               )}
@@ -1043,7 +1043,7 @@ export default function AdminPage() {
                   <input
                     value={emailSubject}
                     onChange={(e) => setEmailSubject(e.target.value)}
-                    className="w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-gold focus:outline-none"
+                    className="w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-brand focus:outline-none"
                   />
                 </label>
                 <label className="block">
@@ -1053,23 +1053,23 @@ export default function AdminPage() {
                     onChange={(e) => setEmailMessage(e.target.value)}
                     rows={5}
                     placeholder="Write your reply to this customer..."
-                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-gold focus:outline-none resize-y"
+                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-brand focus:outline-none resize-y"
                   />
                 </label>
               </div>
               <div className="flex items-center justify-end gap-2 mt-5">
                 <button
                   onClick={() => setEmailTarget(null)}
-                  className="px-4 py-2 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={sendCustomerEmail}
                   disabled={emailSending}
-                  className="px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-4 py-2 rounded-md text-sm font-semibold bg-brand text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {emailSending ? "Sending..." : "Send Email"}
+                  {emailSending ? "Sending..." : "Send email"}
                 </button>
               </div>
             </div>
@@ -1089,9 +1089,9 @@ export default function AdminPage() {
                   <span className="text-foreground font-semibold">{confirmAction.orderId}</span>
                 </p>
                 {confirmAction.kind === "status" && confirmAction.to && (
-                  <div className="flex items-center gap-2 rounded-xl bg-surface-light/60 border border-surface-light px-4 py-3">
+                  <div className="flex items-center gap-2 rounded-md bg-surface-light/60 border border-surface-light px-4 py-3">
                     <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_BADGE_CLASSES[confirmAction.from]}`}
+                      className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${STATUS_BADGE_CLASSES[confirmAction.from]}`}
                     >
                       {statusLabel(confirmAction.from)}
                     </span>
@@ -1106,14 +1106,14 @@ export default function AdminPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                     <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_BADGE_CLASSES[confirmAction.to]}`}
+                      className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${STATUS_BADGE_CLASSES[confirmAction.to]}`}
                     >
                       {statusLabel(confirmAction.to)}
                     </span>
                   </div>
                 )}
                 {confirmAction.kind === "delete" && (
-                  <p className="text-red-400">
+                  <p className="text-danger">
                     This permanently removes the order and its payment proof. This cannot be
                     undone.
                   </p>
@@ -1122,7 +1122,7 @@ export default function AdminPage() {
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setConfirmAction(null)}
-                  className="px-4 h-10 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                  className="px-4 h-10 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1135,7 +1135,7 @@ export default function AdminPage() {
                       setConfirmAction(null);
                       await handleStatus(orderId, to);
                     }}
-                    className="px-4 h-10 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity cursor-pointer"
+                    className="px-4 h-10 rounded-md text-sm font-semibold bg-brand text-background hover:opacity-90 transition-opacity cursor-pointer"
                   >
                     Change status
                   </button>
@@ -1147,7 +1147,7 @@ export default function AdminPage() {
                       setConfirmAction(null);
                       await handleDeleteOrder(orderId);
                     }}
-                    className="px-4 h-10 rounded-full text-sm font-semibold text-white bg-red-500/90 hover:bg-red-500 transition-colors cursor-pointer"
+                    className="px-4 h-10 rounded-md text-sm font-semibold text-background bg-danger hover:bg-danger transition-colors cursor-pointer"
                   >
                     Delete order
                   </button>
@@ -1171,14 +1171,14 @@ export default function AdminPage() {
                   &mdash; {pendingDeleteBooking.service} for{" "}
                   <span className="text-foreground font-semibold">{pendingDeleteBooking.name}</span>
                 </p>
-                <p className="text-red-400">
+                <p className="text-danger">
                   This permanently removes the booking. This cannot be undone.
                 </p>
               </div>
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setPendingDeleteBooking(null)}
-                  className="px-4 h-10 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                  className="px-4 h-10 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1188,7 +1188,7 @@ export default function AdminPage() {
                     setPendingDeleteBooking(null);
                     await handleDeleteBooking(id);
                   }}
-                  className="px-4 h-10 rounded-full text-sm font-semibold text-white bg-red-500/90 hover:bg-red-500 transition-colors cursor-pointer"
+                  className="px-4 h-10 rounded-md text-sm font-semibold text-background bg-danger hover:bg-danger transition-colors cursor-pointer"
                 >
                   Delete booking
                 </button>

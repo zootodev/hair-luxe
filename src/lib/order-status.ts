@@ -21,8 +21,8 @@ export function statusLabel(status: Order["status"]): string {
 
 /** Badge classes (background, text and border) for each order status. */
 export const STATUS_BADGE_CLASSES: Record<Order["status"], string> = {
-  pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-  processing: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-  completed: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-  cancelled: "bg-red-500/15 text-red-400 border-red-500/30",
+  pending: "bg-warning-soft text-warning border-warning/30",
+  processing: "bg-brand-soft text-brand border-brand/30",
+  completed: "bg-success-soft text-success border-success/30",
+  cancelled: "bg-danger-soft text-danger border-danger/30",
 };

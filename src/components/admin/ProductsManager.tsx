@@ -60,7 +60,7 @@ const STOCK_HELP =
   "Total units stocked. Available = total − sold (reserved for orders). This input edits the total.";
 
 const inputClass =
-  "w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-gold focus:outline-none";
+  "w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-brand focus:outline-none";
 
 export default function ProductsManager() {
   const [rows, setRows] = useState<Draft[]>([]);
@@ -240,17 +240,17 @@ export default function ProductsManager() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
-            Catalog Manager
+          <p className="text-brand text-xs font-medium mb-1">
+            Catalog manager
           </p>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold">Products</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold">Products</h1>
           <p className="text-xs text-muted mt-1">
             Changes go live on the store immediately. Sold units are tracked automatically.
           </p>
         </div>
         <div className="flex items-center gap-2 w-fit">
           {dirtyCount > 0 && (
-            <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <span className="px-3 py-1.5 rounded-md text-xs font-semibold bg-warning-soft text-warning border border-warning/30">
               {dirtyCount} unsaved product{dirtyCount > 1 ? "s" : ""}
             </span>
           )}
@@ -260,18 +260,18 @@ export default function ProductsManager() {
               setAddError("");
             }}
             aria-expanded={showAdd}
-            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity cursor-pointer"
+            className="px-4 py-1.5 rounded-md text-xs font-semibold bg-brand text-background hover:opacity-90 transition-opacity cursor-pointer"
           >
-            {showAdd ? "Close" : "Add Product"}
+            {showAdd ? "Close" : "Add product"}
           </button>
         </div>
       </div>
 
       {showAdd && (
-        <div className="rounded-2xl bg-surface border border-gold/30 p-5 mb-6">
-          <h2 className="font-serif text-lg font-bold mb-4">New Product</h2>
+        <div className="rounded-md bg-surface border border-brand/30 p-5 mb-6">
+          <h2 className="font-display text-lg font-bold mb-4">New product</h2>
           {addError && (
-            <p className="text-sm text-red-400 mb-3" role="alert">
+            <p className="text-sm text-danger mb-3" role="alert">
               {addError}
             </p>
           )}
@@ -316,7 +316,7 @@ export default function ProductsManager() {
               />
             </label>
             <label htmlFor="prod-new-compare">
-              <span className="block text-xs text-muted mb-1">Compare At (₦)</span>
+              <span className="block text-xs text-muted mb-1">Compare at (₦)</span>
               <input
                 id="prod-new-compare"
                 className={inputClass}
@@ -358,7 +358,7 @@ export default function ProductsManager() {
               <span className="block text-xs text-muted mb-1">Description</span>
               <textarea
                 id="prod-new-description"
-                className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-gold focus:outline-none resize-y"
+                className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-brand focus:outline-none resize-y"
                 rows={2}
                 value={newProduct.description}
                 onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
@@ -372,7 +372,7 @@ export default function ProductsManager() {
                   type="checkbox"
                   checked={newProduct.visible}
                   onChange={(e) => setNewProduct({ ...newProduct, visible: e.target.checked })}
-                  className="accent-gold w-4 h-4"
+                  className="accent-brand w-4 h-4"
                 />
                 <span className="text-muted">Visible on store</span>
               </label>
@@ -381,7 +381,7 @@ export default function ProductsManager() {
                   type="checkbox"
                   checked={newProduct.featured}
                   onChange={(e) => setNewProduct({ ...newProduct, featured: e.target.checked })}
-                  className="accent-gold w-4 h-4"
+                  className="accent-brand w-4 h-4"
                 />
                 <span className="text-muted">Featured on home</span>
               </label>
@@ -389,21 +389,21 @@ export default function ProductsManager() {
             <button
               onClick={createProduct}
               disabled={adding}
-              className="px-5 py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-5 py-2 rounded-md text-xs font-semibold bg-brand text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              {adding ? "Adding..." : "Add Product"}
+              {adding ? "Adding..." : "Add product"}
             </button>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="rounded-2xl bg-red-500/10 border border-red-500/30 p-4 mb-5 text-sm text-red-400">
+        <div className="rounded-md bg-danger-soft border border-danger/30 p-4 mb-5 text-sm text-danger">
           {error}
         </div>
       )}
       {notice && (
-        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 mb-5 text-sm text-emerald-400">
+        <div className="rounded-md bg-success-soft border border-success/30 p-4 mb-5 text-sm text-success">
           {notice}
         </div>
       )}
@@ -415,12 +415,12 @@ export default function ProductsManager() {
           {rows.map((row) => (
             <div
               key={row.id}
-              className={`rounded-2xl bg-surface border p-5 ${
-                row.dirty ? "border-amber-500/50" : "border-surface-light"
+              className={`rounded-md bg-surface border p-5 ${
+                row.dirty ? "border-warning/50" : "border-surface-light"
               }`}
             >
               <div className="flex flex-wrap items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold text-sm shrink-0">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-brand text-background font-semibold text-sm shrink-0">
                   {row.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -430,7 +430,7 @@ export default function ProductsManager() {
                   </p>
                   <p className="text-xs text-muted">
                     {row.category}
-                    {row.dirty && <span className="text-amber-400 font-semibold ml-2">Unsaved</span>}
+                    {row.dirty && <span className="text-warning font-semibold ml-2">Unsaved</span>}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -438,14 +438,14 @@ export default function ProductsManager() {
                     onClick={() => setDiscardTarget({ id: row.id, name: row.name })}
                     disabled={row.saving || !row.dirty}
                     title="Discard unsaved edits on this product"
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-surface-light text-muted hover:text-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    className="px-3 py-1.5 rounded-md text-xs font-semibold bg-surface-light text-muted hover:text-brand transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
                     Discard changes
                   </button>
                   <button
                     onClick={() => save(row.id)}
                     disabled={row.saving || !row.dirty}
-                    className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    className="px-4 py-1.5 rounded-md text-xs font-semibold bg-brand text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {row.saving ? "Saving..." : "Save"}
                   </button>
@@ -492,7 +492,7 @@ export default function ProductsManager() {
                   />
                 </label>
                 <label htmlFor={`prod-${row.id}-compare`}>
-                  <span className="block text-xs text-muted mb-1">Compare At (₦)</span>
+                  <span className="block text-xs text-muted mb-1">Compare at (₦)</span>
                   <input
                     id={`prod-${row.id}-compare`}
                     className={inputClass}
@@ -537,7 +537,7 @@ export default function ProductsManager() {
                   <span className="block text-xs text-muted mb-1">Description</span>
                   <textarea
                     id={`prod-${row.id}-description`}
-                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-gold focus:outline-none resize-y"
+                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-brand focus:outline-none resize-y"
                     rows={2}
                     value={row.description}
                     onChange={(e) => update(row.id, { description: e.target.value })}
@@ -551,7 +551,7 @@ export default function ProductsManager() {
                     type="checkbox"
                     checked={row.visible}
                     onChange={(e) => update(row.id, { visible: e.target.checked })}
-                    className="accent-gold w-4 h-4"
+                    className="accent-brand w-4 h-4"
                   />
                   <span className="text-muted">Visible on store</span>
                 </label>
@@ -560,13 +560,13 @@ export default function ProductsManager() {
                     type="checkbox"
                     checked={row.featured}
                     onChange={(e) => update(row.id, { featured: e.target.checked })}
-                    className="accent-gold w-4 h-4"
+                    className="accent-brand w-4 h-4"
                   />
                   <span className="text-muted">Featured on home</span>
                 </label>
                 <span
                   className="ml-auto text-xs text-muted cursor-help"
-                  title="Available = Stock (total) − sold (reserved for orders). The storefront and cart sell from Available."
+                  title="Available = stock total minus sold (reserved for orders). The storefront and cart sell from available stock."
                 >
                   Stock (total): {row.stockCount} &middot; Available:{" "}
                   {Number(row.stockCount) - Number(row.sold)} &bull; Active listings update
@@ -591,7 +591,7 @@ export default function ProductsManager() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDiscardTarget(null)}
-            className="px-4 h-10 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+            className="px-4 h-10 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
           >
             Keep editing
           </button>
@@ -600,7 +600,7 @@ export default function ProductsManager() {
               if (discardTarget) discard(discardTarget.id);
               setDiscardTarget(null);
             }}
-            className="px-4 h-10 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity cursor-pointer"
+            className="px-4 h-10 rounded-md text-sm font-semibold bg-brand text-background hover:opacity-90 transition-opacity cursor-pointer"
           >
             Discard changes
           </button>

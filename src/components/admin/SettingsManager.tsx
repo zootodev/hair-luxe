@@ -32,7 +32,7 @@ interface SettingsDraft {
 }
 
 const inputClass =
-  "w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-gold focus:outline-none";
+  "w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-brand focus:outline-none";
 
 const DEFAULT_ZONE: ZoneDraft = { name: "", zones: "", fee: "", days: "" };
 
@@ -187,17 +187,17 @@ export default function SettingsManager() {
   return (
     <div>
       <div className="mb-6">
-        <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
-          Store Configuration
+        <p className="text-brand text-xs font-medium mb-1">
+          Store configuration
         </p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold">Settings</h1>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold">Settings</h1>
         <p className="text-xs text-muted mt-1">
           Business details, delivery zones and the announcement bar shown site-wide.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-2xl bg-red-500/10 border border-red-500/30 p-4 mb-5 text-sm text-red-400">
+        <div className="rounded-md bg-danger-soft border border-danger/30 p-4 mb-5 text-sm text-danger">
           {error}
         </div>
       )}
@@ -206,11 +206,11 @@ export default function SettingsManager() {
 
       {!loading && form && (
         <div className="space-y-5">
-          <section className="rounded-2xl bg-surface border border-surface-light p-5">
-            <h2 className="font-serif text-lg text-gold mb-4">Business Details</h2>
+          <section className="rounded-md bg-surface border border-surface-light p-5">
+            <h2 className="font-display text-lg text-brand mb-4">Business details</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
               <label>
-                <span className="block text-xs text-muted mb-1">Business Name</span>
+                <span className="block text-xs text-muted mb-1">Business name</span>
                 <input
                   className={inputClass}
                   value={form.businessName}
@@ -274,7 +274,7 @@ export default function SettingsManager() {
                 />
               </label>
               <label>
-                <span className="block text-xs text-muted mb-1">Bank Name</span>
+                <span className="block text-xs text-muted mb-1">Bank name</span>
                 <input
                   className={inputClass}
                   value={form.bankName}
@@ -282,7 +282,7 @@ export default function SettingsManager() {
                 />
               </label>
               <label>
-                <span className="block text-xs text-muted mb-1">Account Name</span>
+                <span className="block text-xs text-muted mb-1">Account name</span>
                 <input
                   className={inputClass}
                   value={form.accountName}
@@ -290,7 +290,7 @@ export default function SettingsManager() {
                 />
               </label>
               <label>
-                <span className="block text-xs text-muted mb-1">Account Number</span>
+                <span className="block text-xs text-muted mb-1">Account number</span>
                 <input
                   className={inputClass}
                   value={form.accountNumber}
@@ -300,11 +300,11 @@ export default function SettingsManager() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-surface border border-surface-light p-5">
-            <h2 className="font-serif text-lg text-gold mb-4">Delivery &amp; Fees</h2>
+          <section className="rounded-md bg-surface border border-surface-light p-5">
+            <h2 className="font-display text-lg text-brand mb-4">Delivery &amp; Fees</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
               <label>
-                <span className="block text-xs text-muted mb-1">Default Delivery Fee (₦)</span>
+                <span className="block text-xs text-muted mb-1">Default delivery fee (₦)</span>
                 <input
                   className={inputClass}
                   type="number"
@@ -315,7 +315,7 @@ export default function SettingsManager() {
                 />
               </label>
               <label>
-                <span className="block text-xs text-muted mb-1">Free Delivery Over (₦)</span>
+                <span className="block text-xs text-muted mb-1">Free delivery over (₦)</span>
                 <input
                   className={inputClass}
                   type="number"
@@ -329,21 +329,21 @@ export default function SettingsManager() {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold">Delivery Zones</span>
+                <span className="text-sm font-semibold">Delivery zones</span>
                 <button
                   onClick={() => set({ deliveryZones: [...form.deliveryZones, DEFAULT_ZONE] })}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
                 >
-                  + Add Zone
+                  + Add zone
                 </button>
               </div>
               {form.deliveryZones.map((zone, i) => (
                 <div
                   key={i}
-                  className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 rounded-xl bg-background border border-surface-light p-3 text-sm"
+                  className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 rounded-md bg-background border border-surface-light p-3 text-sm"
                 >
                   <label>
-                    <span className="block text-xs text-muted mb-1">Zone Name</span>
+                    <span className="block text-xs text-muted mb-1">Zone name</span>
                     <input
                       className={inputClass}
                       value={zone.name}
@@ -381,7 +381,7 @@ export default function SettingsManager() {
                   </label>
                   <button
                     onClick={() => setZonePendingRemoval(i)}
-                    className="sm:col-span-4 lg:col-span-1 w-fit px-3 py-1.5 rounded-full text-xs font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors mt-auto cursor-pointer"
+                    className="sm:col-span-4 lg:col-span-1 w-fit px-3 py-1.5 rounded-md text-xs font-semibold text-danger hover:bg-danger-soft border border-danger/30 transition-colors mt-auto cursor-pointer"
                   >
                     Remove
                   </button>
@@ -390,14 +390,14 @@ export default function SettingsManager() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-surface border border-surface-light p-5">
-            <h2 className="font-serif text-lg text-gold mb-4">Announcement Bar</h2>
+          <section className="rounded-md bg-surface border border-surface-light p-5">
+            <h2 className="font-display text-lg text-brand mb-4">Announcement bar</h2>
             <label className="flex items-center gap-2 cursor-pointer w-fit text-sm mb-3">
               <input
                 type="checkbox"
                 checked={form.announcementEnabled}
                 onChange={(e) => set({ announcementEnabled: e.target.checked })}
-                className="accent-gold w-4 h-4"
+                className="accent-brand w-4 h-4"
               />
               <span className="text-muted">Show announcement</span>
             </label>
@@ -407,7 +407,7 @@ export default function SettingsManager() {
                 id="settings-announcement-text"
                 className={inputClass}
                 value={form.announcementText ?? ""}
-                placeholder="e.g. Free delivery on orders over ₦250,000 this week"
+                placeholder="For example, free delivery on orders over ₦250,000 this week"
                 onChange={(e) => set({ announcementText: e.target.value })}
               />
               <span className="block text-xs text-muted mt-1.5">
@@ -421,9 +421,9 @@ export default function SettingsManager() {
             <button
               onClick={save}
               disabled={saving}
-              className="px-6 py-3 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-6 py-3 rounded-md text-sm font-semibold bg-brand text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              {saving ? "Saving..." : "Save Settings"}
+              {saving ? "Saving..." : "Save settings"}
             </button>
           </div>
         </div>
@@ -436,7 +436,7 @@ export default function SettingsManager() {
       >
         <p className="text-sm text-muted mb-5">
           Remove{" "}
-          <span className="text-gold font-semibold">
+          <span className="text-brand font-semibold">
             {form?.deliveryZones[zonePendingRemoval ?? 0]?.name?.trim() || "this zone"}
           </span>
           ? Customers will no longer be able to select it at checkout. This only takes
@@ -445,7 +445,7 @@ export default function SettingsManager() {
         <div className="flex justify-end gap-2">
           <button
             onClick={() => setZonePendingRemoval(null)}
-            className="px-4 py-2 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
           >
             Cancel
           </button>
@@ -458,9 +458,9 @@ export default function SettingsManager() {
               }
               setZonePendingRemoval(null);
             }}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-red-400 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-md text-sm font-semibold text-danger bg-danger-soft border border-danger/30 hover:bg-danger-soft transition-colors cursor-pointer"
           >
-            Remove Zone
+            Remove zone
           </button>
         </div>
       </Modal>

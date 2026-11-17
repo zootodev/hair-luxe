@@ -51,22 +51,18 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 pt-24 md:pt-28 pb-16">
       <div className="w-full max-w-md">
-        <div className="rounded-2xl bg-surface border border-surface-light p-8">
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold text-xl">
-              HL
-            </div>
-            <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
-              Private Dashboard
-            </p>
-            <h1 className="font-serif text-2xl font-bold">Admin Login</h1>
+        <div className="rounded-md bg-surface border border-surface-light p-8">
+          <div className="mb-8">
+            <p className="text-xl font-semibold text-brand tracking-tight">Hair Luxe</p>
+            <h1 className="font-display text-2xl font-bold mt-1">Admin sign in</h1>
+            <p className="text-sm text-muted mt-2">Manage orders, bookings and the catalogue.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs text-muted uppercase tracking-wide mb-2"
+                className="block text-xs text-muted mb-2"
               >
                 Password
               </label>
@@ -79,11 +75,11 @@ export default function AdminLoginPage() {
                 disabled={loading}
                 autoFocus
                 required
-                className="w-full h-12 rounded-xl bg-background border border-surface-light pl-4 pr-12 text-sm focus:border-gold focus:outline-none"
+                className="w-full h-12 rounded-md bg-background border border-surface-light pl-4 pr-12 text-sm focus:border-brand focus:outline-none"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 w-12 flex items-center justify-center text-muted hover:text-gold focus-visible:text-gold transition-colors cursor-pointer"
+                className="absolute inset-y-0 right-0 w-12 flex items-center justify-center text-muted hover:text-brand focus-visible:text-brand transition-colors cursor-pointer"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 aria-pressed={showPassword}
                 onClick={() => setShowPassword(prev => !prev)}
@@ -131,15 +127,15 @@ export default function AdminLoginPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 text-center">{error}</p>
+              <p className="text-sm text-danger text-center">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background font-semibold transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
+              className="w-full h-12 rounded-md bg-brand text-background font-semibold transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
         </div>

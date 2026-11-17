@@ -14,7 +14,7 @@ interface AdminSidebarProps {
 const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
   {
     key: "dashboard",
-    label: "Orders & Bookings",
+    label: "Orders & bookings",
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
         <path
@@ -80,17 +80,16 @@ export default function AdminSidebar({ active, onChange, onLogout }: AdminSideba
     <aside className="w-full lg:w-56 shrink-0 lg:sticky lg:top-28 h-fit">
       {/* Compact top bar (mobile only): brand + log out icon. */}
       <div className="flex items-center justify-between gap-3 mb-3 lg:hidden">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif text-xl font-bold shadow-lg shadow-gold/20 shrink-0">
-            HL
+        <div className="flex items-center min-w-0">
+          <span className="text-lg font-semibold truncate">
+            Hair Luxe <span className="text-muted font-normal">Admin</span>
           </span>
-          <span className="font-serif text-xl font-semibold truncate">Admin</span>
         </div>
         <button
           onClick={onLogout}
           title="Log out"
           aria-label="Log out"
-          className="flex items-center justify-center w-9 h-9 rounded-full text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors shrink-0 cursor-pointer"
+          className="flex items-center justify-center w-9 h-9 rounded-md text-danger hover:bg-danger-soft border border-danger/30 transition-colors shrink-0 cursor-pointer"
         >
           <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
             <path
@@ -111,10 +110,10 @@ export default function AdminSidebar({ active, onChange, onLogout }: AdminSideba
               pillRefs.current[item.key] = el;
             }}
             onClick={() => onChange(item.key)}
-            className={`flex shrink-0 items-center gap-2.5 px-4 py-2.5 rounded-full lg:rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+            className={`flex shrink-0 items-center gap-2.5 px-4 py-2.5 rounded-md lg:rounded-md text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
               active === item.key
-                ? "bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background shadow-lg shadow-gold/20"
-                : "bg-surface border border-surface-light text-muted hover:text-gold hover:border-gold/40"
+                ? "bg-brand text-background"
+                : "bg-surface border border-surface-light text-muted hover:text-brand hover:border-brand/40"
             }`}
           >
             <span className="w-4.5 h-4.5">{item.icon}</span>
@@ -123,7 +122,7 @@ export default function AdminSidebar({ active, onChange, onLogout }: AdminSideba
         ))}
         <button
           onClick={onLogout}
-          className="hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors whitespace-nowrap lg:mt-2 cursor-pointer"
+          className="hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-md text-sm font-semibold text-danger hover:bg-danger-soft border border-danger/30 transition-colors whitespace-nowrap lg:mt-2 cursor-pointer"
         >
           <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
             <path

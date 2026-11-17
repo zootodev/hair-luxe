@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: `Admin Login | ${BUSINESS.name}`,
+  title: `Admin sign in | ${BUSINESS.name}`,
   robots: { index: false, follow: false },
 };
 

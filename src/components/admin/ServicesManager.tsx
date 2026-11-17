@@ -56,7 +56,7 @@ const EMPTY_NEW_SERVICE: NewService = {
 };
 
 const inputClass =
-  "w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-gold focus:outline-none";
+  "w-full h-9 rounded-lg bg-background border border-surface-light px-3 text-sm focus:border-brand focus:outline-none";
 
 export default function ServicesManager() {
   const [rows, setRows] = useState<Draft[]>([]);
@@ -116,11 +116,11 @@ export default function ServicesManager() {
     }
     const start = Number(row.startingPrice);
     if (!Number.isFinite(start) || start <= 0) {
-      setError(`"${row.name}": Start Price must be a positive number.`);
+      setError(`"${row.name}": Starting price must be a positive number.`);
       return;
     }
     if (!isStartPriceInRange(start, row.priceRange)) {
-      setError(`"${row.name}": Start Price must fall within the Price Range (e.g. ₦120,000 - ₦250,000).`);
+      setError(`"${row.name}": Starting price must fall within the price range (for example, ₦120,000 to ₦250,000).`);
       return;
     }
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, saving: true } : r)));
@@ -177,7 +177,7 @@ export default function ServicesManager() {
       return;
     }
     if (!newService.priceRange.trim()) {
-      setAddError("Price Range is required.");
+      setAddError("Price range is required.");
       return;
     }
     if (!newService.duration.trim()) {
@@ -186,11 +186,11 @@ export default function ServicesManager() {
     }
     const start = Number(newService.startingPrice);
     if (!Number.isFinite(start) || start <= 0) {
-      setAddError("Start Price must be a positive number (in naira).");
+      setAddError("Starting price must be a positive number in naira.");
       return;
     }
     if (!isStartPriceInRange(start, newService.priceRange)) {
-      setAddError("Start Price must fall within the Price Range.");
+      setAddError("Starting price must fall within the price range.");
       return;
     }
     const slug = slugify(name);
@@ -241,17 +241,17 @@ export default function ServicesManager() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <p className="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-1">
-            Catalog Manager
+          <p className="text-brand text-xs font-medium mb-1">
+            Catalog manager
           </p>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold">Services</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold">Services</h1>
           <p className="text-xs text-muted mt-1">
             Changes go live on the site immediately, including the booking page.
           </p>
         </div>
         <div className="flex items-center gap-2 w-fit">
           {dirtyCount > 0 && (
-            <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <span className="px-3 py-1.5 rounded-md text-xs font-semibold bg-warning-soft text-warning border border-warning/30">
               {dirtyCount} unsaved service{dirtyCount > 1 ? "s" : ""}
             </span>
           )}
@@ -261,18 +261,18 @@ export default function ServicesManager() {
               setAddError("");
             }}
             aria-expanded={showAdd}
-            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity cursor-pointer"
+            className="px-4 py-1.5 rounded-md text-xs font-semibold bg-brand text-background hover:opacity-90 transition-opacity cursor-pointer"
           >
-            {showAdd ? "Close" : "Add Service"}
+            {showAdd ? "Close" : "Add service"}
           </button>
         </div>
       </div>
 
       {showAdd && (
-        <div className="rounded-2xl bg-surface border border-gold/30 p-5 mb-6">
-          <h2 className="font-serif text-lg font-bold mb-4">New Service</h2>
+        <div className="rounded-md bg-surface border border-brand/30 p-5 mb-6">
+          <h2 className="font-display text-lg font-bold mb-4">New service</h2>
           {addError && (
-            <p className="text-sm text-red-400 mb-3" role="alert">
+            <p className="text-sm text-danger mb-3" role="alert">
               {addError}
             </p>
           )}
@@ -304,7 +304,7 @@ export default function ServicesManager() {
               </select>
             </label>
             <label htmlFor="svc-new-start">
-              <span className="block text-xs text-muted mb-1">Start Price (₦)</span>
+              <span className="block text-xs text-muted mb-1">Starting price (₦)</span>
               <input
                 id="svc-new-start"
                 className={inputClass}
@@ -317,11 +317,11 @@ export default function ServicesManager() {
               />
             </label>
             <label htmlFor="svc-new-range">
-              <span className="block text-xs text-muted mb-1">Price Range</span>
+              <span className="block text-xs text-muted mb-1">Price range</span>
               <input
                 id="svc-new-range"
                 className={inputClass}
-                placeholder="₦120,000 - ₦250,000"
+                placeholder="₦120,000 to ₦250,000"
                 value={newService.priceRange}
                 onChange={(e) => setNewService({ ...newService, priceRange: e.target.value })}
               />
@@ -331,7 +331,7 @@ export default function ServicesManager() {
               <input
                 id="svc-new-duration"
                 className={inputClass}
-                placeholder="1 - 2 hours"
+                placeholder="1 to 2 hours"
                 value={newService.duration}
                 onChange={(e) => setNewService({ ...newService, duration: e.target.value })}
               />
@@ -340,7 +340,7 @@ export default function ServicesManager() {
               <span className="block text-xs text-muted mb-1">Description</span>
               <textarea
                 id="svc-new-description"
-                className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-gold focus:outline-none resize-y"
+                className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-brand focus:outline-none resize-y"
                 rows={2}
                 value={newService.description}
                 onChange={(e) => setNewService({ ...newService, description: e.target.value })}
@@ -354,7 +354,7 @@ export default function ServicesManager() {
                   type="checkbox"
                   checked={newService.visible}
                   onChange={(e) => setNewService({ ...newService, visible: e.target.checked })}
-                  className="accent-gold w-4 h-4"
+                  className="accent-brand w-4 h-4"
                 />
                 <span className="text-muted">Visible on site</span>
               </label>
@@ -363,7 +363,7 @@ export default function ServicesManager() {
                   type="checkbox"
                   checked={newService.featured}
                   onChange={(e) => setNewService({ ...newService, featured: e.target.checked })}
-                  className="accent-gold w-4 h-4"
+                  className="accent-brand w-4 h-4"
                 />
                 <span className="text-muted">Featured on home</span>
               </label>
@@ -371,21 +371,21 @@ export default function ServicesManager() {
             <button
               onClick={createService}
               disabled={adding}
-              className="px-5 py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-5 py-2 rounded-md text-xs font-semibold bg-brand text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              {adding ? "Adding..." : "Add Service"}
+              {adding ? "Adding..." : "Add service"}
             </button>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="rounded-2xl bg-red-500/10 border border-red-500/30 p-4 mb-5 text-sm text-red-400">
+        <div className="rounded-md bg-danger-soft border border-danger/30 p-4 mb-5 text-sm text-danger">
           {error}
         </div>
       )}
       {notice && (
-        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 mb-5 text-sm text-emerald-400">
+        <div className="rounded-md bg-success-soft border border-success/30 p-4 mb-5 text-sm text-success">
           {notice}
         </div>
       )}
@@ -397,12 +397,12 @@ export default function ServicesManager() {
           {rows.map((row) => (
             <div
               key={row.id}
-              className={`rounded-2xl bg-surface border p-5 ${
-                row.dirty ? "border-amber-500/50" : "border-surface-light"
+              className={`rounded-md bg-surface border p-5 ${
+                row.dirty ? "border-warning/50" : "border-surface-light"
               }`}
             >
               <div className="flex flex-wrap items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-gold-light via-gold to-gold-dark text-background font-serif font-bold text-sm shrink-0">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-brand text-background font-semibold text-sm shrink-0">
                   {row.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -412,7 +412,7 @@ export default function ServicesManager() {
                   </p>
                   <p className="text-xs text-muted">
                     {row.category}
-                    {row.dirty && <span className="text-amber-400 font-semibold ml-2">Unsaved</span>}
+                    {row.dirty && <span className="text-warning font-semibold ml-2">Unsaved</span>}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -420,14 +420,14 @@ export default function ServicesManager() {
                     onClick={() => setDiscardTarget({ id: row.id, name: row.name })}
                     disabled={row.saving || !row.dirty}
                     title="Discard unsaved edits on this service"
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-surface-light text-muted hover:text-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    className="px-3 py-1.5 rounded-md text-xs font-semibold bg-surface-light text-muted hover:text-brand transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
                     Discard changes
                   </button>
                   <button
                     onClick={() => save(row.id)}
                     disabled={row.saving || !row.dirty}
-                    className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    className="px-4 py-1.5 rounded-md text-xs font-semibold bg-brand text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {row.saving ? "Saving..." : "Save"}
                   </button>
@@ -466,7 +466,7 @@ export default function ServicesManager() {
                 </label>
                 <label htmlFor={`svc-${row.id}-start`}>
                   <span className="block text-xs text-muted mb-1">
-                    Start Price (₦)
+                    Starting price (₦)
                   </span>
                   <input
                     id={`svc-${row.id}-start`}
@@ -478,13 +478,13 @@ export default function ServicesManager() {
                     onChange={(e) => update(row.id, { startingPrice: e.target.value })}
                   />
                   {!isStartPriceInRange(Number(row.startingPrice), row.priceRange) && (
-                    <p className="text-xs text-red-400 mt-1">
+                    <p className="text-xs text-danger mt-1">
                       Must fall within {row.priceRange}
                     </p>
                   )}
                 </label>
                 <label htmlFor={`svc-${row.id}-range`}>
-                  <span className="block text-xs text-muted mb-1">Price Range</span>
+                  <span className="block text-xs text-muted mb-1">Price range</span>
                   <input
                     id={`svc-${row.id}-range`}
                     className={inputClass}
@@ -505,7 +505,7 @@ export default function ServicesManager() {
                   <span className="block text-xs text-muted mb-1">Description</span>
                   <textarea
                     id={`svc-${row.id}-description`}
-                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-gold focus:outline-none resize-y"
+                    className="w-full rounded-lg bg-background border border-surface-light px-3 py-2 text-sm focus:border-brand focus:outline-none resize-y"
                     rows={2}
                     value={row.description}
                     onChange={(e) => update(row.id, { description: e.target.value })}
@@ -519,7 +519,7 @@ export default function ServicesManager() {
                     type="checkbox"
                     checked={row.visible}
                     onChange={(e) => update(row.id, { visible: e.target.checked })}
-                    className="accent-gold w-4 h-4"
+                    className="accent-brand w-4 h-4"
                   />
                   <span className="text-muted">Visible on site</span>
                 </label>
@@ -528,7 +528,7 @@ export default function ServicesManager() {
                     type="checkbox"
                     checked={row.featured}
                     onChange={(e) => update(row.id, { featured: e.target.checked })}
-                    className="accent-gold w-4 h-4"
+                    className="accent-brand w-4 h-4"
                   />
                   <span className="text-muted">Featured on home</span>
                 </label>
@@ -551,7 +551,7 @@ export default function ServicesManager() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setDiscardTarget(null)}
-            className="px-4 h-10 rounded-full text-sm font-semibold bg-surface-light text-muted hover:text-gold transition-colors cursor-pointer"
+            className="px-4 h-10 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
           >
             Keep editing
           </button>
@@ -560,7 +560,7 @@ export default function ServicesManager() {
               if (discardTarget) discard(discardTarget.id);
               setDiscardTarget(null);
             }}
-            className="px-4 h-10 rounded-full text-sm font-semibold bg-gradient-to-r from-gold-light via-gold to-gold-dark text-background hover:opacity-90 transition-opacity cursor-pointer"
+            className="px-4 h-10 rounded-md text-sm font-semibold bg-brand text-background hover:opacity-90 transition-opacity cursor-pointer"
           >
             Discard changes
           </button>
