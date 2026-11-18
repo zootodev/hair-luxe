@@ -83,7 +83,7 @@ async function seedCart(page: Page, item?: string): Promise<void> {
     productId: "fr-wig-royal",
     name: "Lace front wig, straight",
     price: 250000,
-    image: "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1758315949140-1972ace0644e?q=80&w=1200&auto=format&fit=crop",
     quantity: 1,
     category: "Wigs",
   }]);

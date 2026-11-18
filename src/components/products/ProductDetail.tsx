@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { formatPriceShort, productSpec, swatchColor } from "@/lib/format";
+import { productGallery } from "@/lib/product-gallery";
 import { hasVaryingLengthPrices, priceForLength } from "@/lib/product-pricing";
 import { useCart } from "@/lib/context/CartContext";
 import Toast from "@/components/ui/Toast";
@@ -21,6 +22,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const lowStock = available > 0 && available <= 3;
   const selectedPrice = priceForLength(product, length);
   const varyingLengthPrices = hasVaryingLengthPrices(product);
+  const gallery = productGallery(product);
 
   const handleAdd = () => {
     if (outOfStock || adding) return;
@@ -47,7 +49,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       <div>
         <div className="relative aspect-square rounded-md overflow-hidden bg-surface-light border border-surface-light">
           <Image
-            src={product.images[activeImage] || product.image}
+            src={gallery[activeImage] || product.image}
             alt={`${product.name} — ${productSpec(product)}`}
             fill
             priority
@@ -55,9 +57,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             className="object-cover"
           />
         </div>
-        {product.images.length > 1 && (
+        {gallery.length > 1 && (
           <div className="flex gap-3 mt-4">
-            {product.images.map((img, i) => (
+            {gallery.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setActiveImage(i)}

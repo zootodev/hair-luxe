@@ -10,9 +10,9 @@ export const products: Product[] = [
     price: 250000,
     compareAtPrice: 320000,
     image:
-      "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1758315949140-1972ace0644e?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1758315949140-1972ace0644e?q=80&w=1200&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1613730318129-bf0ca2a12364?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 8,
@@ -64,9 +64,9 @@ export const products: Product[] = [
       "Hand-braided wig with a natural-looking hairline and a lightweight cap. It is available in 16, 20 and 24 inches, and it is ready to wear without an install appointment. Store it flat and wipe the hairline with a soft cloth.",
     price: 180000,
     image:
-      "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1572955304332-bf714bd49add?q=80&w=1200&auto=format&fit=crop",
     images: [
-      "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1572955304332-bf714bd49add?q=80&w=1200&auto=format&fit=crop",
     ],
     stockCount: 12,
     rating: 4.7,

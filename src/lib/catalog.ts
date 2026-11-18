@@ -16,7 +16,7 @@ const PRODUCT_CATEGORIES: Product["category"][] = ["Wigs", "Hair Bundles", "Lash
 const SERVICE_CATEGORIES: Service["category"][] = ["Hair", "Beauty", "Skin"];
 
 const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1706629503720-13cad35ce2e5?q=80&w=1200&auto=format&fit=crop";
 
 function asString(value: unknown, fallback: string): string {
   if (typeof value === "string" && value.trim() !== "") return value.trim();

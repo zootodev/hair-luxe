@@ -30,7 +30,7 @@ export const services: Service[] = [
     startingPrice: 150000,
     duration: "3 to 4 hours",
     image:
-      "https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1663582816182-15cf69d87665?q=80&w=1200&auto=format&fit=crop",
     includes: [
       "Cap fitting and measurements",
       "Hand-sewn closure or frontal",
@@ -49,7 +49,7 @@ export const services: Service[] = [
     startingPrice: 150000,
     duration: "1 to 2 hours",
     image:
-      "https://plus.unsplash.com/premium_photo-1718626725888-c62ace546f1d?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1713771295889-eacfced8de80?q=80&w=1200&auto=format&fit=crop",
     includes: [
       "Skin preparation and priming",
       "Natural or full event look",
@@ -87,7 +87,7 @@ export const services: Service[] = [
     startingPrice: 350000,
     duration: "2 to 3 hours",
     image:
-      "https://plus.unsplash.com/premium_photo-1661582563489-e40604c3ac97?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1785860945533-918a531bcdeb?q=80&w=1200&auto=format&fit=crop",
     includes: [
       "Brow design and mapping",
       "Numbing for comfort",

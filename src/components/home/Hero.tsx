@@ -31,8 +31,8 @@ export default function Hero() {
         <div>
           <div className="relative aspect-[4/5] rounded-md overflow-hidden bg-surface-light">
             <Image
-              src="https://images.unsplash.com/photo-1650649016849-00938690600c?q=80&w=1200&auto=format&fit=crop"
-              alt="A finished wig styled at the Hair Luxe studio"
+              src="https://images.unsplash.com/photo-1770419252624-e14e9f9de640?q=80&w=1200&auto=format&fit=crop"
+              alt="A woman with a finished hairstyle at the Hair Luxe studio"
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"

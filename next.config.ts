@@ -27,7 +27,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com",
+      "img-src 'self' data: blob: https://images.unsplash.com",
       "font-src 'self' data:",
       "connect-src 'self' https://api.emailjs.com",
       "frame-ancestors 'none'",
@@ -45,10 +45,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "plus.unsplash.com",
       },
     ],
   },
