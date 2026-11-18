@@ -5,7 +5,7 @@ import type { CartItem } from "@/lib/types";
 
 const braidWig: CartItem = {
   productId: "closure-wig-goddess",
-  name: "Braid wig",
+  name: "Braid Wig",
   price: 180000,
   image: "https://example.com/braid-wig.jpg",
   quantity: 1,

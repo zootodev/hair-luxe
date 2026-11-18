@@ -1,6 +1,6 @@
 export const BUSINESS = {
   name: "Hair Luxe",
-  tagline: "Wigs and hair services in Lagos",
+  tagline: "Wigs and hair services in Lagos and Ibadan",
   secondaryTagline: "Pickup at the studio or delivery across the South-West.",
   description:
     "Wigs, hair revamping, makeup, lashes, microblading and skin tag removal in Lagos and Ibadan. Prices and appointment lengths are listed online.",

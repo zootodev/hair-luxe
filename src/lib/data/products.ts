@@ -3,10 +3,10 @@ import type { Product } from "@/lib/types";
 export const products: Product[] = [
   {
     id: "fr-wig-royal",
-    name: "Lace front wig, straight",
+    name: "Lace Front Wig, Straight",
     category: "Wigs",
     description:
-      "100% virgin human hair lace front wig with a 5x5 closure. The hairline is pre-plucked, so it is ready to wear.",
+      "Straight human hair wig with a 5x5 lace closure and a pre-plucked hairline. It is 22 inches long and has adjustable straps inside the cap. Use heat protectant when styling and store it on a wig stand.",
     price: 250000,
     compareAtPrice: 320000,
     image:
@@ -22,19 +22,19 @@ export const products: Product[] = [
     lengths: ["22 inches"],
     featured: true,
     details: [
-      "100% unprocessed virgin human hair",
-      "Natural pre-plucked hairline with baby hairs",
-      "Can be bleached, dyed, curled or straightened",
-      "Skin-Friendly transparent HD lace",
-      "Approximately 22 inches in length",
+      "Straight human hair, 22 inches",
+      "5x5 lace closure with a pre-plucked hairline",
+      "Adjustable straps inside the cap",
+      "Can be dyed or heat-styled by a professional",
+      "Store on a wig stand and detangle gently",
     ],
   },
   {
     id: "fl-wig-silk",
-    name: "Full lace wig, body wave",
+    name: "Full Lace Wig, Body Wave",
     category: "Wigs",
     description:
-      "Full lace human hair wig that can be parted in any direction. The cap is light and has adjustable straps.",
+      "Body-wave human hair wig with a full lace cap that can be parted in any direction. It is 24 inches long and has adjustable straps. Detangle with a wide-tooth comb and keep it on a stand when you are not wearing it.",
     price: 350000,
     compareAtPrice: 420000,
     image:
@@ -49,19 +49,19 @@ export const products: Product[] = [
     lengths: ["24 inches"],
     featured: true,
     details: [
-      "360 lace for unlimited parting options",
-      "100% virgin hair, soft and tangle-free",
-      "Comfortable breathable cap",
-      "Adjustable straps for secure fit",
-      "24 inches - shoulder length style",
+      "Body-wave human hair, 24 inches",
+      "Full lace cap, can be parted in any direction",
+      "Adjustable straps for fit",
+      "Breathable cap",
+      "Detangle with a wide-tooth comb and store on a stand",
     ],
   },
   {
     id: "closure-wig-goddess",
-    name: "Braid wig",
+    name: "Braid Wig",
     category: "Wigs",
     description:
-      "Pre-styled braided wig with a natural-looking hairline. Ready to wear, with no install appointment needed.",
+      "Hand-braided wig with a natural-looking hairline and a lightweight cap. It is available in 16, 20 and 24 inches, and it is ready to wear without an install appointment. Store it flat and wipe the hairline with a soft cloth.",
     price: 180000,
     image:
       "https://plus.unsplash.com/premium_photo-1683140447258-d5b56eafa1ea?q=80&w=1200&auto=format&fit=crop",
@@ -79,11 +79,11 @@ export const products: Product[] = [
       "24 inches": 230000,
     },
     details: [
-      "Handmade braided wig",
-      "Natural-looking with a realistic hairline",
-      "Ready to wear - no combing needed",
-      "Lightweight and breathable cap",
-      "Available in multiple lengths",
+      "Hand-braided wig",
+      "Natural-looking hairline",
+      "Lightweight breathable cap",
+      "Ready to wear; no install appointment",
+      "Store flat and wipe the hairline with a soft cloth",
     ],
   },
   {
@@ -91,7 +91,7 @@ export const products: Product[] = [
     name: "Ocean Body Wave Bundles (3x8oz)",
     category: "Hair Bundles",
     description:
-      "Three body wave bundles for sew-ins and crochet styles. The hair is full, holds a curl and sheds very little.",
+      "Three body-wave bundles, 8oz each and 24 inches long, for sew-ins and crochet styles. The hair has a double weft. Wash it with a sulfate-free shampoo, condition, and let it air-dry.",
     price: 200000,
     compareAtPrice: 260000,
     image:
@@ -105,11 +105,11 @@ export const products: Product[] = [
     lengths: ["24 inches"],
     featured: true,
     details: [
-      "100% virgin Brazilian human hair",
-      "3 bundles of 8oz each (24 inches)",
-      "Swiss quality body wave pattern",
-      "Zero shedding and tangle-free",
-      "Can be dyed and heat styled",
+      "Body-wave hair, 24 inches",
+      "3 bundles, 8oz each",
+      "Double weft",
+      "Can be dyed and heat-styled",
+      "Wash with sulfate-free shampoo and air-dry",
     ],
   },
   {
@@ -117,7 +117,7 @@ export const products: Product[] = [
     name: "Silk Straight Bundles (4x4)",
     category: "Hair Bundles",
     description:
-      "Four straight bundles with a double weft for a fuller sew-in. The hair is soft and holds a smooth finish.",
+      "Four straight bundles, 4oz each and 24 inches long, with a double weft for a fuller sew-in. Wash with a sulfate-free shampoo, condition, and let the hair air-dry.",
     price: 280000,
     compareAtPrice: 350000,
     image:
@@ -129,11 +129,11 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 31,
     details: [
-      "100% virgin Peruvian human hair",
-      "4 bundles of 4oz each",
-      "Sleek silk straight texture",
-      "Double wefted for thickness",
-      "Great for advanced sew-in styles",
+      "Straight hair, 24 inches",
+      "4 bundles, 4oz each",
+      "Double weft",
+      "Suits sew-in styles",
+      "Wash with sulfate-free shampoo and air-dry",
     ],
   },
   {
@@ -141,7 +141,7 @@ export const products: Product[] = [
     name: "Ginger Blonde Highlight Bundles",
     category: "Hair Bundles",
     description:
-      "Ginger blonde bundles in three lengths. The colour adds dimension to a sew-in or wig.",
+      "Three ginger-blonde bundles in 16, 18 and 20 inches, ready for a sew-in or wig. The colour is already applied. Use a colour-safe shampoo and keep heat low when styling.",
     price: 230000,
     image:
       "https://images.unsplash.com/photo-1607093699882-27ca1cb89a3b?q=80&w=1200&auto=format&fit=crop",
@@ -154,11 +154,11 @@ export const products: Product[] = [
     colors: ["Ginger Blonde"],
     lengths: ["16 inches", "18 inches", "20 inches"],
     details: [
-      "Blond-highlighted virgin hair",
-      "3 bundles set (16, 18, 20 inches)",
-      "Long-lasting color treatment",
-      "Low shedding",
-      "Suits event styling",
+      "Ginger-blonde hair",
+      "3 bundles: 16, 18 and 20 inches",
+      "Colour already applied",
+      "Use colour-safe shampoo",
+      "Keep heat low when styling",
     ],
   },
   {
@@ -166,7 +166,7 @@ export const products: Product[] = [
     name: "Mink Volume Lash Kit",
     category: "Lashes",
     description:
-      "Faux mink lash kit with ten lengths so you can build a natural or fuller lash line. Reusable and cruelty-free.",
+      "Faux-mink lash clusters in ten lengths, with an applicator and glue. The lashes are reusable. Clean them after each wear and store them in the tray.",
     price: 45000,
     image:
       "https://images.unsplash.com/photo-1639629509821-c54cdd984227?q=80&w=1200&auto=format&fit=crop",
@@ -178,19 +178,19 @@ export const products: Product[] = [
     reviewCount: 38,
     featured: true,
     details: [
-      "Faux mink lashes",
-      "10 individual diameters & lengths",
-      "Reusable up to 20 times",
-      "Cruelty-free and hypoallergenic",
-      "Includes lash applicator & glue",
+      "Faux-mink lash clusters",
+      "10 lengths",
+      "Reusable",
+      "Includes applicator and glue",
+      "Clean after each wear and store in the tray",
     ],
   },
   {
     id: "lash-strip-glam",
-    name: "Strip lashes (5 pairs)",
+    name: "Strip Lashes (5 Pairs)",
     category: "Lashes",
     description:
-      "Five pairs of wispy strip lashes with a flexible band, for events or everyday wear.",
+      "Five pairs of wispy strip lashes with a flexible band. Apply with lash glue, remove them before sleeping, and clean the band after each wear.",
     price: 25000,
     compareAtPrice: 35000,
     image:
@@ -202,19 +202,19 @@ export const products: Product[] = [
     rating: 4.5,
     reviewCount: 51,
     details: [
+      "5 pairs of strip lashes",
       "Wispy style",
-      "Comfortable flexible band",
-      "Reusable multiple times",
-      "Lightweight and natural",
-      "Suitable for salon use",
+      "Flexible band",
+      "Apply with lash glue",
+      "Remove before sleeping and clean after each wear",
     ],
   },
   {
     id: "care-edge-control",
-    name: "Edge control gel",
+    name: "Edge Control Gel",
     category: "Hair Care",
     description:
-      "Strong-hold edge gel that smooths edges without flaking or leaving a white residue.",
+      "Strong-hold edge gel in a 100ml jar. Apply a small amount with an edge brush to smooth your edges, then close the jar.",
     price: 18000,
     compareAtPrice: 24000,
     image:
@@ -226,19 +226,19 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 73,
     details: [
-      "24-hour strong hold",
-      "No flaking or white residue",
-      "Moisturizing formula with argan oil",
-      "Smooths edges quickly",
       "100ml jar",
+      "Strong hold",
+      "Apply with an edge brush",
+      "Close the jar after use",
+      "Wipe the rim clean",
     ],
   },
   {
     id: "care-brand-oil",
-    name: "Growth serum oil",
+    name: "Growth Serum Oil",
     category: "Hair Care",
     description:
-      "Scalp oil with biotin, castor oil and rosemary, for hair that looks fuller and feels conditioned.",
+      "Scalp oil with biotin, castor oil and rosemary in a 60ml bottle. Massage a small amount into the scalp. Keep it out of your eyes and store it away from sunlight.",
     price: 32000,
     image:
       "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=1200&auto=format&fit=crop",
@@ -251,10 +251,10 @@ export const products: Product[] = [
     featured: true,
     details: [
       "Biotin, castor oil and rosemary",
-      "Massaged into the scalp",
-      "Strengthens roots & reduces breakage",
-      "Adds natural shine",
       "60ml bottle",
+      "Massage into the scalp",
+      "Avoid contact with eyes",
+      "Store away from sunlight",
     ],
   },
   {
@@ -262,7 +262,7 @@ export const products: Product[] = [
     name: "Revive + Repair Shampoo",
     category: "Hair Care",
     description:
-      "Sulfate-free shampoo that cleanses while restoring moisture balance. Safe for colored and chemically treated hair.",
+      "Sulfate-free shampoo for coloured and chemically treated hair. The bottle is 350ml. Massage it into wet hair, rinse, then follow with conditioner.",
     price: 28000,
     image:
       "https://images.unsplash.com/photo-1747858989102-cca0f4dc4a11?q=80&w=1200&auto=format&fit=crop",
@@ -273,11 +273,11 @@ export const products: Product[] = [
     rating: 4.6,
     reviewCount: 29,
     details: [
-      "Sulfate & paraben free",
-      "Deeply hydrating formula",
-      "Safe for keratin treatments",
-      "Restores natural shine",
       "350ml bottle",
+      "Sulfate-free",
+      "For coloured and chemically treated hair",
+      "Massage into wet hair and rinse",
+      "Follow with conditioner",
     ],
   },
   {
@@ -285,7 +285,7 @@ export const products: Product[] = [
     name: "Silk Bonnet Scarf Set",
     category: "Hair Care",
     description:
-      "100% mulberry silk bonnet and scrunchie set. Protects hair overnight while sleeping to prevent breakage and preserve style.",
+      "A mulberry silk bonnet and matching scrunchie. The bonnet has an adjustable elastic band. Hand-wash both pieces in cool water and let them air-dry.",
     price: 35000,
     image:
       "https://images.unsplash.com/photo-1661879206759-465a93950df5?q=80&w=1200&auto=format&fit=crop",
@@ -296,11 +296,11 @@ export const products: Product[] = [
     rating: 4.9,
     reviewCount: 25,
     details: [
-      "100% mulberry silk construction",
-      "Reduces friction and breakage",
+      "Mulberry silk bonnet",
+      "Matching scrunchie",
       "Adjustable elastic band",
-      "Gentle on edges & curls",
-      "Includes matching scrunchie",
+      "Hand-wash in cool water",
+      "Air-dry",
     ],
   },
 ];

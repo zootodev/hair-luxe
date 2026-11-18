@@ -18,7 +18,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const [toast, setToast] = useState<string | null>(null);
   const available = Math.max(0, product.stockCount - (product.sold ?? 0));
   const outOfStock = available <= 0;
-  const lowStock = available > 0 && available <= 5;
+  const lowStock = available > 0 && available <= 3;
   const selectedPrice = priceForLength(product, length);
   const varyingLengthPrices = hasVaryingLengthPrices(product);
 
@@ -85,7 +85,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         <p className="text-muted leading-relaxed mb-6">{product.description}</p>
 
         {outOfStock && <p className="text-sm text-danger mb-5">Out of stock</p>}
-        {lowStock && <p className="text-sm text-warning mb-5">Only {available} left</p>}
+        {lowStock && <p className="text-sm text-muted mb-5">{available} left</p>}
 
         {product.colors && product.colors.length > 0 && (
           <div className="mb-5">

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Testimonials from "@/components/home/Testimonials";
 
 const facts = [
   {
@@ -34,7 +33,6 @@ export default function WhyChooseUs() {
         <p className="text-sm text-muted mt-8">
           Need help choosing? <Link href="/contact" className="text-brand font-medium hover:underline">Send us a message</Link>.
         </p>
-        <Testimonials />
       </div>
     </section>
   );

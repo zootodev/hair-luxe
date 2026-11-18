@@ -26,7 +26,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-muted leading-relaxed">
-              {business.tagline}. Pickup at the studio or delivery in Lagos and Ibadan.
+              {business.tagline}. Pickup at the studio or delivery across the South-West.
             </p>
           </div>
 

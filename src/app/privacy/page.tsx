@@ -26,7 +26,7 @@ const SECTIONS = [
   {
     title: "Where your information is stored",
     body: [
-      "Order and booking records are stored securely on our hosting provider (Vercel) and, when configured, a Redis-based data store (Upstash/Vercel KV). Our team members need a private password to view order details in the admin dashboard.",
+      "Order and booking records are stored in our online store database. Only Hair Luxe staff with an admin login can open them.",
       "Records are retained as long as needed to fulfil orders, provide support, and meet legal or tax obligations, and are then deleted.",
     ],
   },
@@ -45,8 +45,8 @@ const SECTIONS = [
   {
     title: "Third-party services",
     body: [
-      "We use EmailJS to send transactional emails (order confirmations, booking notifications, and status updates). Transactional emails are sent only in relation to an order or booking you initiated.",
-      "Website images are served from Unsplash and your device connects to Unsplash's CDN to load them.",
+      "We use an email service to send order confirmations, booking notifications and status updates. These emails are sent only in relation to an order or booking you started.",
+      "Product and service images are loaded from Unsplash, so your browser connects to Unsplash to display them.",
     ],
   },
   {
@@ -58,7 +58,7 @@ const SECTIONS = [
   {
     title: "Cookies and analytics",
     body: [
-      "This website does not use advertising or cross-site tracking cookies. If analytics are enabled in the future, they will not be used to build advertising profiles.",
+      "This website does not use advertising or cross-site tracking cookies, and we do not run analytics on customer activity. One cookie is used only to keep the admin login secure.",
     ],
   },
   {

@@ -35,7 +35,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const outOfStock = available <= 0;
-  const lowStock = available > 0 && available <= 5;
   const spec = productSpec(product);
   const variant = defaultVariant(product);
   const displayPrice = priceForLength(product, variant.length);
@@ -92,7 +91,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         {outOfStock && <p className="mt-2 text-xs text-danger">Out of stock</p>}
-        {lowStock && <p className="mt-2 text-xs text-warning">Only {available} left</p>}
 
         <div className="flex items-center gap-2 mt-4">
           <button

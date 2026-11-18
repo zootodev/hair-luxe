@@ -102,7 +102,7 @@ export function plainRange(value: string): string {
  */
 const PRODUCT_SPECS: Record<string, string> = {
   "fr-wig-royal": "22 inches · lace front · straight",
-  "fl-wig-silk": "24 inches · full lace · straight",
+  "fl-wig-silk": "24 inches · full lace · body wave",
   "closure-wig-goddess": "16 to 24 inches · braided · ready to wear",
   "bundle-seamless-wave": "24 inches · body wave · 3 bundles",
   "bundle-straight-silk": "24 inches · straight · 4 bundles",
