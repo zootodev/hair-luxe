@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { adminFetch } from "@/lib/admin-fetch";
 import type { NextRequest } from "next/server";
+import { isAdmin, verifyCsrf } from "@/lib/admin-session";
+import { markCatalogServiceDeleted } from "@/lib/store";
 
 export const runtime = "nodejs";
 
@@ -8,18 +9,21 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  if (!verifyCsrf(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token." }, { status: 403 });
+  }
+
   const { id } = await params;
   try {
-    const res = await adminFetch(`/api/admin/services/${id}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: "Unknown error" }));
-      return NextResponse.json({ error: err.error ?? "Failed to delete." }, { status: res.status });
-    }
-    return NextResponse.json({ success: true });
-  } catch (err: any) {
-    console.error("Admin service delete error:", err);
-    return NextResponse.json({ error: err.message ?? "Failed to delete." }, { status: 500 });
+    await markCatalogServiceDeleted(id);
+  } catch (error) {
+    console.error("[api/admin/services] delete failed", error);
+    return NextResponse.json({ error: "Failed to delete service." }, { status: 500 });
   }
+
+  return NextResponse.json({ ok: true });
 }

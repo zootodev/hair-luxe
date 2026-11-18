@@ -24,7 +24,10 @@ export function tokenMatches(token: string, expected: string): boolean {
 export const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 
 function getSecret(): string {
-  return process.env.ADMIN_SESSION_SECRET ?? process.env.ADMIN_PASSWORD ?? "";
+  // Keep the demo fallback in step with the login route: without it, `next
+  // start` with no ADMIN_PASSWORD accepts the demo password but cannot sign a
+  // session (WebCrypto rejects a zero-length HMAC key).
+  return process.env.ADMIN_SESSION_SECRET ?? process.env.ADMIN_PASSWORD ?? "hairluxe-demo";
 }
 
 function base64url(value: Uint8Array | string): string {

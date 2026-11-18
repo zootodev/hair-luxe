@@ -110,7 +110,9 @@ export async function getLiveSettings(): Promise<SiteSettings> {
 
 export async function getLiveProducts(): Promise<LiveProduct[]> {
   const [overrides, sold] = await Promise.all([getCatalogProducts(), getSold()]);
-  const fromSeed = baseProducts.map((base) => {
+  const fromSeed = baseProducts
+    .filter((base) => (overrides[base.id] as Record<string, unknown> | undefined)?.deleted !== true)
+    .map((base) => {
     const o = (overrides[base.id] ?? {}) as Record<string, unknown>;
     const price = asNumber(o.price, base.price);
     const compareAtRaw = o.compareAtPrice;
@@ -138,6 +140,7 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
   const created: LiveProduct[] = Object.entries(overrides).flatMap(([id, oRaw]) => {
     if (seedIds.has(id)) return [];
     const o = (oRaw ?? {}) as Record<string, unknown>;
+    if (o.deleted === true) return [];
     const name = typeof o.name === "string" ? o.name.trim() : "";
     const price = Number(o.price);
     if (!name || !Number.isFinite(price) || price <= 0) return [];
@@ -174,7 +177,9 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
 
 export async function getLiveServices(): Promise<LiveService[]> {
   const overrides = await getCatalogServices();
-  const fromSeed = baseServices.map((base) => {
+  const fromSeed = baseServices
+    .filter((base) => (overrides[base.id] as Record<string, unknown> | undefined)?.deleted !== true)
+    .map((base) => {
     const o = (overrides[base.id] ?? {}) as Record<string, unknown>;
     return {
       ...base,
@@ -195,6 +200,7 @@ export async function getLiveServices(): Promise<LiveService[]> {
   const created: LiveService[] = Object.entries(overrides).flatMap(([id, oRaw]) => {
     if (seedIds.has(id)) return [];
     const o = (oRaw ?? {}) as Record<string, unknown>;
+    if (o.deleted === true) return [];
     const name = typeof o.name === "string" ? o.name.trim() : "";
     if (!name) return [];
     const category = SERVICE_CATEGORIES.includes(o.category as Service["category"])

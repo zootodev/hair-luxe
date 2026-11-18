@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { adminFetch } from "@/lib/admin-fetch";
+import { useUnsavedChanges } from "@/components/admin/AdminShell";
 import { isStartPriceInRange } from "@/lib/pricing";
 import Modal from "@/components/ui/Modal";
 import type { Service, ServiceCategory } from "@/lib/types";
@@ -31,10 +32,6 @@ interface Draft {
   visible: boolean;
   dirty: boolean;
   saving: boolean;
-}
-
-interface ServicesManagerProps {
-  onDirtyChange?: (dirtyCount: number) => void;
 }
 
 interface NewService {
@@ -70,6 +67,7 @@ export default function ServicesManager() {
   // Last-saved values per service, used by "Discard changes".
   const pristineRef = useRef<Record<string, Draft>>({});
   const [discardTarget, setDiscardTarget] = useState<{ id: string; name: string } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Draft | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState("");
@@ -239,7 +237,28 @@ export default function ServicesManager() {
     }
   };
 
+  const deleteService = async (service: Draft) => {
+    setPendingDelete(null);
+    setError("");
+    try {
+      const res = await adminFetch(`/api/admin/services/${encodeURIComponent(service.id)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        setError(err.error ?? "Failed to delete the service.");
+        return;
+      }
+      setRows((prev) => prev.filter((r) => r.id !== service.id));
+      delete pristineRef.current[service.id];
+      setNotice(`Deleted "${service.name}".`);
+    } catch {
+      setError("Failed to delete the service. Please try again.");
+    }
+  };
+
   const dirtyCount = rows.filter((r) => r.dirty).length;
+  useUnsavedChanges(dirtyCount > 0);
 
   return (
     <div>
@@ -435,6 +454,14 @@ export default function ServicesManager() {
                   >
                     {row.saving ? "Saving..." : "Save"}
                   </button>
+                  <button
+                    onClick={() => setPendingDelete(row)}
+                    disabled={row.saving}
+                    title="Delete this service"
+                    className="px-3 py-1.5 rounded-md text-xs font-semibold text-danger hover:bg-danger-soft border border-danger/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
 
@@ -567,6 +594,34 @@ export default function ServicesManager() {
             className="px-4 h-10 rounded-md text-sm font-semibold bg-brand text-background hover:opacity-90 transition-opacity cursor-pointer"
           >
             Discard changes
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        title="Delete service?"
+      >
+        <p className="text-sm text-muted mb-6">
+          Delete{" "}
+          <span className="text-foreground font-semibold">{pendingDelete?.name}</span> from the
+          catalogue? It will be removed from the site and the booking page. This cannot be undone.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => setPendingDelete(null)}
+            className="px-4 h-10 rounded-md text-sm font-semibold bg-surface-light text-muted hover:text-brand transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (pendingDelete) void deleteService(pendingDelete);
+            }}
+            className="px-4 h-10 rounded-md text-sm font-semibold text-background bg-danger transition-colors cursor-pointer"
+          >
+            Delete service
           </button>
         </div>
       </Modal>

@@ -6,10 +6,18 @@ export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
 
+function loginUrl(request: NextRequest, pathname: string): URL {
+  const url = new URL("/admin/login", request.url);
+  if (pathname !== "/admin") url.searchParams.set("next", pathname + request.nextUrl.search);
+  return url;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isLogin = pathname === "/admin/login";
+  const isApi = pathname.startsWith("/api/admin");
 
-  if (pathname === "/admin/login" || pathname === "/api/admin/login") {
+  if (isLogin || pathname === "/api/admin/login") {
     // Valid session on /admin/login → redirect to /admin
     const token = request.cookies.get(SESSION_COOKIE)?.value;
     if (token && (await verifySessionToken(token))) {
@@ -20,38 +28,13 @@ export async function proxy(request: NextRequest) {
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
 
-  if (!token) {
-    if (pathname.startsWith("/api/admin")) {
+  if (!token || !(await verifySessionToken(token))) {
+    if (isApi) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
-    // Unauthenticated non-API /admin → redirect to login
-    if (pathname === "/admin") {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
-    }
-    return NextResponse.next();
+    // Every protected admin page (including /admin/bookings/[id]) → sign in.
+    return NextResponse.redirect(loginUrl(request, pathname));
   }
 
-  if (!(await verifySessionToken(token))) {
-    if (pathname.startsWith("/api/admin")) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
-    // Invalid session → redirect to login
-    if (pathname === "/admin") {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
-    }
-    return NextResponse.next();
-  }
-
-  // Valid session on non-API /admin → pass through
-  if (pathname === "/admin") {
-    return NextResponse.next();
-  }
-
-  // API admin routes
-  if (pathname.startsWith("/api/admin")) {
-    return NextResponse.next();
-  }
-
-  // Non-admin paths: just pass through
   return NextResponse.next();
 }

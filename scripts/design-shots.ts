@@ -42,6 +42,11 @@ const BASE_SHOTS: Shot[] = [
   { route: "/track-order", slug: "track-order-no-orders", fillOrder: "HL-2099-9999" },
   { route: "/admin/login", slug: "admin-login" },
   { route: "/admin", slug: "admin" },
+  { route: "/admin/orders", slug: "admin-orders" },
+  { route: "/admin/bookings", slug: "admin-bookings" },
+  { route: "/admin/products", slug: "admin-products" },
+  { route: "/admin/services", slug: "admin-services" },
+  { route: "/admin/settings", slug: "admin-settings" },
   { route: "/shop/no-such-product", slug: "product-not-found" },
 ];
 

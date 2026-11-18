@@ -206,6 +206,15 @@ async function pgUpsertBooking(booking: Booking): Promise<void> {
   );
 }
 
+async function pgGetBookingById(id: string): Promise<Booking | undefined> {
+  await pgInit();
+  const result = await pg().query<{ data: Booking }>(
+    "SELECT data FROM bookings WHERE LOWER(id) = LOWER($1)",
+    [id]
+  );
+  return result.rows[0]?.data;
+}
+
 async function pgDeleteBooking(id: string): Promise<boolean> {
   await pgInit();
   const result = await pg().query("DELETE FROM bookings WHERE LOWER(id) = LOWER($1)", [id]);
@@ -407,6 +416,19 @@ export async function getBookings(): Promise<Booking[]> {
   return mem.bookings;
 }
 
+export async function getBookingById(id: string): Promise<Booking | undefined> {
+  if (isPostgres()) {
+    try {
+      return await pgGetBookingById(id);
+    } catch (error) {
+      console.error("[store] failed to read booking", error);
+      return undefined;
+    }
+  }
+  const bookings = await getBookings();
+  return bookings.find((b) => b.id.toLowerCase() === id.toLowerCase());
+}
+
 export async function addBooking(booking: Booking): Promise<void> {
   if (isPostgres()) {
     await pgUpsertBooking(booking);
@@ -415,6 +437,29 @@ export async function addBooking(booking: Booking): Promise<void> {
     await persistBookings([booking, ...bookings]);
   }
   mem.bookings = [booking, ...mem.bookings];
+}
+
+export async function updateBookingStatus(
+  id: string,
+  status: Booking["status"]
+): Promise<boolean> {
+  if (!status) return false;
+  if (isPostgres()) {
+    const booking = await getBookingById(id);
+    if (!booking) return false;
+    await pgUpsertBooking({ ...booking, status });
+    mem.bookings = mem.bookings.map((b) =>
+      b.id.toLowerCase() === id.toLowerCase() ? { ...b, status } : b
+    );
+    return true;
+  }
+  const bookings = await getBookings();
+  const next = bookings.map((b) =>
+    b.id.toLowerCase() === id.toLowerCase() ? { ...b, status } : b
+  );
+  if (JSON.stringify(next) === JSON.stringify(bookings)) return false;
+  await persistBookings(next);
+  return true;
 }
 
 export async function deleteBooking(id: string): Promise<boolean> {
@@ -473,6 +518,14 @@ export async function deleteCatalogProduct(key: string): Promise<void> {
   delete mem.catalogProducts[key];
 }
 
+/**
+ * Tombstone a product. Seed products live in code, so deleting their override
+ * row is not enough — this marker makes the live catalogue skip them.
+ */
+export async function markCatalogProductDeleted(key: string): Promise<void> {
+  await saveCatalogProduct(key, { deleted: true });
+}
+
 export async function getCatalogServices(): Promise<Record<string, Record<string, unknown>>> {
   try {
     if (isPostgres()) return await pgGetCatalogServices();
@@ -497,6 +550,11 @@ export async function deleteCatalogService(key: string): Promise<void> {
     await pgDeleteCatalogService(key);
   }
   delete mem.catalogServices[key];
+}
+
+/** Tombstone a service so seed services can be deleted from the live catalogue. */
+export async function markCatalogServiceDeleted(key: string): Promise<void> {
+  await saveCatalogService(key, { deleted: true });
 }
 
 async function readStoredSettings(): Promise<Record<string, unknown>> {

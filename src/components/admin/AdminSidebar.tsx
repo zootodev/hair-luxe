@@ -1,20 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 
-export type AdminView = "dashboard" | "products" | "services" | "settings";
+export type AdminView = "orders" | "bookings" | "products" | "services" | "settings";
 
 interface AdminSidebarProps {
-  active: AdminView;
-  onChange: (view: AdminView) => void;
+  activePath: string;
+  onNavigate: (href: string) => void;
   onLogout: () => void;
 }
 
-const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
+const NAV: { key: AdminView; href: string; label: string; icon: ReactNode }[] = [
   {
-    key: "dashboard",
-    label: "Orders & bookings",
+    key: "orders",
+    href: "/admin/orders",
+    label: "Orders",
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
         <path
@@ -26,7 +28,22 @@ const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
     ),
   },
   {
+    key: "bookings",
+    href: "/admin/bookings",
+    label: "Bookings",
+    icon: (
+      <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
+        />
+      </svg>
+    ),
+  },
+  {
     key: "products",
+    href: "/admin/products",
     label: "Products",
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
@@ -40,6 +57,7 @@ const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
   },
   {
     key: "services",
+    href: "/admin/services",
     label: "Services",
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
@@ -53,6 +71,7 @@ const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
   },
   {
     key: "settings",
+    href: "/admin/settings",
     label: "Settings",
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
@@ -67,8 +86,11 @@ const NAV: { key: AdminView; label: string; icon: ReactNode }[] = [
   },
 ];
 
-export default function AdminSidebar({ active, onChange, onLogout }: AdminSidebarProps) {
-  const pillRefs = useRef<Partial<Record<AdminView, HTMLButtonElement | null>>>({});
+export default function AdminSidebar({ activePath, onNavigate, onLogout }: AdminSidebarProps) {
+  const pillRefs = useRef<Partial<Record<AdminView, HTMLAnchorElement | null>>>({});
+  const active =
+    NAV.find((item) => activePath === item.href || activePath.startsWith(`${item.href}/`))?.key ??
+    "orders";
 
   // The mobile nav is a single horizontally scrollable row: keep the active
   // pill in view when the section changes.
@@ -104,13 +126,18 @@ export default function AdminSidebar({ active, onChange, onLogout }: AdminSideba
           column on desktop (hidden scrollbar via .no-scrollbar). */}
       <nav className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 lg:pb-0 lg:flex-col lg:overflow-visible">
         {NAV.map((item) => (
-          <button
+          <Link
             key={item.key}
+            href={item.href}
             ref={(el) => {
               pillRefs.current[item.key] = el;
             }}
-            onClick={() => onChange(item.key)}
-            className={`flex shrink-0 items-center gap-2.5 px-4 py-2.5 rounded-md lg:rounded-md text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate(item.href);
+            }}
+            aria-current={active === item.key ? "page" : undefined}
+            className={`flex shrink-0 items-center gap-2.5 px-4 py-2.5 rounded-md text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
               active === item.key
                 ? "bg-brand text-background"
                 : "bg-surface border border-surface-light text-muted hover:text-brand hover:border-brand/40"
@@ -118,7 +145,7 @@ export default function AdminSidebar({ active, onChange, onLogout }: AdminSideba
           >
             <span className="w-4.5 h-4.5">{item.icon}</span>
             {item.label}
-          </button>
+          </Link>
         ))}
         <button
           onClick={onLogout}

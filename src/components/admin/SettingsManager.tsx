@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/lib/admin-fetch";
+import { useUnsavedChanges } from "@/components/admin/AdminShell";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 
@@ -45,6 +46,7 @@ export default function SettingsManager() {
     null
   );
   const [zonePendingRemoval, setZonePendingRemoval] = useState<number | null>(null);
+  const [pristine, setPristine] = useState<SettingsDraft | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -74,7 +76,7 @@ export default function SettingsManager() {
         };
       };
       const s = data.settings;
-      setForm({
+      const loaded: SettingsDraft = {
         businessName: s.business.name,
         tagline: s.business.tagline ?? "",
         email: s.business.email,
@@ -96,7 +98,9 @@ export default function SettingsManager() {
         })),
         announcementEnabled: s.announcement.enabled,
         announcementText: s.announcement.text ?? "",
-      });
+      };
+      setPristine(loaded);
+      setForm(loaded);
     } catch {
       setError("Could not load settings.");
     } finally {
@@ -173,6 +177,7 @@ export default function SettingsManager() {
         setError(message);
         setToast({ message, variant: "error" });
       } else {
+        setPristine(form);
         setToast({ message: "Settings saved.", variant: "success" });
       }
     } catch {
@@ -183,6 +188,12 @@ export default function SettingsManager() {
       setSaving(false);
     }
   };
+
+  const dirty =
+    form !== null &&
+    pristine !== null &&
+    JSON.stringify(form) !== JSON.stringify(pristine);
+  useUnsavedChanges(dirty);
 
   return (
     <div>
