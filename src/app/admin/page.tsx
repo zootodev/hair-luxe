@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPriceShort } from "@/lib/format";
 import { formatIntlPhone, telHref } from "@/lib/format";
-import type { Order, Booking } from "@/lib/types";
+import type { Order, Booking, Product, Service } from "@/lib/types";
 import AdminSidebar, { type AdminView } from "@/components/admin/AdminSidebar";
 import ProductsManager from "@/components/admin/ProductsManager";
 import ServicesManager from "@/components/admin/ServicesManager";
@@ -79,6 +79,10 @@ export default function AdminPage() {
   } | null>(null);
   // Confirmation modal for deleting a booking (styled, like orders).
   const [pendingDeleteBooking, setPendingDeleteBooking] = useState<Booking | null>(null);
+  // Confirmation modal for deleting a product.
+  const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Product | null>(null);
+  // Confirmation modal for deleting a service.
+  const [pendingDeleteService, setPendingDeleteService] = useState<Service | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -256,6 +260,52 @@ export default function AdminPage() {
         return;
       }
       setToast({ message: `Booking ${bookingId} deleted.`, variant: "success" });
+    } catch {
+      setToast({ message: "Network error. Please try again.", variant: "error" });
+    }
+    await fetchData();
+  };
+
+  const handleDeleteProduct = async (product: Product) => {
+    setPendingDeleteProduct(product);
+  };
+
+  const confirmDeleteProduct = async (productId: string) => {
+    setPendingDeleteProduct(null);
+    try {
+      const res = await adminFetch(`/api/admin/catalog/${encodeURIComponent(productId)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        setToast({ message: err.error ?? "Failed to delete product.", variant: "error" });
+        if (res.status === 401) router.push("/admin/login");
+        return;
+      }
+      setToast({ message: `Product deleted.`, variant: "success" });
+    } catch {
+      setToast({ message: "Network error. Please try again.", variant: "error" });
+    }
+    await fetchData();
+  };
+
+  const handleDeleteService = async (service: Service) => {
+    setPendingDeleteService(service);
+  };
+
+  const confirmDeleteService = async (serviceId: string) => {
+    setPendingDeleteService(null);
+    try {
+      const res = await adminFetch(`/api/admin/services/${encodeURIComponent(serviceId)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Unknown error" }));
+        setToast({ message: err.error ?? "Failed to delete service.", variant: "error" });
+        if (res.status === 401) router.push("/admin/login");
+        return;
+      }
+      setToast({ message: `Service deleted.`, variant: "success" });
     } catch {
       setToast({ message: "Network error. Please try again.", variant: "error" });
     }

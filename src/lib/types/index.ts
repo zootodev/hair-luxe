@@ -106,6 +106,8 @@ export interface Order {
   date: string;
 }
 
+export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled" | "no-show";
+
 export interface Booking {
   id: string;
   name: string;
@@ -114,6 +116,7 @@ export interface Booking {
   service: string;
   date: string;
   time: string;
+  status?: BookingStatus;
   notes?: string;
   dateCreated: string;
 }

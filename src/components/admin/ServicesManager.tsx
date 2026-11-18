@@ -33,6 +33,10 @@ interface Draft {
   saving: boolean;
 }
 
+interface ServicesManagerProps {
+  onDirtyChange?: (dirtyCount: number) => void;
+}
+
 interface NewService {
   name: string;
   description: string;
