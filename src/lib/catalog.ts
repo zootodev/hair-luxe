@@ -38,6 +38,19 @@ function asStringArray(value: unknown): string[] | undefined {
   return arr.length > 0 ? arr : undefined;
 }
 
+function asPriceMap(value: unknown): Record<string, number> | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const entries = Object.entries(value as Record<string, unknown>).flatMap(
+    ([length, price]) => {
+      const key = length.trim();
+      const amount = Number(price);
+      if (!key || !Number.isFinite(amount) || amount <= 0) return [];
+      return [[key, amount] as const];
+    }
+  );
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+}
+
 function asBankDetails(value: unknown, fallback: SiteSettings["bankDetails"]): SiteSettings["bankDetails"] {
   const o = (value && typeof value === "object" ? value : {}) as Partial<SiteSettings["bankDetails"]>;
   return {
@@ -129,6 +142,7 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
       compareAtPrice,
       image: asString(o.image, base.image),
       stockCount: asNumber(o.stockCount, base.stockCount),
+      lengthPrices: asPriceMap(o.lengthPrices) ?? base.lengthPrices,
       featured: asBoolean(o.featured, base.featured ?? false),
       visible: o.visible === false ? false : true,
       sold: sold[base.id] ?? 0,
@@ -168,6 +182,7 @@ export async function getLiveProducts(): Promise<LiveProduct[]> {
         details: asStringArray(o.details) ?? [],
         colors: asStringArray(o.colors),
         lengths: asStringArray(o.lengths),
+        lengthPrices: asPriceMap(o.lengthPrices),
       },
     ];
   });

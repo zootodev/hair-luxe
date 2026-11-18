@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { addBooking, nextBookingId } from "@/lib/store";
 import { sendBookingEmail } from "@/lib/email-server";
+import { isPastBookingDate, isValidIsoDate } from "@/lib/booking-date";
 import { formatNigerianPhone } from "@/lib/format";
 import type { Booking } from "@/lib/types";
 
@@ -73,13 +74,9 @@ export async function POST(request: NextRequest) {
   }
 
   const date = body.date ?? "";
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const min = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-  const selected = new Date(date + "T00:00:00");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || selected.getTime() < min.getTime()) {
+  if (!isValidIsoDate(date) || isPastBookingDate(date)) {
     return NextResponse.json(
-      { error: "Please select a date at least 1 day from today." },
+      { error: "Please select today or a future date." },
       { status: 400 }
     );
   }

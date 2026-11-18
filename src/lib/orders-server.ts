@@ -6,7 +6,9 @@ import {
   nextOrderId,
 } from "@/lib/store";
 import { sendOrderEmail } from "@/lib/email-server";
+import { cartLineKey } from "@/lib/cart";
 import { formatNigerianPhone } from "@/lib/format";
+import { priceForLength } from "@/lib/product-pricing";
 import type { CartItem, DeliveryMethod, Order } from "@/lib/types";
 
 export interface CreateOrderInput {
@@ -89,30 +91,68 @@ export async function createOrderServer(
   }
 
   const validatedItems: CartItem[] = [];
+  const productsById = new Map<string, LiveProduct>();
+  const requestedByProduct = new Map<string, number>();
   for (const item of items) {
-    const product: LiveProduct | undefined = await getLiveProductById(item.productId);
+    const existingProduct = productsById.get(item.productId);
+    const product: LiveProduct | undefined =
+      existingProduct ?? (await getLiveProductById(item.productId));
     if (!product) {
       return { ok: false, error: `Product ${item.productId} is no longer available.` };
     }
+    productsById.set(product.id, product);
     if (product.visible === false) {
       return { ok: false, error: `${product.name} is no longer available.` };
     }
+    if (item.color && product.colors && !product.colors.includes(item.color)) {
+      return { ok: false, error: `${product.name} is no longer available in that colour.` };
+    }
+    if (item.length && product.lengths && !product.lengths.includes(item.length)) {
+      return { ok: false, error: `${product.name} is no longer available in that length.` };
+    }
+
     const qty = Math.max(1, Math.floor(Number(item.quantity) || 1));
+    const requested = (requestedByProduct.get(product.id) ?? 0) + qty;
+    requestedByProduct.set(product.id, requested);
+
+    const color =
+      item.color && product.colors?.includes(item.color)
+        ? item.color
+        : product.colors?.[0];
+    const length =
+      item.length && product.lengths?.includes(item.length)
+        ? item.length
+        : product.lengths?.[0];
+    const lineKey = cartLineKey({ productId: product.id, color, length });
+    const existingLine = validatedItems.find(
+      (validated) => cartLineKey(validated) === lineKey
+    );
+    if (existingLine) {
+      existingLine.quantity += qty;
+    } else {
+      validatedItems.push({
+        productId: product.id,
+        name: product.name,
+        price: priceForLength(product, length),
+        image: product.image,
+        quantity: qty,
+        category: product.category,
+        color,
+        length,
+      });
+    }
+  }
+
+  for (const [productId, requested] of requestedByProduct) {
+    const product = productsById.get(productId);
+    if (!product) continue;
     const availableStock = Math.max(0, product.stockCount - product.sold);
-    if (qty > availableStock) {
+    if (requested > availableStock) {
       return {
         ok: false,
         error: `${product.name} only has ${availableStock} in stock.`,
       };
     }
-    validatedItems.push({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: qty,
-      category: product.category,
-    });
   }
 
   const subtotal = Number(

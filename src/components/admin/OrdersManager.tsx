@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatIntlPhone, formatPriceShort, telHref } from "@/lib/format";
 import { adminFetch } from "@/lib/admin-fetch";
+import { cartLineKey, variantSummary } from "@/lib/cart";
 import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
 import type { Booking, Order } from "@/lib/types";
 import Modal from "@/components/ui/Modal";
@@ -463,9 +464,14 @@ export default function OrdersManager() {
                               <h4 className="text-xs text-muted mb-3">Items ({order.items.length})</h4>
                               <div className="rounded-md bg-surface-light/50 p-4 space-y-2 text-sm">
                                 {order.items.map((item) => (
-                                  <p key={item.productId} className="flex justify-between gap-3">
+                                  <p key={cartLineKey(item)} className="flex justify-between gap-3">
                                     <span>
                                       {item.name} <span className="text-muted">x{item.quantity}</span>
+                                      {variantSummary(item) && (
+                                        <span className="block text-xs text-muted">
+                                          {variantSummary(item)}
+                                        </span>
+                                      )}
                                     </span>
                                     <span className="font-medium tabular">
                                       {formatPriceShort(item.price * item.quantity)}

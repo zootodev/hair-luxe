@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Product } from "@/lib/types";
 import { formatPriceShort, productSpec } from "@/lib/format";
+import {
+  defaultVariant,
+  hasVaryingLengthPrices,
+  priceForLength,
+} from "@/lib/product-pricing";
 import { useCart } from "@/lib/context/CartContext";
 import { getSoldCount } from "@/lib/stock";
 import Toast from "@/components/ui/Toast";
@@ -32,6 +37,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const outOfStock = available <= 0;
   const lowStock = available > 0 && available <= 5;
   const spec = productSpec(product);
+  const variant = defaultVariant(product);
+  const displayPrice = priceForLength(product, variant.length);
+  const varyingLengthPrices = hasVaryingLengthPrices(product);
 
   const handleQuickAdd = () => {
     if (outOfStock || adding) return;
@@ -41,10 +49,12 @@ export default function ProductCard({ product }: ProductCardProps) {
       addItem({
         productId: product.id,
         name: product.name,
-        price: product.price,
+        price: displayPrice,
         image: product.image,
         quantity: 1,
         category: product.category,
+        color: variant.color,
+        length: variant.length,
       });
       setAdding(false);
       setToast("Added to cart");
@@ -78,7 +88,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </Link>
         <p className="text-xs text-muted mt-1">{spec}</p>
         <p className="text-lg font-semibold text-brand price tabular mt-3">
-          {formatPriceShort(product.price)}
+          {varyingLengthPrices ? `From ${formatPriceShort(displayPrice)}` : formatPriceShort(displayPrice)}
         </p>
 
         {outOfStock && <p className="mt-2 text-xs text-danger">Out of stock</p>}

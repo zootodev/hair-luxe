@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { formatPriceShort, productSpec, swatchColor } from "@/lib/format";
+import { hasVaryingLengthPrices, priceForLength } from "@/lib/product-pricing";
 import { useCart } from "@/lib/context/CartContext";
 import Toast from "@/components/ui/Toast";
 import type { Product } from "@/lib/types";
@@ -18,6 +19,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const available = Math.max(0, product.stockCount - (product.sold ?? 0));
   const outOfStock = available <= 0;
   const lowStock = available > 0 && available <= 5;
+  const selectedPrice = priceForLength(product, length);
+  const varyingLengthPrices = hasVaryingLengthPrices(product);
 
   const handleAdd = () => {
     if (outOfStock || adding) return;
@@ -27,10 +30,12 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       addItem({
         productId: product.id,
         name: product.name,
-        price: product.price,
+        price: selectedPrice,
         image: product.image,
         quantity,
         category: product.category,
+        color: color ?? undefined,
+        length: length ?? undefined,
       });
       setAdding(false);
       setToast("Added to cart");
@@ -74,7 +79,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         <p className="text-sm text-muted mb-4">{productSpec(product)}</p>
 
         <p className="text-3xl font-semibold text-brand price tabular mb-6">
-          {formatPriceShort(product.price)}
+          {formatPriceShort(selectedPrice)}
         </p>
 
         <p className="text-muted leading-relaxed mb-6">{product.description}</p>
@@ -144,13 +149,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                       onClick={() => setLength(l)}
                       aria-pressed={length === l}
                       title={l}
-                      className={`px-3 h-9 rounded-md text-xs font-semibold border transition-colors cursor-pointer ${
+                      className={`px-3 py-2 rounded-md text-xs font-semibold border transition-colors cursor-pointer ${
                         length === l
                           ? "bg-brand text-background border-brand"
                           : "bg-surface text-muted border-surface-light hover:border-brand/40 hover:text-brand"
                       }`}
                     >
-                      {l}
+                      <span>{l}</span>
+                      {varyingLengthPrices && (
+                        <span className="block text-[10px] font-normal opacity-80 mt-0.5">
+                          {formatPriceShort(priceForLength(product, l))}
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>

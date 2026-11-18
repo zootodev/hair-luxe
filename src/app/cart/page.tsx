@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/context/CartContext";
+import { cartLineKey, variantSummary } from "@/lib/cart";
+import { deliveryFeeLabel, freeDeliveryThresholdText } from "@/lib/delivery-display";
 import { formatPriceShort } from "@/lib/format";
 import Button from "@/components/ui/Button";
 
@@ -55,9 +57,12 @@ export default function CartPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
+            {items.map((item) => {
+              const lineKey = cartLineKey(item);
+              const variant = variantSummary(item);
+              return (
               <div
-                key={item.productId}
+                key={lineKey}
                 className="flex flex-col sm:flex-row gap-4 p-4 rounded-md bg-surface border border-surface-light"
               >
                 <Link
@@ -76,9 +81,10 @@ export default function CartPage() {
                       >
                         {item.name}
                       </Link>
+                      {variant && <p className="text-xs text-muted mt-0.5">{variant}</p>}
                     </div>
                     <button
-                      onClick={() => removeItem(item.productId)}
+                      onClick={() => removeItem(lineKey)}
                       className="text-muted hover:text-danger transition-colors cursor-pointer"
                       aria-label={`Remove ${item.name} from cart`}
                     >
@@ -94,7 +100,7 @@ export default function CartPage() {
                   <div className="mt-auto pt-3 flex items-center justify-between">
                     <div className="flex items-center rounded-md border border-surface-light bg-surface-light">
                       <button
-                        onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                        onClick={() => updateQuantity(lineKey, item.quantity - 1)}
                         className="flex items-center justify-center w-9 h-9 text-lg text-muted hover:text-brand transition-colors cursor-pointer"
                         aria-label={`Decrease quantity of ${item.name}`}
                       >
@@ -102,7 +108,7 @@ export default function CartPage() {
                       </button>
                       <span className="w-6 text-center text-sm font-semibold tabular">{item.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                        onClick={() => updateQuantity(lineKey, item.quantity + 1)}
                         className="flex items-center justify-center w-9 h-9 text-lg text-muted hover:text-brand transition-colors cursor-pointer"
                         aria-label={`Increase quantity of ${item.name}`}
                       >
@@ -115,7 +121,8 @@ export default function CartPage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
 
             <Link
               href="/shop"
@@ -130,7 +137,12 @@ export default function CartPage() {
 
           <div className="lg:col-span-1">
             <div className="rounded-md bg-surface border border-surface-light p-6 sticky top-24">
-              <h2 className="text-lg font-semibold mb-6">Order summary</h2>
+              <h2 className="text-lg font-semibold mb-2">Order summary</h2>
+              {freeDeliveryOver > 0 && (
+                <p className="text-xs text-muted mb-6">
+                  {freeDeliveryThresholdText(freeDeliveryOver)}
+                </p>
+              )}
 
               <div className="mb-6">
                 <p className="text-xs text-muted mb-3">Fulfilment method</p>
@@ -184,25 +196,26 @@ export default function CartPage() {
                   </span>
                   <span className="text-foreground price tabular">{formatPriceShort(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-muted">
-                  <span>{deliveryMethod === "delivery" ? "Delivery fee" : "Pickup"}</span>
-                  <span className="text-foreground price tabular">
-                    {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)}
+                <div className="flex justify-between gap-3 text-muted">
+                  <span>{deliveryMethod === "delivery" ? "Delivery" : "Pickup"}</span>
+                  <span className="text-foreground price tabular text-right">
+                    {deliveryFeeLabel({
+                      deliveryMethod,
+                      deliveryZone,
+                      deliveryFee,
+                      subtotal,
+                      freeDeliveryOver,
+                    })}
                   </span>
                 </div>
-                {deliveryMethod === "delivery" && freeDeliveryOver > 0 && (
-                  <div
-                    className={`rounded-md border px-3 py-2.5 text-xs font-semibold ${
-                      subtotal >= freeDeliveryOver
-                        ? "bg-success-soft border-success/25 text-success"
-                        : "bg-brand/10 border-brand/30 text-brand"
-                    }`}
-                  >
-                    {subtotal >= freeDeliveryOver
-                      ? "Free delivery included"
-                      : `Add ${formatPriceShort(freeDeliveryOver - subtotal)} more for free delivery`}
-                  </div>
-                )}
+                {deliveryMethod === "delivery" &&
+                  deliveryZone &&
+                  freeDeliveryOver > 0 &&
+                  subtotal < freeDeliveryOver && (
+                    <p className="text-xs text-muted">
+                      Add {formatPriceShort(freeDeliveryOver - subtotal)} more for free delivery.
+                    </p>
+                  )}
                 <div className="flex justify-between font-semibold text-base border-t border-surface-light pt-3">
                   <span>Total</span>
                   <span className="text-brand price tabular">{formatPriceShort(total)}</span>

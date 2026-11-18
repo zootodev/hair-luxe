@@ -11,8 +11,8 @@ const facts = [
     text: "Pick up at the studio, or have your order delivered within the South-West.",
   },
   {
-    title: "Bank transfer or pay on arrival",
-    text: "Choose the payment option that suits you at checkout.",
+    title: "Bank transfer only",
+    text: "Pay by bank transfer at checkout. We confirm the transfer before preparing your order.",
   },
 ];
 

@@ -73,6 +73,11 @@ export const products: Product[] = [
     reviewCount: 19,
     colors: ["Natural Black", "Dark Brown", "Honey Blonde"],
     lengths: ["16 inches", "20 inches", "24 inches"],
+    lengthPrices: {
+      "16 inches": 180000,
+      "20 inches": 205000,
+      "24 inches": 230000,
+    },
     details: [
       "Handmade braided wig",
       "Natural-looking with a realistic hairline",

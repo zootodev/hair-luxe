@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { getOrders } from "@/lib/orders";
+import { cartLineKey, variantSummary } from "@/lib/cart";
 import { formatPriceShort } from "@/lib/format";
 import { studioLocation } from "@/lib/format";
 import { statusLabel } from "@/lib/order-status";
@@ -65,7 +66,7 @@ export default function OrderConfirmationPage() {
           {order.items.map((item) => {
             const productSlug = item.productId;
             return (
-              <div key={item.productId} className="flex items-center gap-3 py-2">
+              <div key={cartLineKey(item)} className="flex items-center gap-3 py-2">
                 <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-surface-light shrink-0">
                   <Image
                     src={item.image}
@@ -83,6 +84,9 @@ export default function OrderConfirmationPage() {
                     {item.name}
                     <span className="text-muted font-normal"> x{item.quantity}</span>
                   </Link>
+                  {variantSummary(item) && (
+                    <p className="text-xs text-muted">{variantSummary(item)}</p>
+                  )}
                 </div>
                 <span className="text-sm font-semibold price tabular">
                   {formatPriceShort(item.price * item.quantity)}

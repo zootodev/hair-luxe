@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getOrders } from "@/lib/orders";
+import { cartLineKey, variantSummary } from "@/lib/cart";
 import { formatPriceShort } from "@/lib/format";
 import { phonesMatch, studioLocation } from "@/lib/format";
 import { statusLabel, STATUS_BADGE_CLASSES } from "@/lib/order-status";
@@ -144,9 +145,12 @@ export default function TrackOrderPage() {
 
             <div className="space-y-3 mb-4">
               {found.items.map((item) => (
-                <div key={item.productId} className="flex items-center justify-between text-sm">
+                <div key={cartLineKey(item)} className="flex items-center justify-between gap-3 text-sm">
                   <span>
                     {item.name} <span className="text-muted">x{item.quantity}</span>
+                    {variantSummary(item) && (
+                      <span className="block text-xs text-muted">{variantSummary(item)}</span>
+                    )}
                   </span>
                   <span className="font-semibold price tabular">{formatPriceShort(item.price * item.quantity)}</span>
                 </div>

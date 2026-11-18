@@ -1,14 +1,16 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/context/CartContext";
+import { cartLineKey, variantSummary } from "@/lib/cart";
+import { deliveryFeeLabel, freeDeliveryThresholdText } from "@/lib/delivery-display";
 import { formatPriceShort } from "@/lib/format";
 import { formatNigerianPhone, studioLocation } from "@/lib/format";
 import { statusLabel } from "@/lib/order-status";
-import { generateOrderId, saveOrder } from "@/lib/orders";
+import { saveOrder } from "@/lib/orders";
 import { recordSold } from "@/lib/stock";
 import type { DeliveryZoneSettings, Order } from "@/lib/types";
 
@@ -20,8 +22,19 @@ const STATUS_STEPS = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, deliveryFee, total, deliveryMethod, deliveryZone, setDeliveryZone, clearCart, business, deliveryZones } =
-    useCart();
+  const {
+    items,
+    subtotal,
+    deliveryFee,
+    total,
+    deliveryMethod,
+    deliveryZone,
+    setDeliveryZone,
+    clearCart,
+    business,
+    deliveryZones,
+    freeDeliveryOver,
+  } = useCart();
 
   const zoneInfo =
     deliveryZones.find((z) => z.name === deliveryZone) ??
@@ -45,21 +58,6 @@ const [submitting, setSubmitting] = useState(false);
   const [proofLoading, setProofLoading] = useState(false);
   const [proofError, setProofError] = useState("");
   const proofInputRef = useRef<HTMLInputElement>(null);
-  const [previewId, setPreviewId] = useState<string>(() => generateOrderId());
-
-  useEffect(() => {
-    if (step !== 2) return;
-    let cancelled = false;
-    fetch("/api/orders/next")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: { id?: string } | null) => {
-        if (data?.id && !cancelled) setPreviewId(data.id);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [step]);
 
   const handleProofFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,7 +158,6 @@ const handlePlaceOrder = async () => {
           },
           paymentProof: proofFile?.dataUrl,
           paymentProofName: proofFile?.name,
-          requestedId: previewId,
         }),
       });
 
@@ -246,9 +243,12 @@ const handlePlaceOrder = async () => {
 
             <div className="space-y-3 mb-4">
               {placedOrder.items.map((item) => (
-                <div key={item.productId} className="flex items-center justify-between text-sm">
+                <div key={cartLineKey(item)} className="flex items-center justify-between text-sm">
                   <span>
                     {item.name} <span className="text-muted">x{item.quantity}</span>
+                    {variantSummary(item) && (
+                      <span className="block text-xs text-muted">{variantSummary(item)}</span>
+                    )}
                   </span>
                   <span className="font-semibold">
                     {formatPriceShort(item.price * item.quantity)}
@@ -580,9 +580,21 @@ const handlePlaceOrder = async () => {
                       />
                     </svg>
                     <p className="text-muted">
-                      Delivery is {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)} to{" "}
-                      {deliveryZone || "your zone"} and takes {zoneInfo.days}. We&apos;ll call you
-                      on your phone number before delivery.
+                      {deliveryZone ? (
+                        <>
+                          Delivery is{" "}
+                          {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)} to{" "}
+                          {deliveryZone} and takes {zoneInfo.days}. We&apos;ll call you on your
+                          phone number before delivery.
+                        </>
+                      ) : (
+                        <>
+                          Choose a delivery zone above to see the fee and delivery time.
+                          {freeDeliveryOver > 0 && (
+                            <> {freeDeliveryThresholdText(freeDeliveryOver)}.</>
+                          )}
+                        </>
+                      )}
                     </p>
                   </div>
                 ) : (
@@ -647,8 +659,8 @@ const handlePlaceOrder = async () => {
                         desc: `Transfer the exact amount of ${formatPriceShort(total)}. Double-check to avoid errors.`,
                       },
                       {
-                        title: `Step 4: use "Order ${previewId}" as reference`,
-                        desc: "Add your order number as the transfer reference or narration so we can match your payment quickly.",
+                        title: "Step 4: keep your transfer receipt",
+                        desc: "Keep the transfer confirmation. Once you place the order, we will show the order reference to use when you contact us.",
                       },
                       {
                         title: "Step 5: confirm below",
@@ -689,10 +701,6 @@ const handlePlaceOrder = async () => {
                         <span className="font-bold tabular text-brand text-base">
                           {formatPriceShort(total)}
                         </span>
-                      </p>
-                      <p className="flex justify-between">
-                        <span className="text-muted">Reference</span>
-                        <span className="font-medium">Order {previewId}</span>
                       </p>
                     </div>
                   </div>
@@ -762,8 +770,8 @@ const handlePlaceOrder = async () => {
                       <strong className="text-brand">{formatPriceShort(total)}</strong> to{" "}
                       <strong>
                         {business.bankDetails.bankName}, account {business.bankDetails.accountNumber}
-                      </strong>{" "}
-                      with reference <strong>Order {previewId}</strong>.
+                      </strong>
+                      .
                     </span>
                   </label>
 
@@ -795,10 +803,15 @@ const handlePlaceOrder = async () => {
 
           <div className="lg:col-span-2">
             <div className="rounded-md bg-surface border border-surface-light p-6 sticky top-24">
-              <h2 className="font-display text-xl font-bold mb-5">Order summary</h2>
+              <h2 className="font-display text-xl font-bold mb-2">Order summary</h2>
+              {freeDeliveryOver > 0 && (
+                <p className="text-xs text-muted mb-5">
+                  {freeDeliveryThresholdText(freeDeliveryOver)}
+                </p>
+              )}
               <div className="space-y-4 mb-5 max-h-64 overflow-y-auto pr-1">
                 {items.map((item) => (
-                  <div key={item.productId} className="flex items-center gap-3">
+                  <div key={cartLineKey(item)} className="flex items-center gap-3">
                     <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-surface-light shrink-0">
                       <Image
                         src={item.image}
@@ -810,6 +823,9 @@ const handlePlaceOrder = async () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.name}</p>
+                      {variantSummary(item) && (
+                        <p className="text-xs text-muted truncate">{variantSummary(item)}</p>
+                      )}
                       <p className="text-xs text-muted">
                         {formatPriceShort(item.price)} x {item.quantity}
                       </p>
@@ -826,14 +842,20 @@ const handlePlaceOrder = async () => {
                   <span>Subtotal</span>
                   <span className="text-foreground price tabular">{formatPriceShort(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-muted">
+                <div className="flex justify-between gap-3 text-muted">
                   <span>
                     {deliveryMethod === "delivery"
                       ? `Delivery${deliveryZone ? ` (${deliveryZone})` : ""}`
                       : "Pickup"}
                   </span>
-                  <span className="text-foreground tabular">
-                    {deliveryFee === 0 ? "Free" : formatPriceShort(deliveryFee)}
+                  <span className="text-foreground tabular text-right">
+                    {deliveryFeeLabel({
+                      deliveryMethod,
+                      deliveryZone,
+                      deliveryFee,
+                      subtotal,
+                      freeDeliveryOver,
+                    })}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-base border-t border-surface-light pt-3">

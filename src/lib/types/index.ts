@@ -40,6 +40,8 @@ export interface Product {
   details: string[];
   colors?: string[];
   lengths?: string[];
+  /** Optional price override keyed by the exact value in `lengths`. */
+  lengthPrices?: Record<string, number>;
 }
 
 export interface DeliveryZoneSettings {
@@ -78,6 +80,8 @@ export interface CartItem {
   image: string;
   quantity: number;
   category: ProductCategory;
+  color?: string;
+  length?: string;
 }
 
 export interface ContactInfo {

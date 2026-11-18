@@ -9,16 +9,20 @@ import { createSessionToken, verifySessionToken } from "@/lib/admin-auth";
  */
 describe("admin session signing without env config", () => {
   const saved = {
+    vercelEnv: process.env.VERCEL_ENV,
     password: process.env.ADMIN_PASSWORD,
     secret: process.env.ADMIN_SESSION_SECRET,
   };
 
   beforeEach(() => {
+    delete process.env.VERCEL_ENV;
     delete process.env.ADMIN_PASSWORD;
     delete process.env.ADMIN_SESSION_SECRET;
   });
 
   afterEach(() => {
+    if (saved.vercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = saved.vercelEnv;
     if (saved.password === undefined) delete process.env.ADMIN_PASSWORD;
     else process.env.ADMIN_PASSWORD = saved.password;
     if (saved.secret === undefined) delete process.env.ADMIN_SESSION_SECRET;

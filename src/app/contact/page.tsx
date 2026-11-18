@@ -3,17 +3,37 @@
 import { useState } from "react";
 import { useCart } from "@/lib/context/CartContext";
 
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
 export default function ContactPage() {
   const { business } = useCart();
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [sendError, setSendError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const updateField = (field: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    setFieldErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+    setSendError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
-      setSendError("Please fill in all required fields (marked with *).");
+    const nextErrors: Record<string, string> = {};
+    if (!form.name.trim()) nextErrors.name = "Required";
+    if (!EMAIL_PATTERN.test(form.email.trim())) nextErrors.email = "Enter a valid email";
+    if (!form.subject.trim()) nextErrors.subject = "Select a topic";
+    if (!form.message.trim()) nextErrors.message = "Required";
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      setSendError("");
       return;
     }
     setSending(true);
@@ -140,6 +160,7 @@ export default function ContactPage() {
           <div className="lg:col-span-3">
             <form
               onSubmit={handleSubmit}
+              noValidate
               className="rounded-md bg-surface border border-surface-light p-6 sm:p-8"
             >
               <h2 className="font-display text-xl font-bold mb-1">Send us a message</h2>
@@ -157,7 +178,7 @@ export default function ContactPage() {
                     tabIndex={-1}
                     autoComplete="off"
                     value={form.website}
-                    onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    onChange={(e) => updateField("website", e.target.value)}
                   />
                 </label>
               </div>
@@ -170,11 +191,17 @@ export default function ContactPage() {
                     type="text"
                     required
                     aria-required="true"
+                    aria-invalid={!!fieldErrors.name}
                     value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
+                    onChange={(e) => updateField("name", e.target.value)}
+                    className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
+                      fieldErrors.name ? "border-danger" : "border-surface-light focus:border-brand"
+                    }`}
                     placeholder="Jane Smith"
                   />
+                  {fieldErrors.name && (
+                    <p className="text-xs text-danger mt-1">{fieldErrors.name}</p>
+                  )}
                 </label>
                 <label className="block">
                   <span className="text-xs text-muted mb-1.5 block">
@@ -183,7 +210,7 @@ export default function ContactPage() {
                   <input
                     type="tel"
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onChange={(e) => updateField("phone", e.target.value)}
                     className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
                     placeholder="+234 800 000 0000"
                   />
@@ -197,11 +224,17 @@ export default function ContactPage() {
                   type="email"
                   required
                   aria-required="true"
+                  aria-invalid={!!fieldErrors.email}
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
+                  onChange={(e) => updateField("email", e.target.value)}
+                  className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
+                    fieldErrors.email ? "border-danger" : "border-surface-light focus:border-brand"
+                  }`}
                   placeholder="jane@email.com"
                 />
+                {fieldErrors.email && (
+                  <p className="text-xs text-danger mt-1">{fieldErrors.email}</p>
+                )}
               </label>
               <label className="block mb-4">
                 <span className="text-xs text-muted mb-1.5 block">
@@ -210,9 +243,12 @@ export default function ContactPage() {
                 <select
                   required
                   aria-required="true"
+                  aria-invalid={!!fieldErrors.subject}
                   value={form.subject}
-                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none appearance-none"
+                  onChange={(e) => updateField("subject", e.target.value)}
+                  className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none appearance-none ${
+                    fieldErrors.subject ? "border-danger" : "border-surface-light focus:border-brand"
+                  }`}
                 >
                   <option value="" disabled>
                     Select a topic
@@ -224,6 +260,9 @@ export default function ContactPage() {
                   <option>Delivery / Pickup</option>
                   <option>Other</option>
                 </select>
+                {fieldErrors.subject && (
+                  <p className="text-xs text-danger mt-1">{fieldErrors.subject}</p>
+                )}
               </label>
               <label className="block mb-6">
                 <span className="text-xs text-muted mb-1.5 block">
@@ -232,11 +271,17 @@ export default function ContactPage() {
                 <textarea
                   required
                   aria-required="true"
+                  aria-invalid={!!fieldErrors.message}
                   value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-brand focus:outline-none min-h-[140px] resize-none"
+                  onChange={(e) => updateField("message", e.target.value)}
+                  className={`w-full rounded-lg bg-surface-light border px-4 py-3 text-sm focus:outline-none min-h-[140px] resize-none ${
+                    fieldErrors.message ? "border-danger" : "border-surface-light focus:border-brand"
+                  }`}
                   placeholder="How can we help?"
                 />
+                {fieldErrors.message && (
+                  <p className="text-xs text-danger mt-1">{fieldErrors.message}</p>
+                )}
               </label>
 
               {sent && (

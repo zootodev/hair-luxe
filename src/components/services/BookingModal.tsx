@@ -4,8 +4,16 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { generateBookingId, saveBooking } from "@/lib/orders";
 import { BUSINESS } from "@/lib/config";
+import {
+  formatBookingDate,
+  formatBookingDateShort,
+  isPastBookingDate,
+  lagosTodayIso,
+} from "@/lib/booking-date";
 import { formatIntlPhone, formatNigerianPhone, plainRange } from "@/lib/format";
 import type { Booking, Service } from "@/lib/types";
+
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 const TIME_SLOTS = [
   "9:00 AM",
@@ -39,14 +47,25 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<Booking | null>(null);
   const [error, setError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const updateField = (field: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    setFieldErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+    setError("");
+  };
 
   const close = () => {
     onClose();
     setForm({ name: "", email: "", phone: "", date: "", time: "", notes: "", website: "" });
     setSuccess(null);
     setError("");
-    setPhoneError("");
+    setFieldErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,17 +73,22 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
 
     // Always stored as a normalised string (+234XXXXXXXXXX).
     const phone = formatNigerianPhone(form.phone);
+    const nextErrors: Record<string, string> = {};
+    if (!form.name.trim()) nextErrors.name = "Required";
+    if (!EMAIL_PATTERN.test(form.email.trim())) nextErrors.email = "Enter a valid email";
     if (!phone) {
-      setPhoneError("Enter a valid Nigerian phone number, e.g. 08123456789");
-      return;
+      nextErrors.phone = "Enter a valid Nigerian phone number, for example 08123456789";
     }
-    setPhoneError("");
+    if (!form.date) {
+      nextErrors.date = "Choose a date";
+    } else if (isPastBookingDate(form.date)) {
+      nextErrors.date = "Choose today or a future date";
+    }
+    if (!TIME_SLOTS.includes(form.time)) nextErrors.time = "Select a time";
 
-    const minDate = new Date();
-    minDate.setDate(minDate.getDate() + 1);
-    const selected = new Date(form.date);
-    if (selected < minDate) {
-      setError("Please select a date at least 1 day from today.");
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0 || !phone) {
+      setError("");
       return;
     }
 
@@ -137,9 +161,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
     console.warn("Booking saved locally only; server persistence is not available.");
   };
 
-  const today = new Date();
-  const minDate = new Date(today);
-  minDate.setDate(minDate.getDate() + 1);
+  const todayIso = lagosTodayIso();
 
   return (
     <Modal
@@ -169,14 +191,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             </p>
             <p>
               <span className="text-muted">Date:</span>{" "}
-              <span className="font-semibold">
-                {new Date(success.date + "T00:00:00").toLocaleDateString("en-NG", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
+              <span className="font-semibold">{formatBookingDate(success.date)}</span>
             </p>
             <p>
               <span className="text-muted">Time:</span>{" "}
@@ -208,7 +223,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div aria-hidden="true" className="hidden">
             <label>
               Leave this field empty
@@ -217,7 +232,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 tabIndex={-1}
                 autoComplete="off"
                 value={form.website}
-                onChange={(e) => setForm({ ...form, website: e.target.value })}
+                onChange={(e) => updateField("website", e.target.value)}
               />
             </label>
           </div>
@@ -236,10 +251,16 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 type="text"
                 required
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
+                onChange={(e) => updateField("name", e.target.value)}
+                aria-invalid={!!fieldErrors.name}
+                className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
+                  fieldErrors.name ? "border-danger" : "border-surface-light focus:border-brand"
+                }`}
                 placeholder="Jane Smith"
               />
+              {fieldErrors.name && (
+                <p className="text-xs text-danger mt-1">{fieldErrors.name}</p>
+              )}
             </label>
             <label className="block">
               <span className="text-xs text-muted mb-1.5 block">
@@ -249,18 +270,15 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                 type="tel"
                 required
                 value={form.phone}
-                onChange={(e) => {
-                  setPhoneError("");
-                  setForm({ ...form, phone: e.target.value });
-                }}
-                aria-invalid={!!phoneError}
+                onChange={(e) => updateField("phone", e.target.value)}
+                aria-invalid={!!fieldErrors.phone}
                 className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
-                  phoneError ? "border-danger" : "border-surface-light focus:border-brand"
+                  fieldErrors.phone ? "border-danger" : "border-surface-light focus:border-brand"
                 }`}
                 placeholder="+234 812 345 6789"
               />
-              {phoneError && (
-                <p className="text-xs text-danger mt-1">{phoneError}</p>
+              {fieldErrors.phone && (
+                <p className="text-xs text-danger mt-1">{fieldErrors.phone}</p>
               )}
             </label>
           </div>
@@ -272,10 +290,16 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
               type="email"
               required
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none"
+              onChange={(e) => updateField("email", e.target.value)}
+              aria-invalid={!!fieldErrors.email}
+              className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none ${
+                fieldErrors.email ? "border-danger" : "border-surface-light focus:border-brand"
+              }`}
               placeholder="jane@email.com"
             />
+            {fieldErrors.email && (
+              <p className="text-xs text-danger mt-1">{fieldErrors.email}</p>
+            )}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block">
@@ -285,11 +309,23 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
               <input
                 type="date"
                 required
-                min={minDate.toISOString().split("T")[0]}
+                min={todayIso}
                 value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none [color-scheme:dark]"
+                onChange={(e) => updateField("date", e.target.value)}
+                aria-invalid={!!fieldErrors.date}
+                className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none [color-scheme:dark] ${
+                  fieldErrors.date ? "border-danger" : "border-surface-light focus:border-brand"
+                }`}
               />
+              {fieldErrors.date ? (
+                <p className="text-xs text-danger mt-1">{fieldErrors.date}</p>
+              ) : (
+                form.date && (
+                  <p className="text-xs text-muted mt-1">
+                    Selected: {formatBookingDateShort(form.date)}
+                  </p>
+                )
+              )}
             </label>
             <label className="block">
               <span className="text-xs text-muted mb-1.5 block">
@@ -298,8 +334,11 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
               <select
                 required
                 value={form.time}
-                onChange={(e) => setForm({ ...form, time: e.target.value })}
-                className="w-full h-11 rounded-lg bg-surface-light border border-surface-light px-4 text-sm focus:border-brand focus:outline-none appearance-none"
+                onChange={(e) => updateField("time", e.target.value)}
+                aria-invalid={!!fieldErrors.time}
+                className={`w-full h-11 rounded-lg bg-surface-light border px-4 text-sm focus:outline-none appearance-none ${
+                  fieldErrors.time ? "border-danger" : "border-surface-light focus:border-brand"
+                }`}
               >
                 <option value="" disabled>
                   Select time
@@ -310,6 +349,9 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
                   </option>
                 ))}
               </select>
+              {fieldErrors.time && (
+                <p className="text-xs text-danger mt-1">{fieldErrors.time}</p>
+              )}
             </label>
           </div>
           <label className="block">
@@ -318,7 +360,7 @@ export default function BookingModal({ service, isOpen, onClose }: BookingModalP
             </span>
             <textarea
               value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              onChange={(e) => updateField("notes", e.target.value)}
               className="w-full rounded-lg bg-surface-light border border-surface-light px-4 py-3 text-sm focus:border-brand focus:outline-none min-h-[80px] resize-none"
               placeholder="Anything we should know?"
             />

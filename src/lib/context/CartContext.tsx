@@ -10,6 +10,8 @@ import {
 import type { CartItem, DeliveryMethod, DeliveryZoneSettings } from "@/lib/types";
 import { BUSINESS, DELIVERY_ZONES } from "@/lib/config";
 import { getProductById } from "@/lib/data/products";
+import { addCartLine, cartLineKey, setCartLineQuantity } from "@/lib/cart";
+import { priceForLength } from "@/lib/product-pricing";
 import { getAvailableStock } from "@/lib/stock";
 
 export interface LiveCatalogProduct {
@@ -20,6 +22,9 @@ export interface LiveCatalogProduct {
   stockCount: number;
   sold: number;
   visible: boolean;
+  colors?: string[];
+  lengths?: string[];
+  lengthPrices?: Record<string, number>;
 }
 
 export interface LiveCatalogBusiness {
@@ -52,8 +57,8 @@ interface LiveCatalogPayload {
 interface CartContextValue {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (lineKey: string) => void;
+  updateQuantity: (lineKey: string, quantity: number) => void;
   clearCart: () => void;
   restockCheck: (items: CartItem[]) => CartItem[];
   itemCount: number;
@@ -83,9 +88,17 @@ function loadCart(): CartItem[] {
       .map((i) => {
         // Products outside the seed catalog can't be checked here; they are
         // validated against the live catalog by reconcileItems once loaded.
-        const known = getProductById(i.productId) !== undefined;
-        const max = known ? getAvailableStock(i.productId) : i.quantity;
-        return { ...i, quantity: Math.min(i.quantity, max) };
+        const product = getProductById(i.productId);
+        const max = product ? getAvailableStock(i.productId) : i.quantity;
+        const color = i.color ?? product?.colors?.[0];
+        const length = i.length ?? product?.lengths?.[0];
+        return {
+          ...i,
+          color,
+          length,
+          price: product ? priceForLength(product, length) : i.price,
+          quantity: Math.min(i.quantity, max),
+        };
       })
       .filter((i) => i.quantity > 0);
   } catch {
@@ -100,11 +113,17 @@ function reconcileItems(items: CartItem[], products: LiveCatalogProduct[]): Cart
     if (!p || p.visible === false) return [];
     const quantity = Math.min(i.quantity, Math.max(0, p.stockCount - p.sold));
     if (quantity <= 0) return [];
+    const color =
+      i.color && p.colors?.includes(i.color) ? i.color : p.colors?.[0] ?? i.color;
+    const length =
+      i.length && p.lengths?.includes(i.length) ? i.length : p.lengths?.[0] ?? i.length;
     return [
       {
         ...i,
+        color,
+        length,
         name: p.name,
-        price: p.price,
+        price: priceForLength(p, length),
         image: p.image,
         quantity,
       },
@@ -205,50 +224,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = (item: CartItem) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.productId === item.productId);
-      const newQty = (existing?.quantity ?? 0) + item.quantity;
       const maxQty = catalogStock[item.productId] ?? getAvailableStock(item.productId);
-      const capped = Math.max(0, Math.min(newQty, maxQty));
-      if (capped <= 0) return prev;
-      if (existing) {
-        return prev.map((i) =>
-          i.productId === item.productId
-            ? { ...i, quantity: capped, price: item.price, name: item.name, image: item.image }
-            : i
-        );
-      }
-      return [...prev, { ...item, quantity: capped }];
+      return addCartLine(prev, item, maxQty);
     });
   };
 
-  const removeItem = (productId: string) => {
-    setItems((prev) => prev.filter((i) => i.productId !== productId));
+  const removeItem = (lineKey: string) => {
+    setItems((prev) => prev.filter((i) => cartLineKey(i) !== lineKey));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(productId);
-      return;
-    }
-    const maxQty = catalogStock[productId] ?? getAvailableStock(productId);
-    const capped = Math.min(quantity, maxQty);
-    if (capped <= 0) {
-      removeItem(productId);
-      return;
-    }
-    setItems((prev) =>
-      prev.map((i) => (i.productId === productId ? { ...i, quantity: capped } : i))
-    );
+  const updateQuantity = (lineKey: string, quantity: number) => {
+    setItems((prev) => {
+      const target = prev.find((i) => cartLineKey(i) === lineKey);
+      if (!target) return prev;
+      const maxQty = catalogStock[target.productId] ?? getAvailableStock(target.productId);
+      return setCartLineQuantity(prev, lineKey, quantity, maxQty);
+    });
   };
 
   const clearCart = () => setItems([]);
 
   const restockCheck = (itemsToCheck: CartItem[]): CartItem[] => {
+    const used: Record<string, number> = {};
     return itemsToCheck
       .filter((i) => i.quantity > 0)
       .map((i) => {
         const maxQty = catalogStock[i.productId] ?? getAvailableStock(i.productId);
-        return { ...i, quantity: Math.min(i.quantity, maxQty) };
+        const alreadyUsed = used[i.productId] ?? 0;
+        const quantity = Math.min(i.quantity, Math.max(0, maxQty - alreadyUsed));
+        used[i.productId] = alreadyUsed + quantity;
+        return { ...i, quantity };
       })
       .filter((i) => i.quantity > 0);
   };

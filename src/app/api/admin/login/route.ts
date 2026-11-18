@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, createSessionToken, hashAdminPassword, SESSION_TTL_MS, generateCSRFToken } from "@/lib/admin-auth";
+import {
+  SESSION_COOKIE,
+  createSessionToken,
+  getAdminAuthConfig,
+  hashAdminPassword,
+  isProductionDeployment,
+  SESSION_TTL_MS,
+  generateCSRFToken,
+} from "@/lib/admin-auth";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -25,11 +33,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Password is required" }, { status: 400 });
   }
 
-  const expectedPassword = process.env.ADMIN_PASSWORD ?? "hairluxe-demo";
-  if (!process.env.ADMIN_PASSWORD) {
+  const config = getAdminAuthConfig();
+  if (!config) {
+    return NextResponse.json(
+      {
+        error:
+          "Admin login is not configured. Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET in the deployment environment.",
+      },
+      { status: 503 }
+    );
+  }
+
+  if (!isProductionDeployment() && !process.env.ADMIN_PASSWORD) {
     console.warn("[admin] Using demo admin password - set ADMIN_PASSWORD for production use");
   }
 
+  const expectedPassword = config.password;
   const [submittedHash, expectedHash] = await Promise.all([
     hashAdminPassword(password),
     hashAdminPassword(expectedPassword),
