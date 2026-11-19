@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/context/CartContext";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -12,6 +12,13 @@ export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [sendError, setSendError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const feedbackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!sent && !sendError) return;
+    feedbackRef.current?.focus();
+    feedbackRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [sent, sendError]);
 
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -22,10 +29,12 @@ export default function ContactPage() {
       return next;
     });
     setSendError("");
+    setSent(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSent(false);
     const nextErrors: Record<string, string> = {};
     if (!form.name.trim()) nextErrors.name = "Required";
     if (!EMAIL_PATTERN.test(form.email.trim())) nextErrors.email = "Enter a valid email";
@@ -58,7 +67,6 @@ export default function ContactPage() {
       if (res.ok && data?.ok !== false) {
         setSent(true);
         setForm({ name: "", email: "", phone: "", subject: "", message: "", website: "" });
-        setTimeout(() => setSent(false), 5000);
       } else {
         setSendError(
           res.status === 429
@@ -284,14 +292,18 @@ export default function ContactPage() {
                 )}
               </label>
 
-              {sent && (
-                <div className="rounded-md bg-success-soft border border-success/30 px-4 py-3 text-sm text-success mb-4">
-                  Message sent! We&apos;ll get back to you within 24 hours.
-                </div>
-              )}
-              {sendError && (
-                <div className="rounded-md bg-danger-soft border border-danger/30 px-4 py-3 text-sm text-danger mb-4">
-                  {sendError}
+              {(sent || sendError) && (
+                <div ref={feedbackRef} tabIndex={-1} role="status" aria-live="polite" className="mb-4">
+                  {sent && (
+                    <div className="rounded-md bg-success-soft border border-success/30 px-4 py-3 text-sm text-success">
+                      Message sent! We&apos;ll get back to you within 24 hours.
+                    </div>
+                  )}
+                  {sendError && (
+                    <div role="alert" className="rounded-md bg-danger-soft border border-danger/30 px-4 py-3 text-sm text-danger">
+                      {sendError}
+                    </div>
+                  )}
                 </div>
               )}
 

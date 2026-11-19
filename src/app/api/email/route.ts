@@ -46,12 +46,16 @@ export async function POST(request: NextRequest) {
     message: body.message.trim(),
   });
 
-  return NextResponse.json(
-    {
-      ok: result.ok,
-      status: result.status,
-      error: result.ok ? undefined : "Message accepted, but the email notification could not be sent.",
-    },
-    { status: result.ok ? 200 : 200 }
-  );
+  if (!result.ok) {
+    console.error(`[contact] Failed to send contact email (status ${result.status ?? "unknown"}).`);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "We couldn't send your message right now. Please try again or call us.",
+      },
+      { status: 502 }
+    );
+  }
+
+  return NextResponse.json({ ok: true });
 }
